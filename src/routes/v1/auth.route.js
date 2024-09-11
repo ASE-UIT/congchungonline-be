@@ -1,10 +1,18 @@
 const express = require('express');
+const passport = require('passport');
 const validate = require('../../middlewares/validate');
 const authValidation = require('../../validations/auth.validation');
 const authController = require('../../controllers/auth.controller');
 const auth = require('../../middlewares/auth');
 
 const router = express.Router();
+
+/**
+ * @swagger
+ * tags:
+ *   name: Auth
+ *   description: Authentication
+ */
 
 router.post('/register', validate(authValidation.register), authController.register);
 router.post('/login', validate(authValidation.login), authController.login);
@@ -15,6 +23,13 @@ router.post('/reset-password', validate(authValidation.resetPassword), authContr
 router.post('/send-verification-email', auth(), authController.sendVerificationEmail);
 router.post('/verify-email', validate(authValidation.verifyEmail), authController.verifyEmail);
 
+// Google OAuth2 routes
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get(
+  '/google/callback',
+  passport.authenticate('google', { failureRedirect: '/login', session: false }),
+  authController.loginWithGoogle
+);
 module.exports = router;
 
 /**
@@ -288,4 +303,36 @@ module.exports = router;
  *             example:
  *               code: 401
  *               message: verify email failed
+ */
+/**
+ * @swagger
+ * /auth/google:
+ *   get:
+ *     summary: Google OAuth2 authentication
+ *     tags: [Auth]
+ *     responses:
+ *       "302":
+ *         description: Redirect to Google OAuth2 authorization page
+ */
+
+/**
+ * @swagger
+ * /auth/google/callback:
+ *   get:
+ *     summary: Google OAuth2 callback
+ *     tags: [Auth]
+ *     responses:
+ *       "200":
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *                 tokens:
+ *                   $ref: '#/components/schemas/AuthTokens'
+ *       "401":
+ *         $ref: '#/components/responses/Unauthorized'
  */

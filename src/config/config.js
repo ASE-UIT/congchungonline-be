@@ -61,4 +61,9 @@ module.exports = {
     },
     from: envVars.EMAIL_FROM,
   },
+  google: {
+    clientID: envVars.GOOGLE_CLIENT_ID,
+    clientSecret: envVars.GOOGLE_CLIENT_SECRET,
+    callbackUrl: envVars.GOOGLE_CALLBACK_URL,
+  },
 };
