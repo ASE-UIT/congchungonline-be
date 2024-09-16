@@ -66,4 +66,7 @@ module.exports = {
     clientSecret: envVars.GOOGLE_CLIENT_SECRET,
     callbackUrl: envVars.GOOGLE_CALLBACK_URL,
   },
+  gemini: {
+    apiKey: envVars.GEMINI_API_KEY,
+  },
 };
