@@ -3,7 +3,7 @@ name: Discord Commit Message
 on:
   push:
     branches:
-      - 'master'
+      - 'main'
 
 jobs:
   discord_message:
