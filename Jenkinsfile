@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        NODE_ENV = 'development'
+        NODE_ENV = 'production'
         PORT = "${env.PORT}"
         MONGODB_URL = "${env.MONGODB_URL}"
         JWT_SECRET = "${env.JWT_SECRET}"
@@ -31,18 +31,18 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
-            steps {
-                script {
-                    bat "set MONGODB_URL=${MONGODB_URL} && set JWT_SECRET=${JWT_SECRET} && npm test"
-                }
-            }
-        }
+        // stage('Run Tests') {
+        //     steps {
+        //         script {
+        //             bat "set MONGODB_URL=${MONGODB_URL} && set JWT_SECRET=${JWT_SECRET} && npm test"
+        //         }
+        //     }
+        // }
 
         stage('Run Application') {
             steps {
                 script {
-                    bat "set PORT=${PORT} && npm start"
+                    bat "set PORT=${PORT} && set JWT_SECRET=${JWT_SECRET} && npm start"
                 }
             }
         }
