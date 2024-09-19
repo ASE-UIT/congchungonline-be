@@ -31,18 +31,18 @@ pipeline {
             }
         }
 
-        // stage('Run Tests') {
-        //     steps {
-        //         script {
-        //             bat "set MONGODB_URL=${MONGODB_URL} && npm test"
-        //         }
-        //     }
-        // }
+        stage('Run Tests') {
+            steps {
+                script {
+                    bat "set MONGODB_URL=${MONGODB_URL} && set JWT_SECRET=${JWT_SECRET} && npm test"
+                }
+            }
+        }
 
         stage('Run Application') {
             steps {
                 script {
-                    bat "set PORT=${PORT} && set JWT_SECRET=${JWT_SECRET} && npm start"
+                    bat "set PORT=${PORT} && npm start"
                 }
             }
         }
