@@ -3,6 +3,10 @@ pipeline {
 
     environment {
         NODE_ENV = 'production'
+        PORT = "${env.PORT}"
+        MONGODB_URL = "${env.MONGODB_URL}"
+        JWT_SECRET = "${env.JWT_SECRET}"
+        GEMINI_API_KEY = "${env.GEMINI_API_KEY}"
     }
 
     stages {
@@ -30,7 +34,7 @@ pipeline {
         // stage('Run Tests') {
         //     steps {
         //         script {
-        //             bat 'npm test'
+        //             bat "set MONGODB_URL=${MONGODB_URL} && npm test"
         //         }
         //     }
         // }
@@ -38,7 +42,7 @@ pipeline {
         stage('Run Application') {
             steps {
                 script {
-                    bat 'npm start'
+                    bat "set PORT=${PORT} && set JWT_SECRET=${JWT_SECRET} && npm start"
                 }
             }
         }
