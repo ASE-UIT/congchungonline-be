@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        NODE_ENV = 'production'
+        NODE_ENV = 'development'
         PORT = "${env.PORT}"
         MONGODB_URL = "${env.MONGODB_URL}"
         JWT_SECRET = "${env.JWT_SECRET}"
