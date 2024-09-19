@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 node:alpine
+FROM --platform=linux/arm64 node:alpine
 
 RUN mkdir -p /usr/src/node-app && chown -R node:node /usr/src/node-app
 
