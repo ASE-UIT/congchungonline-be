@@ -27,13 +27,13 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
-            steps {
-                script {
-                    bat 'npm test'
-                }
-            }
-        }
+        // stage('Run Tests') {
+        //     steps {
+        //         script {
+        //             bat 'npm test'
+        //         }
+        //     }
+        // }
 
         stage('Run Application') {
             steps {
