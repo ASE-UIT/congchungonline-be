@@ -6,6 +6,14 @@ pipeline {
     }
 
     stages {
+        stage('Install Yarn') {
+            steps {
+                script {
+                    bat 'npm install -g yarn'
+                }
+            }
+        }
+
         stage('Checkout') {
             steps {
                 script {
