@@ -3,3 +3,4 @@ module.exports.emailService = require('./email.service');
 module.exports.tokenService = require('./token.service');
 module.exports.userService = require('./user.service');
 module.exports.chatbotService = require('./chatbot.service');
+module.exports.documentService = require('./document.service');
