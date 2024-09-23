@@ -12,6 +12,6 @@ RUN yarn install --pure-lockfile
 
 COPY --chown=node:node . .
 
-EXPOSE 8080
+EXPOSE 3100
 
 CMD ["yarn", "start"]
