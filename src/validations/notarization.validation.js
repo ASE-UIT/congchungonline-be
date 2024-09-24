@@ -5,7 +5,7 @@ const createDocument = {
     files: Joi.object().keys({}),
     notaryService: Joi.string().required(),
     notaryField: Joi.string().required(),
-    requesterInfo: Joi.string().required(), 
+    requesterInfo: Joi.string().required(),
   }),
 };
 
