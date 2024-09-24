@@ -1,4 +1,3 @@
-// services/documentService.js
 const httpStatus = require('http-status');
 const { Document } = require('../models');
 const ApiError = require('../utils/ApiError');
@@ -40,7 +39,7 @@ const createDocument = async (documentBody, files) => {
 
         newDocument.files = formattedFiles;
         await newDocument.save();
-
+        
         return newDocument;
     } catch (error) {
         console.error('Error uploading file:', error.message);
