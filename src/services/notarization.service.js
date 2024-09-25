@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { Document } = require('../models');
+const { Document, StatusTracking } = require('../models');
 const ApiError = require('../utils/ApiError');
 const { bucket } = require('../config/firebase');
 
@@ -39,13 +39,37 @@ const createDocument = async (documentBody, files) => {
     newDocument.files = formattedFiles;
     await newDocument.save();
 
-    return newDocument;
+    const statusTracking = await createStatusTracking(newDocument._id, 'pending');
+
+    return {
+      document: newDocument,
+      statusTracking,
+    };
   } catch (error) {
     console.error('Error uploading file:', error.message);
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to upload file');
   }
 };
 
+const createStatusTracking = async (documentId, status) => { 
+  try {
+    const statusTracking = new StatusTracking({
+      documentId,
+      status,
+      updatedAt: new Date(),
+    });
+
+    await statusTracking.save(); 
+    return statusTracking;
+  } catch (error) {
+    console.error('Error creating status tracking:', error.message);
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to create status tracking');
+  }
+};
+
+
+
 module.exports = {
   createDocument,
+  createStatusTracking
 };
