@@ -66,4 +66,13 @@ module.exports = {
     clientSecret: envVars.GOOGLE_CLIENT_SECRET,
     callbackUrl: envVars.GOOGLE_CALLBACK_URL,
   },
+  firebase: {
+    apiKey: envVars.FIREBASE_API_KEY,
+    authDomain: envVars.FIREBASE_AUTH_DOMAIN,
+    projectId: envVars.FIREBASE_PROJECT_ID,
+    storageBucket: envVars.FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: envVars.FIREBASE_MESSAGING_SENDER_ID,
+    appId: envVars.FIREBASE_APP_ID,
+    measurementId: envVars.FIREBASE_MEASUREMENT_ID,
+  },
 };
