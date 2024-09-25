@@ -1,4 +1,5 @@
 const express = require('express');
+const auth = require('../../middlewares/auth');
 const multer = require('multer');
 const validate = require('../../middlewares/validate');
 const notarizationValidation = require('../../validations/notarization.validation');
@@ -9,14 +10,26 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 /**
  * @swagger
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ *       description: 'JWT authorization header. Use `Bearer <token>` format.'
+ */
+
+/**
+ * @swagger
  * tags:
  *   name: Notarizations
  *   description: Notarization document management API
  */
 
+
 router
   .route('/upload-files')
-  .post(upload.array('files'), validate(notarizationValidation.createDocument), notarizationController.createDocument);
+  .post(auth('uploadDocuments'), upload.array('files'), validate(notarizationValidation.createDocument), notarizationController.createDocument);
 
 /**
  * @swagger
@@ -24,6 +37,8 @@ router
  *   post:
  *     summary: Upload notarization documents
  *     tags: [Notarizations]
+ *     security:
+ *       - bearerAuth: []  
  *     requestBody:
  *       required: true
  *       content:
@@ -75,7 +90,7 @@ router
  *               phoneNumber: 0941788455
  *               email: 123@gmail.com
  *     responses:
- *       "200":
+ *       "201":
  *         description: Documents uploaded successfully
  *         content:
  *           application/json:
@@ -139,5 +154,6 @@ router
  *                   type: string
  *                   example: Failed to upload files
  */
+
 
 module.exports = router;

@@ -6,11 +6,15 @@ const { notarizationService } = require('../services');
 
 const createDocument = catchAsync(async (req, res) => {
     if (typeof req.body.requesterInfo === 'string') {
-            req.body.requesterInfo = JSON.parse(req.body.requesterInfo);}
-    const document = await notarizationService.createDocument(req.body, req.files);
+        req.body.requesterInfo = JSON.parse(req.body.requesterInfo);
+    }
+    
+    const userId = req.user.id; 
+
+    const document = await notarizationService.createDocument({ ...req.body, userId }, req.files);
+    
     res.status(httpStatus.CREATED).send(document);
 });
-
 
 module.exports = {
     createDocument,
