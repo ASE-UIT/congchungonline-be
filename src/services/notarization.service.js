@@ -38,15 +38,15 @@ const createDocument = async (documentBody, files) => {
 
     newDocument.files = formattedFiles;
     await newDocument.save();
-    
-    return newDocument ;
+
+    return newDocument;
   } catch (error) {
     console.error('Error uploading file:', error.message);
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to upload file');
   }
 };
 
-const createStatusTracking = async (documentId, status) => { 
+const createStatusTracking = async (documentId, status) => {
   try {
     const statusTracking = new StatusTracking({
       documentId,
@@ -54,7 +54,7 @@ const createStatusTracking = async (documentId, status) => {
       updatedAt: new Date(),
     });
 
-    await statusTracking.save(); 
+    await statusTracking.save();
     return statusTracking;
   } catch (error) {
     console.error('Error creating status tracking:', error.message);
@@ -62,9 +62,7 @@ const createStatusTracking = async (documentId, status) => {
   }
 };
 
-
-
 module.exports = {
   createDocument,
-  createStatusTracking
+  createStatusTracking,
 };

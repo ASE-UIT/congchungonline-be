@@ -1,6 +1,6 @@
 const express = require('express');
-const auth = require('../../middlewares/auth');
 const multer = require('multer');
+const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
 const notarizationValidation = require('../../validations/notarization.validation');
 const notarizationController = require('../../controllers/notarization.controller');
@@ -26,10 +26,14 @@ const upload = multer({ storage: multer.memoryStorage() });
  *   description: Notarization document management API
  */
 
-
 router
   .route('/upload-files')
-  .post(auth('uploadDocuments'), upload.array('files'), validate(notarizationValidation.createDocument), notarizationController.createDocument);
+  .post(
+    auth('uploadDocuments'),
+    upload.array('files'),
+    validate(notarizationValidation.createDocument),
+    notarizationController.createDocument
+  );
 
 /**
  * @swagger
@@ -38,7 +42,7 @@ router
  *     summary: Upload notarization documents
  *     tags: [Notarizations]
  *     security:
- *       - bearerAuth: []  
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -154,6 +158,5 @@ router
  *                   type: string
  *                   example: Failed to upload files
  */
-
 
 module.exports = router;
