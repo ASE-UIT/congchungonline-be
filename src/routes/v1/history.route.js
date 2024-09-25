@@ -3,6 +3,7 @@ const validate = require('../../middlewares/validate');
 const historyValidation = require('../../validations/history.validation');
 const historyController = require('../../controllers/history.controller');
 const addUUIDToHeader = require('../../middlewares/uuid');
+
 const router = express.Router();
 
 /**

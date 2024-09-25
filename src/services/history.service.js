@@ -1,7 +1,6 @@
-const httpStatus = require('http-status');
+// const httpStatus = require('http-status');
 const { History } = require('../models'); // Import History model
-const ApiError = require('../utils/ApiError');
-
+// const ApiError = require('../utils/ApiError');
 
 /**
  * Get history by UUID
@@ -9,8 +8,8 @@ const ApiError = require('../utils/ApiError');
  * @returns {Promise<History>}
  */
 const getHistoryByUuid = async (uuid) => {
-    const history = await History.findOne({ uuid });
-    return history;
+  const history = await History.findOne({ uuid });
+  return history;
 };
 
 module.exports = {

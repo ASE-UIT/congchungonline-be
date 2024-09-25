@@ -1,53 +1,52 @@
 const moongoose = require('mongoose');
 const { toJSON, paginate } = require('./plugins');
-const { v4: uuidv4 } = require('uuid'); // Import thư viện uuid
 
 const HistorySchema = moongoose.Schema({
-    uuid: {
+  uuid: {
+    type: String,
+    required: true,
+  },
+  files: [
+    {
+      filename: {
         type: String,
         required: true,
-    },
-    files: [{
-        filename: {
-            type: String,
-            required: true,
-            trim: true,
-        },
-        firebaseUrl: {
-            type: String,
-            required: true,
-            trim: true,
-        },
-    }],
-    notaryService: {
+        trim: true,
+      },
+      firebaseUrl: {
         type: String,
-        required: true
+        required: true,
+        trim: true,
+      },
     },
-    notaryField: {
-        type: String,
-        required: true
+  ],
+  notaryService: {
+    type: String,
+    required: true,
+  },
+  notaryField: {
+    type: String,
+    required: true,
+  },
+  requesterInfo: {
+    citizenId: {
+      type: String,
+      required: true,
     },
-    requesterInfo: {
-        citizenId: {
-            type: String,
-            required: true,
-        },
-        phoneNumber: {
-            type: String,
-            required: true,
-        },
-        email: {
-            type: String,
-            required: true,
-        }
+    phoneNumber: {
+      type: String,
+      required: true,
     },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
-})
-
-
+    email: {
+      type: String,
+      required: true,
+    },
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
 
 HistorySchema.plugin(toJSON);
 HistorySchema.plugin(paginate);
