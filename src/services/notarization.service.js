@@ -38,13 +38,8 @@ const createDocument = async (documentBody, files) => {
 
     newDocument.files = formattedFiles;
     await newDocument.save();
-
-    const statusTracking = await createStatusTracking(newDocument._id, 'pending');
-
-    return {
-      document: newDocument,
-      statusTracking,
-    };
+    
+    return newDocument ;
   } catch (error) {
     console.error('Error uploading file:', error.message);
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to upload file');
