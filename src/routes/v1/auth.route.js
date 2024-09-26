@@ -4,6 +4,7 @@ const validate = require('../../middlewares/validate');
 const authValidation = require('../../validations/auth.validation');
 const authController = require('../../controllers/auth.controller');
 const auth = require('../../middlewares/auth');
+const addUUIDToHeader = require('../../middlewares/uuid');
 
 const router = express.Router();
 
@@ -22,6 +23,7 @@ router.post('/forgot-password', validate(authValidation.forgotPassword), authCon
 router.post('/reset-password', validate(authValidation.resetPassword), authController.resetPassword);
 router.post('/send-verification-email', auth(), authController.sendVerificationEmail);
 router.post('/verify-email', validate(authValidation.verifyEmail), authController.verifyEmail);
+router.get('/history',addUUIDToHeader, validate(authValidation.getHistoryByUuid), authController.getHistoryByUuid);
 
 // Google OAuth2 routes
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
@@ -282,6 +284,33 @@ module.exports = router;
  * @swagger
  * /auth/verify-email:
  *   post:
+ *     summary: verify email
+ *     tags: [Auth]
+ *     parameters:
+ *       - in: query
+ *         name: token
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The verify email token
+ *     responses:
+ *       "204":
+ *         description: No content
+ *       "401":
+ *         description: verify email failed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               code: 401
+ *               message: verify email failed
+ */
+
+/**
+ * @swagger
+ * /auth/history:
+ *   get:
  *     summary: verify email
  *     tags: [Auth]
  *     parameters:

@@ -2,7 +2,7 @@ const express = require('express');
 const authRoute = require('./auth.route');
 const userRoute = require('./user.route');
 const docsRoute = require('./docs.route');
-const historyRoute = require('./history.route');
+//const historyRoute = require('./history.route');
 const chatbotRoute = require('./chatbot.route');
 const notarizationRoute = require('./notarization.route');
 const config = require('../../config/config');
@@ -19,10 +19,10 @@ const defaultRoutes = [
     path: '/users',
     route: userRoute,
   },
-  {
-    path: '/history',
-    route: historyRoute,
-  },
+  // {
+  //   path: '/history',
+  //   route: historyRoute,
+  // },
   {
     path: '/chatbot',
     route: chatbotRoute,

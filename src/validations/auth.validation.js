@@ -49,6 +49,12 @@ const verifyEmail = {
   }),
 };
 
+const getHistoryByUuid = {
+  headers: Joi.object().keys({
+    'x-request-id': Joi.string().required(),
+  }),
+};
+
 module.exports = {
   register,
   login,
@@ -57,4 +63,5 @@ module.exports = {
   forgotPassword,
   resetPassword,
   verifyEmail,
+  getHistoryByUuid,
 };
