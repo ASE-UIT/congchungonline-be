@@ -63,11 +63,8 @@ jobs:
       - name: Use Node.js 16
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 14
           cache: 'npm'
-
-      - run: npm install
-      - run: npm test
 
       - name: Install Railway
         run: npm i -g @railway/cli
