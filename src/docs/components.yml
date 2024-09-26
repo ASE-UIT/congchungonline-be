@@ -47,6 +47,37 @@ components:
         message:
           type: string
 
+    Notarizations:
+      type: object
+      properties:
+        files:
+          type: array
+          items:
+            type: object
+            properties:
+              filename:
+                type: string
+              firebaseUrl:
+                type: string
+        notaryService:
+          type: string
+        notaryField:
+          type: string
+        requesterInfo:
+          type: object
+          properties:
+            citizenId:
+              type: string
+            phoneNumber:
+              type: string
+            email:
+              type: string
+        userId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
   responses:
     DuplicateEmail:
       description: Email already taken
@@ -84,6 +115,24 @@ components:
           example:
             code: 404
             message: Not found
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: 400
+            message: Bad request
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: 500
+            message: Internal server error
 
   securitySchemes:
     bearerAuth:

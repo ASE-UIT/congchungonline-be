@@ -68,13 +68,13 @@ const getHistoryByUserId = async (userId) => {
 
 const getDocumenntStatus = async (documentId) => {
   try {
-    const statusTracking = await StatusTracking.findOne({ 'documentId': documentId });
+    const statusTracking = await StatusTracking.findOne({ documentId });
     return statusTracking;
   } catch (error) {
     console.log(error);
-    throw error; // Nếu muốn truyền lỗi lên cho các hàm gọi xử lý
+    throw error;
   }
-}
+};
 
 module.exports = {
   createDocument,

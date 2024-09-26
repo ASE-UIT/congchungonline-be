@@ -238,8 +238,7 @@ router.route('/getStatusById/:documentId').get(notarizationController.getDocumen
  * @swagger
  * /notarization/getStatusById/{documentId}:
  *   get:
- *     summary: Get a document
- *     description:
+ *     summary: Get the status of a document by ID
  *     tags: [Notarizations]
  *     parameters:
  *       - in: path
@@ -247,22 +246,22 @@ router.route('/getStatusById/:documentId').get(notarizationController.getDocumen
  *         required: true
  *         schema:
  *           type: string
- *         description: documentId
+ *         description: ID of the document to retrieve status
  *     responses:
  *       "200":
- *         description: OK
+ *         description: Document status retrieved successfully
  *         content:
  *           application/json:
  *             schema:
- *                $ref: '#/components/schemas/Notarizations'
+ *               $ref: '#/components/schemas/Notarizations'
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
  *         $ref: '#/components/responses/Forbidden'
  *       "404":
  *         $ref: '#/components/responses/NotFound'
- *      "500":
- *        $ref: '#/components/responses/InternalServerError'
+ *       "500":
+ *         $ref: '#/components/responses/InternalServerError'
  */
 
 module.exports = router;
