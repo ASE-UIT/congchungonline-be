@@ -18,6 +18,7 @@ const defaultRoutes = [
     path: '/users',
     route: userRoute,
   },
+
   {
     path: '/chatbot',
     route: chatbotRoute,

@@ -2,6 +2,7 @@ const httpStatus = require('http-status');
 const tokenService = require('./token.service');
 const userService = require('./user.service');
 const Token = require('../models/token.model');
+const { Document } = require('../models');
 const ApiError = require('../utils/ApiError');
 const { tokenTypes } = require('../config/tokens');
 
@@ -90,10 +91,31 @@ const verifyEmail = async (verifyEmailToken) => {
   }
 };
 
+/**
+ * Get history by UUID
+ * @param {string} userId - UUID of the history
+ * @returns {Promise<History>}
+ */
+const getHistoryByUuid = async (userId) => {
+  try {
+    const history = await Document.findOne({ userId });
+    if (!history) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'History not found');
+    }
+    return history;
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'The error occurred while retrieving the history');
+  }
+};
+
 module.exports = {
   loginUserWithEmailAndPassword,
   logout,
   refreshAuth,
   resetPassword,
   verifyEmail,
+  getHistoryByUuid,
 };
