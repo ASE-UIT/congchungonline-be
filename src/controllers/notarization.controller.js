@@ -45,10 +45,21 @@ const getDocumentStatus = async (req, res) => {
   try {
     const documentId = req.params['documentId'];
     console.log('documentId:', documentId);
+
+    // Gọi service để lấy trạng thái của document
     const status = await notarizationService.getDocumenntStatus(documentId);
+
+    // Kiểm tra nếu document không tồn tại
+    if (!status) {
+      return res.status(404).json({ code: 404, message: "Notarizations does not exist in document" });
+    }
+
+    // Trả về dữ liệu nếu document tồn tại
     res.json(status);
   } catch (error) {
-    console.log(error)
+    console.log(error);
+    // Trả về mã lỗi 500 nếu có lỗi xảy ra
+    res.status(500).json({ code: 500, message: "Internal Server Error" });
   }
 }
 
