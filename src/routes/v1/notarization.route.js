@@ -234,4 +234,34 @@ router
  *         $ref: '#/components/responses/Unauthorized'
  */
 
+/**
+ * @swagger
+ * /notarization/get-status-by-id/{documentId}:
+ *   get:
+ *     summary: Get a document
+ *     description: 
+ *     tags: [Notarizations]
+ *     parameters:
+ *       - in: path
+ *         name: documentId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: documentId
+ *     responses:
+ *       "200":
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *                $ref: '#/components/schemas/Notarizations'
+ *       "401":
+ *         $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         $ref: '#/components/responses/Forbidden'
+ *       "404":
+ *         $ref: '#/components/responses/NotFound'
+ *
+*/
+
 module.exports = router;
