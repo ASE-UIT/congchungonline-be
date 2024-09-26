@@ -4,10 +4,25 @@ on:
   push:
     branches:
       - '**'
+  pull_request:
+    branches:
+      - main
+
 jobs:
+  check-branch:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Check if the branch is up to date with main
+        run: |
+          git fetch origin main
+          if ! git diff --exit-code origin/main; then
+            echo "Your branch is out of date with main. Please merge main into your branch before pushing."
+            exit 1
+          fi
+
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
