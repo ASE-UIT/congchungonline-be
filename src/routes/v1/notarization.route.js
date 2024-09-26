@@ -64,7 +64,8 @@ router
     validate(notarizationValidation.getHistoryByUserId),
     notarizationController.getHistoryByUserId
   );
-
+router
+  .route('/get-status-by-id/:documentId').get(notarizationController.getDocumentStatus)
 /**
  * @swagger
  * /notarization/upload-files:

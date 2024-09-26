@@ -41,7 +41,19 @@ const getHistoryByUserId = catchAsync(async (req, res) => {
   res.send(history);
 });
 
+const getDocumentStatus = async (req, res) => {
+  try {
+    const documentId = req.params['documentId'];
+    console.log('documentId:', documentId);
+    const status = await notarizationService.getDocumenntStatus(documentId);
+    res.json(status);
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 module.exports = {
   createDocument,
   getHistoryByUserId,
+  getDocumentStatus,
 };
