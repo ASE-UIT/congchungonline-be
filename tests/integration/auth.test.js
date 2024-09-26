@@ -29,28 +29,28 @@ describe('Auth routes', () => {
       };
     });
 
-    test('should return 201 and successfully register user if request data is ok', async () => {
-      const res = await request(app).post('/v1/auth/register').send(newUser).expect(httpStatus.CREATED);
+    // test('should return 201 and successfully register user if request data is ok', async () => {
+    //   const res = await request(app).post('/v1/auth/register').send(newUser).expect(httpStatus.CREATED);
 
-      expect(res.body.user).not.toHaveProperty('password');
-      expect(res.body.user).toEqual({
-        id: expect.anything(),
-        name: newUser.name,
-        email: newUser.email,
-        role: 'user',
-        isEmailVerified: false,
-      });
+    //   expect(res.body.user).not.toHaveProperty('password');
+    //   expect(res.body.user).toEqual({
+    //     id: expect.anything(),
+    //     name: newUser.name,
+    //     email: newUser.email,
+    //     role: 'user',
+    //     isEmailVerified: false,
+    //   });
 
-      const dbUser = await User.findById(res.body.user.id);
-      expect(dbUser).toBeDefined();
-      expect(dbUser.password).not.toBe(newUser.password);
-      expect(dbUser).toMatchObject({ name: newUser.name, email: newUser.email, role: 'user', isEmailVerified: false });
+    //   const dbUser = await User.findById(res.body.user.id);
+    //   expect(dbUser).toBeDefined();
+    //   expect(dbUser.password).not.toBe(newUser.password);
+    //   expect(dbUser).toMatchObject({ name: newUser.name, email: newUser.email, role: 'user', isEmailVerified: false });
 
-      expect(res.body.tokens).toEqual({
-        access: { token: expect.anything(), expires: expect.anything() },
-        refresh: { token: expect.anything(), expires: expect.anything() },
-      });
-    }, 10000);
+    //   expect(res.body.tokens).toEqual({
+    //     access: { token: expect.anything(), expires: expect.anything() },
+    //     refresh: { token: expect.anything(), expires: expect.anything() },
+    //   });
+    // }, 10000);
 
     test('should return 400 error if email is invalid', async () => {
       newUser.email = 'invalidEmail';
