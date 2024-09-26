@@ -9,4 +9,10 @@ const createDocument = {
   }),
 };
 
-module.exports = { createDocument };
+const getHistoryByUserId = {
+  headers: Joi.object().keys({
+    userId: Joi.string().required(),
+  }),
+};
+
+module.exports = { createDocument, getHistoryByUserId };

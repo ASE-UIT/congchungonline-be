@@ -1,6 +1,4 @@
 const httpStatus = require('http-status');
-const pick = require('../utils/pick');
-const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const { notarizationService } = require('../services');
 const { sendEmail } = require('../services/email.service');
@@ -37,6 +35,13 @@ const createDocument = catchAsync(async (req, res) => {
   res.status(httpStatus.CREATED).send(document);
 });
 
+const getHistoryByUserId = catchAsync(async (req, res) => {
+  const userId = req.user.id;
+  const history = await notarizationService.getHistoryByUserId(userId);
+  res.send(history);
+});
+
 module.exports = {
   createDocument,
+  getHistoryByUserId,
 };

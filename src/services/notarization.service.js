@@ -62,7 +62,12 @@ const createStatusTracking = async (documentId, status) => {
   }
 };
 
+const getHistoryByUserId = async (userId) => {
+  return Document.find({ userId });
+};
+
 module.exports = {
   createDocument,
   createStatusTracking,
+  getHistoryByUserId,
 };

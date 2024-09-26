@@ -4,7 +4,6 @@ const validate = require('../../middlewares/validate');
 const authValidation = require('../../validations/auth.validation');
 const authController = require('../../controllers/auth.controller');
 const auth = require('../../middlewares/auth');
-const addUUIDToHeader = require('../../middlewares/uuid');
 
 const router = express.Router();
 
@@ -23,7 +22,6 @@ router.post('/forgot-password', validate(authValidation.forgotPassword), authCon
 router.post('/reset-password', validate(authValidation.resetPassword), authController.resetPassword);
 router.post('/send-verification-email', auth(), authController.sendVerificationEmail);
 router.post('/verify-email', validate(authValidation.verifyEmail), authController.verifyEmail);
-router.get('/history',addUUIDToHeader, validate(authValidation.getHistoryByUuid), authController.getHistoryByUuid);
 
 // Google OAuth2 routes
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
@@ -307,31 +305,6 @@ module.exports = router;
  *               message: verify email failed
  */
 
-/**
- * @swagger
- * /auth/history:
- *   get:
- *     summary: Retrieve history by UUID
- *     tags: [Auth]
- *     parameters:
- *       - in: header
- *         name: x-request-id
- *         schema:
- *           type: string
- *         required: true
- *         description: The UUID of the notarization record to look up
- *     responses:
- *       "200":
- *         description: Notarization history details
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/History'
- *       "400":
- *         $ref: '#/components/responses/BadRequest'
- *       "401":
- *         $ref: '#/components/responses/Unauthorized'
- */
 /**
  * @swagger
  * /auth/google:

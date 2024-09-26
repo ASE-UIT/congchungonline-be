@@ -1,6 +1,6 @@
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
-const { authService, userService, tokenService, emailService, historyService } = require('../services');
+const { authService, userService, tokenService, emailService } = require('../services');
 const { auth, db } = require('../config/firebase'); // Import auth from firebase.js
 
 const register = catchAsync(async (req, res) => {
@@ -96,12 +96,6 @@ const loginWithGoogle = catchAsync(async (req, res) => {
   res.send({ user, tokens });
 });
 
-const getHistoryByUuid = catchAsync(async (req, res) => {
-  const uuid  = req.uuid;
-  const result = await authService.getHistoryByUuid(uuid);  
-  res.send(result);
-});
-
 module.exports = {
   register,
   login,
@@ -111,6 +105,5 @@ module.exports = {
   resetPassword,
   sendVerificationEmail,
   verifyEmail,
-  getHistoryByUuid,
   loginWithGoogle,
 };

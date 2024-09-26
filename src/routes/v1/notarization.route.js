@@ -17,6 +17,28 @@ const upload = multer({ storage: multer.memoryStorage() });
  *       scheme: bearer
  *       bearerFormat: JWT
  *       description: 'JWT authorization header. Use `Bearer <token>` format.'
+ *
+ *   responses:
+ *     BadRequest:
+ *       description: Bad Request
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               message:
+ *                 type: string
+ *                 example: Invalid request parameters
+ *     Unauthorized:
+ *       description: Unauthorized access
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               message:
+ *                 type: string
+ *                 example: Unauthorized
  */
 
 /**
@@ -33,6 +55,14 @@ router
     upload.array('files'),
     validate(notarizationValidation.createDocument),
     notarizationController.createDocument
+  );
+
+router
+  .route('/history')
+  .get(
+    auth('viewNotarizationHistory'),
+    validate(notarizationValidation.getHistoryByUserId),
+    notarizationController.getHistoryByUserId
   );
 
 /**
@@ -157,6 +187,50 @@ router
  *                 message:
  *                   type: string
  *                   example: Failed to upload files
+ */
+
+/**
+ * @swagger
+ * /notarization/history:
+ *   get:
+ *     summary: Retrieve notarization history by UUID
+ *     tags: [Notarizations]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       "200":
+ *         description: Notarization history details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   description: ID of the created document
+ *                   example: 66f1818416c9ba1bfc053c3c
+ *                 notaryService:
+ *                   type: string
+ *                   example: Vay-Mượn Tài Sản
+ *                 notaryField:
+ *                   type: string
+ *                   example: Vay mượn
+ *                 requesterInfo:
+ *                   type: object
+ *                   properties:
+ *                     citizenId:
+ *                       type: string
+ *                       example: 123456789012
+ *                     phoneNumber:
+ *                       type: string
+ *                       example: 0941788455
+ *                     email:
+ *                       type: string
+ *                       example: 123@gmail.com
+ *       "400":
+ *         $ref: '#/components/responses/BadRequest'
+ *       "401":
+ *         $ref: '#/components/responses/Unauthorized'
  */
 
 module.exports = router;
