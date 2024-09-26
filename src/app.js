@@ -13,8 +13,32 @@ const { authLimiter } = require('./middlewares/rateLimiter');
 const routes = require('./routes/v1');
 const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 
 const app = express();
+
+// Swagger definition
+const swaggerDefinition = {
+  openapi: '3.0.0',
+  info: {
+    title: 'API Documentation',
+    version: '1.0.0',
+    description: 'API documentation for your project',
+  },
+  servers: [
+    {
+      url: `http://localhost:${config.port}/v1`, // URL của API
+    },
+  ],
+};
+
+const swaggerOptions = {
+  swaggerDefinition,
+  apis: ['./src/routes/v1/*.js'], // Đường dẫn tới các file route của bạn (có thể chỉnh sửa theo đường dẫn của bạn)
+};
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
 if (config.env !== 'test') {
   app.use(morgan.successHandler);
@@ -52,6 +76,9 @@ if (config.env === 'production') {
 
 // v1 api routes
 app.use('/v1', routes);
+
+// Swagger UI setup
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {

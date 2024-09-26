@@ -98,7 +98,7 @@ const loginWithGoogle = catchAsync(async (req, res) => {
 
 const getHistoryByUuid = catchAsync(async (req, res) => {
   const uuid  = req.uuid;
-  const result = await historyService.getHistoryByUuid(uuid);  
+  const result = await authService.getHistoryByUuid(uuid);  
   res.send(result);
 });
 

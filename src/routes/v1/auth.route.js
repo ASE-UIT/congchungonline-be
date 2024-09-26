@@ -311,27 +311,26 @@ module.exports = router;
  * @swagger
  * /auth/history:
  *   get:
- *     summary: verify email
+ *     summary: Retrieve history by UUID
  *     tags: [Auth]
  *     parameters:
- *       - in: query
- *         name: token
- *         required: true
+ *       - in: header
+ *         name: x-request-id
  *         schema:
  *           type: string
- *         description: The verify email token
+ *         required: true
+ *         description: The UUID of the notarization record to look up
  *     responses:
- *       "204":
- *         description: No content
- *       "401":
- *         description: verify email failed
+ *       "200":
+ *         description: Notarization history details
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Error'
- *             example:
- *               code: 401
- *               message: verify email failed
+ *               $ref: '#/components/schemas/History'
+ *       "400":
+ *         $ref: '#/components/responses/BadRequest'
+ *       "401":
+ *         $ref: '#/components/responses/Unauthorized'
  */
 /**
  * @swagger
