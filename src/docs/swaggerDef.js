@@ -16,67 +16,6 @@ const swaggerDef = {
       url: `http://localhost:${config.port}/v1`,
     },
   ],
-  components: {
-    schemas: {
-      Notarizations: {
-        type: 'object',
-        properties: {
-          files: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                filename: {
-                  type: 'string',
-                },
-                firebaseUrl: {
-                  type: 'string',
-                },
-              },
-            },
-          },
-          notaryService: {
-            type: 'string',
-          },
-          notaryField: {
-            type: 'string',
-          },
-          requesterInfo: {
-            type: 'object',
-            properties: {
-              citizenId: {
-                type: 'string',
-              },
-              phoneNumber: {
-                type: 'string',
-              },
-              email: {
-                type: 'string',
-              },
-            },
-          },
-          userId: {
-            type: 'string',
-          },
-          createdAt: {
-            type: 'string',
-            format: 'date-time',
-          },
-        },
-      },
-    },
-    responses: {
-      Unauthorized: {
-        description: 'Unauthorized',
-      },
-      Forbidden: {
-        description: 'Forbidden',
-      },
-      NotFound: {
-        description: 'Not Found',
-      },
-    },
-  },
 };
 
 module.exports = swaggerDef;

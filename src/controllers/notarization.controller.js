@@ -43,7 +43,7 @@ const getHistoryByUserId = catchAsync(async (req, res) => {
 
 const getDocumentStatus = async (req, res) => {
   try {
-    const documentId = req.params['documentId'];
+    const { documentId } = req.params;
     console.log('documentId:', documentId);
 
     // Gọi service để lấy trạng thái của document
@@ -51,7 +51,7 @@ const getDocumentStatus = async (req, res) => {
 
     // Kiểm tra nếu document không tồn tại
     if (!status) {
-      return res.status(404).json({ code: 404, message: "Notarizations does not exist in document" });
+      return res.status(404).json({ code: 404, message: 'Notarizations does not exist in document' });
     }
 
     // Trả về dữ liệu nếu document tồn tại
@@ -59,9 +59,9 @@ const getDocumentStatus = async (req, res) => {
   } catch (error) {
     console.log(error);
     // Trả về mã lỗi 500 nếu có lỗi xảy ra
-    res.status(500).json({ code: 500, message: "Internal Server Error" });
+    res.status(500).json({ code: 500, message: 'Internal Server Error' });
   }
-}
+};
 
 module.exports = {
   createDocument,
