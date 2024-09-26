@@ -65,6 +65,7 @@ router
     notarizationController.getHistoryByUserId
   );
 
+router.route('/getStatusById/:documentId').get(notarizationController.getDocumentStatus);
 /**
  * @swagger
  * /notarization/upload-files:
@@ -231,6 +232,37 @@ router
  *         $ref: '#/components/responses/BadRequest'
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
+ */
+
+/**
+ * @swagger
+ * /notarization/getStatusById/{documentId}:
+ *   get:
+ *     summary: Get a document
+ *     description:
+ *     tags: [Notarizations]
+ *     parameters:
+ *       - in: path
+ *         name: documentId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: documentId
+ *     responses:
+ *       "200":
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *                $ref: '#/components/schemas/Notarizations'
+ *       "401":
+ *         $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         $ref: '#/components/responses/Forbidden'
+ *       "404":
+ *         $ref: '#/components/responses/NotFound'
+ *      "500":
+ *        $ref: '#/components/responses/InternalServerError'
  */
 
 module.exports = router;
