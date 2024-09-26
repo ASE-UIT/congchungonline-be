@@ -67,19 +67,31 @@ const verifyEmail = catchAsync(async (req, res) => {
 const loginWithGoogle = catchAsync(async (req, res) => {
   const { user } = req;
   const tokens = await tokenService.generateAuthTokens(user);
-  // Create user in Firebase
-  const firebaseUser = await auth.createUser({
-    email: user.email,
-    password: user.password,
-  });
-  db.ref(`users/${firebaseUser.uid}`).set({
-    role: 'user',
-    name: user.name,
-    email: user.email,
-    password: user.password,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  });
+
+  let firebaseUser;
+  try {
+    firebaseUser = await auth.getUserByEmail(user.email);
+    console.log('User already exists in Firebase:', firebaseUser.uid);
+  } catch (error) {
+    if (error.code === 'auth/user-not-found') {
+      firebaseUser = await auth.createUser({
+        email: user.email,
+        password: user.password,
+      });
+      console.log('User created in Firebase:', firebaseUser.uid);
+
+      await db.ref(`users/${firebaseUser.uid}`).set({
+        role: 'user',
+        name: user.name,
+        email: user.email,
+        password: user.password,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+    } else {
+      throw error;
+    }
+  }
 
   res.send({ user, tokens });
 });
