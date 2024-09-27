@@ -6,7 +6,8 @@ const chatbot = async (req, res) => {
     const response = await chatbotService.chat(prompt);
     res.send({ message: response });
   } catch (error) {
-    res.status(500).send(error);
+    console.error('An error occurred:', error);
+    res.status(500).send({ error: 'Internal Server Error' });
   }
 };
 
