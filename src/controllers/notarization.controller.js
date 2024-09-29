@@ -1,67 +1,72 @@
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
-const { notarizationService } = require('../services');
-const { sendEmail } = require('../services/email.service');
+const { notarizationService, emailService } = require('../services');
 
-const isValidEmail = (email) => {
-  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return regex.test(email);
-};
+// Utility function to validate email format
+const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-const createDocument = catchAsync(async (req, res) => {
-  if (typeof req.body.requesterInfo === 'string') {
-    req.body.requesterInfo = JSON.parse(req.body.requesterInfo);
-  }
+// Helper function to handle email sending logic
+const sendDocumentCreationEmail = async (email, documentId) => {
+  const subject = 'Tài liệu đã được tạo';
+  const message = `Tài liệu của bạn với ID: ${documentId} đã được tạo thành công.`;
 
-  const userId = req.user.id;
-
-  const document = await notarizationService.createDocument({ ...req.body, userId }, req.files);
-  const statusTracking = await notarizationService.createStatusTracking(document._id, 'pending');
-
-  if (!isValidEmail(req.body.requesterInfo.email)) {
-    return res.status(400).send({ message: 'Invalid email address' });
-  }
   try {
-    await sendEmail(
-      req.body.requesterInfo.email,
-      'Tài liệu đã được tạo',
-      `Tài liệu của bạn với ID: ${document._id} đã được tạo thành công.`
-    );
+    await emailService.sendEmail(email, subject, message);
   } catch (error) {
     console.error('Error sending email:', error);
-    return res.status(500).send({ message: 'Document created, but failed to send email notification.' });
+    throw new Error('Failed to send email notification.');
+  }
+};
+
+// Controller function to create a document
+const createDocument = catchAsync(async (req, res) => {
+  const { requesterInfo } = req.body;
+  const userId = req.user.id;
+
+  if (typeof requesterInfo === 'string') {
+    req.body.requesterInfo = JSON.parse(requesterInfo);
+  }
+
+  if (!isValidEmail(req.body.requesterInfo.email)) {
+    return res.status(httpStatus.BAD_REQUEST).send({ message: 'Invalid email address' });
+  }
+
+  const document = await notarizationService.createDocument({ ...req.body, userId }, req.files);
+  await notarizationService.createStatusTracking(document._id, 'pending');
+
+  try {
+    await sendDocumentCreationEmail(req.body.requesterInfo.email, document._id);
+  } catch (error) {
+    return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+      message: 'Document created, but failed to send email notification.',
+    });
   }
 
   res.status(httpStatus.CREATED).send(document);
 });
 
+// Controller function to get history by user ID
 const getHistoryByUserId = catchAsync(async (req, res) => {
   const userId = req.user.id;
   const history = await notarizationService.getHistoryByUserId(userId);
-  res.send(history);
+  res.status(httpStatus.OK).send(history);
 });
 
-const getDocumentStatus = async (req, res) => {
-  try {
-    const { documentId } = req.params;
-    console.log('documentId:', documentId);
+// Controller function to get document status by document ID
+const getDocumentStatus = catchAsync(async (req, res) => {
+  const { documentId } = req.params;
 
-    // Gọi service để lấy trạng thái của document
-    const status = await notarizationService.getDocumenntStatus(documentId);
+  const status = await notarizationService.getDocumentStatus(documentId);
 
-    // Kiểm tra nếu document không tồn tại
-    if (!status) {
-      return res.status(404).json({ code: 404, message: 'Notarizations does not exist in document' });
-    }
-
-    // Trả về dữ liệu nếu document tồn tại
-    res.json(status);
-  } catch (error) {
-    console.log(error);
-    // Trả về mã lỗi 500 nếu có lỗi xảy ra
-    res.status(500).json({ code: 500, message: 'Internal Server Error' });
+  if (!status) {
+    return res.status(httpStatus.NOT_FOUND).json({
+      code: httpStatus.NOT_FOUND,
+      message: 'Notarizations does not exist in document',
+    });
   }
-};
+
+  res.status(httpStatus.OK).json(status);
+});
 
 module.exports = {
   createDocument,
