@@ -1,7 +1,7 @@
 const passport = require('passport');
 const httpStatus = require('http-status');
 const ApiError = require('../utils/ApiError');
-const { roleRights } = require('../config/roles');
+const { getPermissionsByRoleName } = require('../config/roles');
 
 const verifyCallback = (req, resolve, reject, requiredRights) => async (err, user, info) => {
   if (err || info || !user) {
@@ -10,10 +10,16 @@ const verifyCallback = (req, resolve, reject, requiredRights) => async (err, use
   req.user = user;
 
   if (requiredRights.length) {
-    const userRights = roleRights.get(user.role);
-    const hasRequiredRights = requiredRights.every((requiredRight) => userRights.includes(requiredRight));
-    if (!hasRequiredRights && req.params.userId !== user.id) {
-      return reject(new ApiError(httpStatus.FORBIDDEN, 'Forbidden'));
+    try {
+      const userPermissions = await getPermissionsByRoleName(user.role);
+
+      const hasRequiredRights = requiredRights.every((requiredRight) => userPermissions.includes(requiredRight));
+      if (!hasRequiredRights && req.params.userId !== user.id) {
+        return reject(new ApiError(httpStatus.FORBIDDEN, 'Forbidden'));
+      }
+    } catch (error) {
+      console.error('Error fetching role permissions:', error);
+      return reject(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Error fetching role permissions'));
     }
   }
 

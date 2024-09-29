@@ -78,6 +78,19 @@ components:
           type: string
           format: date-time
 
+    Role:
+      type: object
+      properties:
+        name:
+          type: string
+        permissions:
+          type: array
+          items:
+            type: string
+      example:
+        name: 'user'
+        permissions: ['viewNotarizationHistory', 'uploadDocuments']
+
   responses:
     DuplicateEmail:
       description: Email already taken
