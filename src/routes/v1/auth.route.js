@@ -85,6 +85,8 @@ module.exports = router;
  *                   $ref: '#/components/schemas/AuthTokens'
  *       "400":
  *         $ref: '#/components/responses/DuplicateEmail'
+ *       "403":
+ *         $ref: '#/components/responses/Forbidden'
  */
 
 /**
