@@ -5,3 +5,5 @@ module.exports.userService = require('./user.service');
 module.exports.notarizationService = require('./notarization.service');
 module.exports.chatbotService = require('./chatbot.service');
 module.exports.roleService = require('./role.service');
+module.exports.notarizationFieldService = require('./notarizationField.service')
+module.exports.notarizationServiceService = require('./notarizationService.service')
