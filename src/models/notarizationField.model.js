@@ -14,6 +14,4 @@ notarizationFieldSchema.plugin(toJSON);
 notarizationFieldSchema.plugin(paginate);
 
 
-const NotarizationField = mongoose.model('NotarizationFields', notarizationFieldSchema);
-
-module.exports = NotarizationField;
+module.exports = mongoose.model('NotarizationFields', notarizationFieldSchema);

@@ -13,9 +13,9 @@ const getNotarizationField = catchAsync(async (req, res) => {
 });
 
 const getAllNotarizationFields = catchAsync(async (req, res) => {
-    const notarizationFields = await notarizationFieldService.getAllNotarizationFields();
-    res.status(httpStatus.OK).send(notarizationFields);
-  });
+  const notarizationFields = await notarizationFieldService.getAllNotarizationFields();
+  res.status(httpStatus.OK).send(notarizationFields);
+});
 
 const updateNotarizationField = catchAsync(async (req, res) => {
   const notarizationField = await notarizationFieldService.updateNotarizationFieldById(req.params.id, req.body);

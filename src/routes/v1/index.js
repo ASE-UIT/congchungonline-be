@@ -6,6 +6,7 @@ const chatbotRoute = require('./chatbot.route');
 const notarizationRoute = require('./notarization.route');
 const roleRoute = require('./role.route');
 const notarizationFieldRoute = require('./notarizationField.route')
+const notarizationServiceRoute = require('./notarizationService.route')
 const config = require('../../config/config');
 // const { path } = require('../../app');
 
@@ -36,6 +37,10 @@ const defaultRoutes = [
   {
     path: '/notarizationFields',
     route: notarizationFieldRoute,
+  },
+  {
+    path: '/notarizationServices',
+    route: notarizationServiceRoute,
   },
 ];
 
