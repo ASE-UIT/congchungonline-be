@@ -15,4 +15,13 @@ const getHistoryByUserId = {
   }),
 };
 
-module.exports = { createDocument, getHistoryByUserId };
+const forwardDocumentStatus = {
+  headers: Joi.object().keys({
+    userId: Joi.string().required(),
+  }),
+  body: Joi.object().keys({
+    action: Joi.string().required(),
+  }),
+}
+
+module.exports = { createDocument, getHistoryByUserId, forwardDocumentStatus};

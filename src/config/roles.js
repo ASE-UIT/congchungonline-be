@@ -1,6 +1,8 @@
 const allRoles = {
   user: ['uploadDocuments', 'viewNotarizationHistory'],
   admin: ['getUsers', 'manageUsers', 'uploadDocuments', 'viewNotarizationHistory', 'manageRoles'],
+  notary: ['getDocumentsByRole', 'forwardDocumentStatus'],
+  secretary: ['getDocumentsByRole', 'forwardDocumentStatus'],
 };
 
 const roles = Object.keys(allRoles);

@@ -65,7 +65,26 @@ router
     notarizationController.getHistoryByUserId
   );
 
-router.route('/getStatusById/:documentId').get(notarizationController.getDocumentStatus);
+router
+  .route('/getStatusById/:documentId')
+  .get(notarizationController.getDocumentStatus);
+
+
+router
+  .route('/getDocumentByRole')
+  .get(
+    auth('getDocumentsByRole'),
+    notarizationController.getDocumentByRole,
+),
+
+router
+  .route('/forwardDocumentStatus/:documentId')
+  .patch(
+    auth('forwardDocumentStatus'),
+    validate(notarizationValidation.forwardDocumentStatus),
+    notarizationController.forwardDocumentStatus
+  )
+  
 /**
  * @swagger
  * /notarization/upload-files:
@@ -178,6 +197,16 @@ router.route('/getStatusById/:documentId').get(notarizationController.getDocumen
  *                 message:
  *                   type: string
  *                   example: No files provided
+ *       "401":
+ *          description: Unauthorized
+ *          content: 
+ *            application/json:
+ *              schema:
+ *              type: object
+ *              properties:
+ *                message:
+ *                  type: string
+ *                  example: Please authenticate
  *       "500":
  *         description: Internal Server Error - Failed to upload files
  *         content:
@@ -263,5 +292,136 @@ router.route('/getStatusById/:documentId').get(notarizationController.getDocumen
  *       "500":
  *         $ref: '#/components/responses/InternalServerError'
  */
+
+
+/**
+ * @swagger
+ * /notarization/getDocumentByRole:
+ *   get:
+ *     summary: Get all notarization documents by user role
+ *     tags: [Notarizations]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       "200":
+ *         description: Successfully retrieved documents for the specified role
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 requesterInfo:
+ *                   type: object
+ *                   properties:
+ *                     citizenId:
+ *                       type: string
+ *                       example: "123456789012"
+ *                     phoneNumber:
+ *                       type: string
+ *                       example: "941788455"
+ *                     email:
+ *                       type: string
+ *                       example: "123@gmail.com"
+ *                 _id:
+ *                   type: string
+ *                   example: "66f516c6df00763b8878bb89"
+ *                 notaryService:
+ *                   type: string
+ *                   example: "Example Notary Service"
+ *                 notaryField:
+ *                   type: string
+ *                   example: "Example Notary Field"
+ *                 userId:
+ *                   type: string
+ *                   example: "66f46255529f780cf0b20d3e"
+ *                 files:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                         example: "66f516c6df00763b8878bb8b"
+ *                       filename:
+ *                         type: string
+ *                         example: "1727338182964-search-interface-symbol.png"
+ *                       firebaseUrl:
+ *                         type: string
+ *                         example: "https://storage.googleapis.com/congchungonline-6692e.appspot.com/66f516c6df00763b8878bb89/1727338182108-search-interface-symbol.png"
+ *                 createdAt:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2024-09-26T08:09:42.039Z"
+ *                 __v:
+ *                   type: integer
+ *                   example: 1
+ *                 status:
+ *                   type: string
+ *                   example: "processing"
+ *       "400":
+ *         $ref: '#/components/responses/BadRequest'
+ *       "401":
+ *         $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         code: 403
+ *         message: You do not have permission to access these documents
+ *       "500":
+ *         $ref: '#/components/responses/InternalServerError'
+ */
+
+/**
+ * @swagger
+ * /notarization/forwardDocumentStatus/{documentId}:
+ *   patch:
+ *     summary: Forward the status of a notarization document by document ID
+ *     tags: [Notarizations]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: documentId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the document to forward status
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               action:
+ *                 type: string
+ *                 description: The action to do
+ *                 example: accept
+ *     responses:
+ *       "200":
+ *         description: Successfully updated the document status
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Document status updated to digitalSignature"
+ *                 documentId:
+ *                   type: string
+ *                   example: "66f462fa57b33d48e47ab55f"
+ *       "400":
+ *         $ref: '#/components/responses/BadRequest'
+ *       "401":
+ *         $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         code: 403
+ *         message: You do not have permission to access these documents
+ *       "404":
+ *         code: 404
+ *         message: Document not found
+ *       "500":
+ *         $ref: '#/components/responses/InternalServerError'
+ */
+
 
 module.exports = router;

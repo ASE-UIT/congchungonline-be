@@ -68,8 +68,25 @@ const getDocumentStatus = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).json(status);
 });
 
+
+const getDocumentByRole = catchAsync(async (req, res) => {
+  const user = req.user;
+  const documents = await notarizationService.getDocumentByRole(user.role);
+  res.status(httpStatus.OK).send(documents);
+})
+
+const forwardDocumentStatus = catchAsync(async (req, res) => {
+  const { documentId } = req.params;
+  const {action} = req.body;
+  const role = req.user.role;
+  const updatedStatus = await notarizationService.forwardDocumentStatus(documentId, action, role);
+  res.status(httpStatus.OK).send(updatedStatus);
+})
+
 module.exports = {
   createDocument,
   getHistoryByUserId,
   getDocumentStatus,
+  getDocumentByRole,
+  forwardDocumentStatus,
 };
