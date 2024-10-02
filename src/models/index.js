@@ -5,3 +5,4 @@ module.exports.StatusTracking = require('./statusTracking.model');
 module.exports.Role = require('./role.model');
 module.exports.NotarizationField = require('./notarizationField.model');
 module.exports.NotarizationService = require('./notarizationService.model')
+module.exports.ApproveHistory = require('./approveHistory.model')

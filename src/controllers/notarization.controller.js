@@ -79,7 +79,8 @@ const forwardDocumentStatus = catchAsync(async (req, res) => {
   const { documentId } = req.params;
   const {action} = req.body;
   const role = req.user.role;
-  const updatedStatus = await notarizationService.forwardDocumentStatus(documentId, action, role);
+  const userId = req.user.id;
+  const updatedStatus = await notarizationService.forwardDocumentStatus(documentId, action, role, userId);
   res.status(httpStatus.OK).send(updatedStatus);
 })
 

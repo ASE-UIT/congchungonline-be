@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { Document, StatusTracking } = require('../models');
+const { Document, StatusTracking, ApproveHistory } = require('../models');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const { bucket } = require('../config/firebase');
@@ -116,7 +116,7 @@ const getDocumentByRole = async (role) => {
   }
 }
 
-const forwardDocumentStatus = async (documentId, action, role) => {
+const forwardDocumentStatus = async (documentId, action, role, userId) => {
   try {
     
     const validStatuses = ['pending', 'verification', 'processing','digitalSignature', 'completed'];
@@ -154,6 +154,14 @@ const forwardDocumentStatus = async (documentId, action, role) => {
       throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid action provided');
     }
 
+    const approveHistory = new ApproveHistory({
+      userId,
+      documentId,
+      beforeStatus: (await StatusTracking.findOne({ documentId }, 'status')).status,
+      afterStatus: newStatus,
+    });
+
+    await approveHistory.save();
  
     const result = await StatusTracking.updateOne(
       { documentId },
