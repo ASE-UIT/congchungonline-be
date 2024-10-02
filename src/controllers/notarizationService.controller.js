@@ -1,6 +1,6 @@
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
-const {notarizationServiceService} = require('../services');
+const { notarizationServiceService } = require('../services');
 
 const createNotarizationService = catchAsync(async (req, res) => {
   const notarizationService = await notarizationServiceService.createNotarizationService(req.body);
