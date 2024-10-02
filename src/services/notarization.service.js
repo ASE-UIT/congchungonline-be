@@ -67,27 +67,6 @@ const getHistoryByUserId = async (userId) => {
   return Document.find({ userId });
 };
 
-const getDocumentByUserId = async (userId) => {
-  try {
-    const documents = await Document.find({ userId });
-
-    if (!documents || documents.length === 0) {
-      throw new ApiError(httpStatus.NOT_FOUND, 'No documents found for this user');
-    }
-
-    return {
-      message: `Documents found for user ${userId}`,
-      documents,
-    };
-  } catch (error) {
-    if (error instanceof ApiError) {
-      throw error;
-    }
-
-    console.error('Error retrieving documents by userId:', error.message);
-    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to retrieve documents');
-  }
-};
 
 const getDocumentStatus = async (documentId) => {
   try {
@@ -206,7 +185,6 @@ module.exports = {
   createStatusTracking,
   getHistoryByUserId,
   getDocumentStatus,
-  getDocumentByUserId,
   getDocumentByRole,
   forwardDocumentStatus
 };

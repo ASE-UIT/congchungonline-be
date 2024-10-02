@@ -68,11 +68,6 @@ const getDocumentStatus = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).json(status);
 });
 
-const getDocumentByUserId = catchAsync(async(req, res) => {
-  const { userId } = req.params;
-  const documents = await notarizationService.getDocumentByUserId(userId);
-  res.status(httpStatus.OK).send(documents);
-})
 
 const getDocumentByRole = catchAsync(async (req, res) => {
   const user = req.user;
@@ -94,5 +89,4 @@ module.exports = {
   getDocumentStatus,
   getDocumentByRole,
   forwardDocumentStatus,
-  getDocumentByUserId
 };

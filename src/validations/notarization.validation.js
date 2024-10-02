@@ -24,10 +24,4 @@ const forwardDocumentStatus = {
   }),
 }
 
-const getDocumentByUserId = {
-  headers: Joi.object().keys({
-    userId: Joi.string().required(),
-  }),
-}
-
-module.exports = { createDocument, getHistoryByUserId, forwardDocumentStatus, getDocumentByUserId};
+module.exports = { createDocument, getHistoryByUserId, forwardDocumentStatus};
