@@ -1,7 +1,7 @@
 const express = require('express');
-const auth = require('../../middlewares/auth'); 
-const validate = require('../../middlewares/validate'); 
-const notarizationFieldValidation = require('../../validations/notarizationField.validation'); 
+const auth = require('../../middlewares/auth');
+const validate = require('../../middlewares/validate');
+const notarizationFieldValidation = require('../../validations/notarizationField.validation');
 const notarizationFieldController = require('../../controllers/notarizationField.controller');
 
 const router = express.Router();
@@ -13,11 +13,29 @@ const router = express.Router();
  *   description: Notarization field management API
  */
 
-router.post('/createNotarizationField', auth('manageNotarizationFields'), validate(notarizationFieldValidation.createNotarizationField), notarizationFieldController.createNotarizationField);
-router.get('/getAllNotarizationFields', auth('manageNotarizationFields'), notarizationFieldController.getAllNotarizationFields);
+router.post(
+  '/createNotarizationField',
+  auth('manageNotarizationFields'),
+  validate(notarizationFieldValidation.createNotarizationField),
+  notarizationFieldController.createNotarizationField
+);
+router.get(
+  '/getAllNotarizationFields',
+  auth('manageNotarizationFields'),
+  notarizationFieldController.getAllNotarizationFields
+);
 router.get('/getNotarizationField/:id', auth('manageNotarizationFields'), notarizationFieldController.getNotarizationField);
-router.delete('/deleteNotarizationField/:id', auth('manageNotarizationFields'), notarizationFieldController.deleteNotarizationField);
-router.patch('/updateNotarizationField/:id', auth('manageNotarizationFields'), validate(notarizationFieldValidation.updateNotarizationField), notarizationFieldController.updateNotarizationField);
+router.delete(
+  '/deleteNotarizationField/:id',
+  auth('manageNotarizationFields'),
+  notarizationFieldController.deleteNotarizationField
+);
+router.patch(
+  '/updateNotarizationField/:id',
+  auth('manageNotarizationFields'),
+  validate(notarizationFieldValidation.updateNotarizationField),
+  notarizationFieldController.updateNotarizationField
+);
 
 /**
  * @swagger
@@ -38,7 +56,7 @@ router.patch('/updateNotarizationField/:id', auth('manageNotarizationFields'), v
  *       example:
  *         id: "12345"
  *         name: "Notarization Field Example"
- * 
+ *
  *   responses:
  *     DuplicateName:
  *       description: A notarization field with the same name already exists.
@@ -85,7 +103,6 @@ router.patch('/updateNotarizationField/:id', auth('manageNotarizationFields'), v
  *             example:
  *               message: "Notarization field not found."
  */
-
 
 /**
  * @swagger
@@ -177,7 +194,7 @@ router.patch('/updateNotarizationField/:id', auth('manageNotarizationFields'), v
  *       "404":
  *         $ref: '#/components/responses/NotFound'
  *
-  * /notarizationFields/deleteNotarizationField/{notarizationFieldId}:
+ * /notarizationFields/deleteNotarizationField/{notarizationFieldId}:
  *   delete:
  *     summary: Delete a notarization field
  *     description: Only admins can delete notarization fields.
@@ -209,7 +226,7 @@ router.patch('/updateNotarizationField/:id', auth('manageNotarizationFields'), v
  *         $ref: '#/components/responses/Forbidden'
  *       "404":
  *         $ref: '#/components/responses/NotFound'
- * 
+ *
  * /notarizationFields/updateNotarizationField/{notarizationFieldId}:
  *   patch:
  *     summary: Update a notarization field
@@ -249,4 +266,4 @@ router.patch('/updateNotarizationField/:id', auth('manageNotarizationFields'), v
  *         $ref: '#/components/responses/NotFound'
  */
 
-module.exports = router; 
+module.exports = router;

@@ -1,7 +1,7 @@
 const express = require('express');
 const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
-const notarizationServiceValidation = require('../../validations/notarizationService.validation'); 
+const notarizationServiceValidation = require('../../validations/notarizationService.validation');
 const notarizationServiceController = require('../../controllers/notarizationService.controller');
 
 const router = express.Router();
@@ -13,44 +13,43 @@ const router = express.Router();
  *   description: Notarization service management API
  */
 
-
 router.post(
-    '/createNotarizationService',
-    auth('manageNotarizationServices'),
-    validate(notarizationServiceValidation.createNotarizationService),
-    notarizationServiceController.createNotarizationService
+  '/createNotarizationService',
+  auth('manageNotarizationServices'),
+  validate(notarizationServiceValidation.createNotarizationService),
+  notarizationServiceController.createNotarizationService
 );
-  
+
 router.get(
-    '/getAllNotarizationServices',
-    auth('manageNotarizationServices'),
-    notarizationServiceController.getAllNotarizationServices
+  '/getAllNotarizationServices',
+  auth('manageNotarizationServices'),
+  notarizationServiceController.getAllNotarizationServices
 );
-  
+
 router.get(
-    '/getNotarizationService/:serviceId',
-    auth('manageNotarizationServices'),
-    notarizationServiceController.getNotarizationService
+  '/getNotarizationService/:serviceId',
+  auth('manageNotarizationServices'),
+  notarizationServiceController.getNotarizationService
 );
-  
+
 router.delete(
-    '/deleteNotarizationService/:serviceId',
-    auth('manageNotarizationServices'),
-    notarizationServiceController.deleteNotarizationService
+  '/deleteNotarizationService/:serviceId',
+  auth('manageNotarizationServices'),
+  notarizationServiceController.deleteNotarizationService
 );
-  
+
 router.patch(
-    '/updateNotarizationService/:serviceId',
-    auth('manageNotarizationServices'),
-    validate(notarizationServiceValidation.updateNotarizationService),
-    notarizationServiceController.updateNotarizationService
+  '/updateNotarizationService/:serviceId',
+  auth('manageNotarizationServices'),
+  validate(notarizationServiceValidation.updateNotarizationService),
+  notarizationServiceController.updateNotarizationService
 );
 
 /**
  * @swagger
  * components:
  *   schemas:
- *    
+ *
  *     NotarizationService:
  *       type: object
  *       properties:
@@ -260,7 +259,6 @@ router.patch(
  *       "404":
  *         $ref: '#/components/responses/NotFound'
  */
-
 
 /**
  * @swagger

@@ -65,17 +65,9 @@ router
     notarizationController.getHistoryByUserId
   );
 
-router
-  .route('/getStatusById/:documentId')
-  .get(notarizationController.getDocumentStatus);
+router.route('/getStatusById/:documentId').get(notarizationController.getDocumentStatus);
 
-
-router
-  .route('/getDocumentByRole')
-  .get(
-    auth('getDocumentsByRole'),
-    notarizationController.getDocumentByRole,
-),
+router.route('/getDocumentByRole').get(auth('getDocumentsByRole'), notarizationController.getDocumentByRole);
 
 router
   .route('/forwardDocumentStatus/:documentId')
@@ -83,15 +75,9 @@ router
     auth('forwardDocumentStatus'),
     validate(notarizationValidation.forwardDocumentStatus),
     notarizationController.forwardDocumentStatus
-  )
-
-router
-  .route('/getApproveHistory')
-  .get(
-    auth('getApproveHistory'),
-    notarizationController.getApproveHistory
   );
-  
+
+router.route('/getApproveHistory').get(auth('getApproveHistory'), notarizationController.getApproveHistory);
 /**
  * @swagger
  * /notarization/upload-files:
@@ -206,7 +192,7 @@ router
  *                   example: No files provided
  *       "401":
  *          description: Unauthorized
- *          content: 
+ *          content:
  *            application/json:
  *              schema:
  *              type: object
@@ -299,7 +285,6 @@ router
  *       "500":
  *         $ref: '#/components/responses/InternalServerError'
  */
-
 
 /**
  * @swagger

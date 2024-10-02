@@ -1,7 +1,6 @@
-const { NotarizationService, NotarizationField } = require('../models'); 
-const ApiError = require('../utils/ApiError');
 const httpStatus = require('http-status');
-
+const { NotarizationService, NotarizationField } = require('../models');
+const ApiError = require('../utils/ApiError');
 
 const createNotarizationService = async (notarizationServiceBody) => {
   try {
@@ -22,7 +21,6 @@ const createNotarizationService = async (notarizationServiceBody) => {
   }
 };
 
-
 const getAllNotarizationServices = async () => {
   try {
     const services = await NotarizationService.find();
@@ -38,7 +36,6 @@ const getAllNotarizationServices = async () => {
   }
 };
 
-
 const getNotarizationServiceById = async (serviceId) => {
   try {
     const service = await NotarizationService.findById(serviceId);
@@ -53,7 +50,6 @@ const getNotarizationServiceById = async (serviceId) => {
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Error fetching notarization service');
   }
 };
-
 
 const updateNotarizationServiceById = async (serviceId, updateBody) => {
   try {

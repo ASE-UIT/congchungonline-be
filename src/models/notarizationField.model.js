@@ -1,17 +1,18 @@
 const mongoose = require('mongoose');
 const { toJSON, paginate } = require('./plugins');
 
-const notarizationFieldSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    unique: true,
+const notarizationFieldSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      unique: true,
+    },
   },
-}, { collection: 'notarizationFields' }
+  { collection: 'notarizationFields' }
 );
 
 notarizationFieldSchema.plugin(toJSON);
 notarizationFieldSchema.plugin(paginate);
-
 
 module.exports = mongoose.model('NotarizationFields', notarizationFieldSchema);
