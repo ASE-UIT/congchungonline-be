@@ -84,10 +84,17 @@ const forwardDocumentStatus = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send(updatedStatus);
 })
 
+const getApproveHistory = catchAsync(async (req, res) => {
+  const userId = req.user.id; 
+  const approveHistory = await notarizationService.getApproveHistory(userId);
+  res.status(httpStatus.OK).send(approveHistory);
+});
+
 module.exports = {
   createDocument,
   getHistoryByUserId,
   getDocumentStatus,
   getDocumentByRole,
   forwardDocumentStatus,
+  getApproveHistory
 };

@@ -188,11 +188,30 @@ const forwardDocumentStatus = async (documentId, action, role, userId) => {
   }
 };
 
+const getApproveHistory = async (userId) => {
+  try {
+    const history = await ApproveHistory.find({ userId })
+
+    if (history.length === 0) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'No approval history found for this user.');
+    }
+    
+    return history;
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    console.error('Error fetching approve history:', error.message);
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to fetch approve history');
+  }
+};
+
 module.exports = {
   createDocument,
   createStatusTracking,
   getHistoryByUserId,
   getDocumentStatus,
   getDocumentByRole,
-  forwardDocumentStatus
+  forwardDocumentStatus,
+  getApproveHistory
 };

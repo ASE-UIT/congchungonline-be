@@ -84,6 +84,13 @@ router
     validate(notarizationValidation.forwardDocumentStatus),
     notarizationController.forwardDocumentStatus
   )
+
+router
+  .route('/getApproveHistory')
+  .get(
+    auth('getApproveHistory'),
+    notarizationController.getApproveHistory
+  );
   
 /**
  * @swagger
@@ -423,5 +430,72 @@ router
  *         $ref: '#/components/responses/InternalServerError'
  */
 
+/**
+ * @swagger
+ * /notarization/getApproveHistory:
+ *   get:
+ *     summary: Retrieve the approval history of notarization documents
+ *     tags: [Notarizations]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       "200":
+ *         description: Successfully retrieved approval history
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   documentId:
+ *                     type: string
+ *                     example: "66f462fa57b33d48e47ab55f"
+ *                   status:
+ *                     type: string
+ *                     example: "approved"
+ *                   approvedBy:
+ *                     type: string
+ *                     example: "userId123"
+ *                   approvedAt:
+ *                     type: string
+ *                     format: date-time
+ *                     example: "2024-09-26T08:09:42.039Z"
+ *                   comments:
+ *                     type: string
+ *                     example: "Document approved successfully."
+ *       "401":
+ *         $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         description: Forbidden - User does not have permission to access this resource
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "You do not have permission to access this resource."
+ *       "404":
+ *         description: Not Found - Approval history not found for the specified document
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Approval history not found."
+ *       "500":
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Failed to retrieve approval history"
+ */
 
 module.exports = router;
