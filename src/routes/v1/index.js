@@ -35,6 +35,10 @@ const defaultRoutes = [
     path: '/role',
     route: roleRoute,
   },
+  {
+    path: '/session',
+    route: sessionRoute,
+  }
 ];
 
 const devRoutes = [

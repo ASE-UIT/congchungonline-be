@@ -1,9 +1,5 @@
 const allRoles = {
   user: ['uploadDocuments', 'viewNotarizationHistory','createSession'],
-  admin: ['getUsers', 'manageUsers', 'uploadDocuments', 'viewNotarizationHistory', 'manageRoles'],
-  notary: ['getDocumentsByRole', 'forwardDocumentStatus'],
-  secretary: ['getDocumentsByRole', 'forwardDocumentStatus'],
-  user: ['uploadDocuments', 'viewNotarizationHistory'],
   admin: [
     'getUsers',
     'manageUsers',
