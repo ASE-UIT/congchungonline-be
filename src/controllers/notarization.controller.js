@@ -1,5 +1,6 @@
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
+const pick = require('lodash/pick');
 const { notarizationService, emailService } = require('../services');
 
 // Utility function to validate email format
@@ -89,6 +90,18 @@ const getApproveHistory = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send(approveHistory);
 });
 
+const getNotarizations = catchAsync(async (req, res) => {
+  const options = pick(req.query, ['sortBy', 'limit', 'page']);
+  const notarizations = await notarizationService.getNotarizations({}, options)
+  res.send(notarizations);
+})
+
+const getAllNotarizations = catchAsync(async (req, res) => {
+  const options = pick(req.query, ['sortBy', 'limit', 'page']);
+  const notarizations = await notarizationService.getAllNotarizations({}, options)
+  res.send(notarizations);
+})
+
 module.exports = {
   createDocument,
   getHistoryByUserId,
@@ -96,4 +109,5 @@ module.exports = {
   getDocumentByRole,
   forwardDocumentStatus,
   getApproveHistory,
+  getAllNotarizations,
 };
