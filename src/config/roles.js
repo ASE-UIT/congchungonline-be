@@ -1,5 +1,5 @@
 const allRoles = {
-  user: ['uploadDocuments', 'viewNotarizationHistory','createSession'],
+  user: ['uploadDocuments', 'viewNotarizationHistory','createSession','addUserToSession','deleteUserOutOfSession'],
   admin: [
     'getUsers',
     'manageUsers',

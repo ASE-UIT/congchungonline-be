@@ -2,6 +2,9 @@ const mongoose = require('mongoose');
 const { toJSON, paginate } = require('./plugins');
 
 const sessionSchema = new mongoose.Schema({
+  sessionId: {
+    type: mongoose.Schema.Types.ObjectId,
+  },
   sessionName: {
     type: String,
     required: true,
@@ -18,13 +21,13 @@ const sessionSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-//   email: {
-//     type: String,
-//   },
-//   createdBy: {
-//     type: mongoose.Schema.Types.ObjectId,
-//     ref: 'User',
-//   }
+  email: {
+    type: [String],
+  },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  },
 });
 
 sessionSchema.plugin(toJSON);

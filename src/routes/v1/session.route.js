@@ -64,6 +64,22 @@ router
     sessionController.createSession
   );
 
+router
+  .route('/add-user')
+  .post(
+    auth('addUserToSession'),
+    validate(sessionValidation.addUserToSession),
+    sessionController.addUserToSession
+  );
+
+router
+  .route('/delete-user')
+  .post(
+    auth('deleteUserOutOfSession'),
+    validate(sessionValidation.deleteUserOutOfSession),
+    sessionController.deleteUserOutOfSession
+  );
+
 /**
  * @swagger
  * /session/create-session:
@@ -75,7 +91,7 @@ router
  *     requestBody:
  *       required: true
  *       content:
- *         application/json: 
+ *         application/json:
  *           schema:
  *             type: object
  *             properties:
@@ -97,11 +113,21 @@ router
  *                 type: number
  *                 description: The duration of the session in minutes
  *                 example: 120
+ *               email:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: List of email addresses related to the session
+ *               createdBy:
+ *                 type: string
+ *                 description: The user ID of the creator
  *             required:
  *               - sessionName
  *               - startTime
  *               - startDate
  *               - duration
+ *               - email
+ *               - createdBy
  *     responses:
  *       "201":
  *         description: Session created successfully
@@ -124,6 +150,14 @@ router
  *                 duration:
  *                   type: number
  *                   example: 120
+ *                 email:
+ *                   type: array
+ *                   items:
+ *                      type: string
+ *                   example: "abc@gmail.com"
+ *                 createdBy:
+ *                   type: string
+ *  
  *       "400":
  *         description: Bad Request - Invalid input
  *         content:
@@ -154,6 +188,156 @@ router
  *                 message:
  *                   type: string
  *                   example: "Failed to create session"
+ */
+/**
+ * @swagger
+ * /session/add-user:
+ *   post:
+ *     summary: Add user to session
+ *     tags: [Sessions]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               sessionId:
+ *                 type: string
+ *                 description: The Id of the session
+ *                 example: "66fe4c6b76f99374f4c87165"
+ *               email:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: List of email addresses add to the session
+ *             required:
+ *               - sessionId
+ *               - email
+ *     responses:
+ *       "201":
+ *         description: User was added successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 sessionId:
+ *                   type: string
+ *                   example: "66fe4c6b76f99374f4c87165"
+ *                 email:
+ *                   type: array
+ *                   items:
+ *                      type: string
+ *                   example: "abc@gmail.com"
+ *   
+ *       "400":
+ *         description: Bad Request - Invalid input
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid request parameters"
+ *       "401":
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Unauthorized"
+ *       "500":
+ *         description: Internal Server Error - Failed to add user to session
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Failed to add user to session"
+ */
+/**
+ * @swagger
+ * /session/delete-user:
+ *   post:
+ *     summary: Delete user out of session
+ *     tags: [Sessions]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               sessionId:
+ *                 type: string
+ *                 description: The Id of the session
+ *                 example: "66fe4c6b76f99374f4c87165"
+ *               email:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: List of email addresses delete out of the session
+ *             required:
+ *               - sessionId
+ *               - email
+ *     responses:
+ *       "201":
+ *         description: User was deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 sessionId:
+ *                   type: string
+ *                   example: "66fe4c6b76f99374f4c87165"
+ *                 email:
+ *                   type: array
+ *                   items:
+ *                      type: string
+ *                   example: "abc@gmail.com"
+ *   
+ *       "400":
+ *         description: Bad Request - Invalid input
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid request parameters"
+ *       "401":
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Unauthorized"
+ *       "500":
+ *         description: Internal Server Error - Failed to delete user out of session
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Failed to delete user out of session"
  */
 
 module.exports = router;
