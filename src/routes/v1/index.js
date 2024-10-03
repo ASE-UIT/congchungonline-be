@@ -5,6 +5,7 @@ const docsRoute = require('./docs.route');
 const chatbotRoute = require('./chatbot.route');
 const notarizationRoute = require('./notarization.route');
 const roleRoute = require('./role.route');
+const sessionRoute = require('./session.route');
 const config = require('../../config/config');
 // const { path } = require('../../app');
 
@@ -32,6 +33,10 @@ const defaultRoutes = [
     path: '/role',
     route: roleRoute,
   },
+  {
+    path: '/session',
+    route: sessionRoute,
+  }
 ];
 
 const devRoutes = [
