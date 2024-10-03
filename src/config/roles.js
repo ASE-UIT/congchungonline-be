@@ -8,6 +8,7 @@ const allRoles = {
     'manageRoles',
     'manageNotarizationFields',
     'manageNotarizationServices',
+    'getAllNotarizations',
   ],
   notary: ['getDocumentsByRole', 'forwardDocumentStatus', 'getApproveHistory'],
   secretary: ['getDocumentsByRole', 'forwardDocumentStatus', 'getApproveHistory'],
