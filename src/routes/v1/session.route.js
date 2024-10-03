@@ -46,7 +46,6 @@ const router = express.Router();
  *             properties:
  *               message:
  *                 type: string
- *                 example: Failed to create session
  */
 
 /**
@@ -57,7 +56,7 @@ const router = express.Router();
  */
 
 router
-  .route('/create-session')
+  .route('/createSession')
   .post(
     auth('createSession'),
     validate(sessionValidation.createSession),
@@ -65,16 +64,16 @@ router
   );
 
 router
-  .route('/add-user')
-  .post(
+  .route('/addUser/:sessionId')
+  .patch(
     auth('addUserToSession'),
     validate(sessionValidation.addUserToSession),
     sessionController.addUserToSession
   );
 
 router
-  .route('/delete-user')
-  .post(
+  .route('/deleteUser/:sessionId')
+  .patch(
     auth('deleteUserOutOfSession'),
     validate(sessionValidation.deleteUserOutOfSession),
     sessionController.deleteUserOutOfSession
@@ -82,7 +81,7 @@ router
 
 /**
  * @swagger
- * /session/create-session:
+ * /session/createSession:
  *   post:
  *     summary: Create session
  *     tags: [Sessions]
@@ -118,16 +117,12 @@ router
  *                 items:
  *                   type: string
  *                 description: List of email addresses related to the session
- *               createdBy:
- *                 type: string
- *                 description: The user ID of the creator
  *             required:
  *               - sessionName
  *               - startTime
  *               - startDate
  *               - duration
  *               - email
- *               - createdBy
  *     responses:
  *       "201":
  *         description: Session created successfully
@@ -159,7 +154,7 @@ router
  *                   type: string
  *  
  *       "400":
- *         description: Bad Request - Invalid input
+ *         description: Bad Request
  *         content:
  *           application/json:
  *             schema:
@@ -191,12 +186,19 @@ router
  */
 /**
  * @swagger
- * /session/add-user:
- *   post:
+ * /session/addUser/{sessionId}:
+ *   patch:
  *     summary: Add user to session
  *     tags: [Sessions]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: sessionId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the session
  *     requestBody:
  *       required: true
  *       content:
@@ -204,17 +206,12 @@ router
  *           schema:
  *             type: object
  *             properties:
- *               sessionId:
- *                 type: string
- *                 description: The Id of the session
- *                 example: "66fe4c6b76f99374f4c87165"
  *               email:
  *                 type: array
  *                 items:
  *                   type: string
  *                 description: List of email addresses add to the session
  *             required:
- *               - sessionId
  *               - email
  *     responses:
  *       "201":
@@ -234,7 +231,7 @@ router
  *                   example: "abc@gmail.com"
  *   
  *       "400":
- *         description: Bad Request - Invalid input
+ *         description: Bad Request 
  *         content:
  *           application/json:
  *             schema:
@@ -266,12 +263,19 @@ router
  */
 /**
  * @swagger
- * /session/delete-user:
- *   post:
+ * /session/deleteUser/{sessionId}:
+ *   patch:
  *     summary: Delete user out of session
  *     tags: [Sessions]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: sessionId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the session
  *     requestBody:
  *       required: true
  *       content:
@@ -279,17 +283,12 @@ router
  *           schema:
  *             type: object
  *             properties:
- *               sessionId:
- *                 type: string
- *                 description: The Id of the session
- *                 example: "66fe4c6b76f99374f4c87165"
  *               email:
  *                 type: array
  *                 items:
  *                   type: string
  *                 description: List of email addresses delete out of the session
  *             required:
- *               - sessionId
  *               - email
  *     responses:
  *       "201":
@@ -299,17 +298,11 @@ router
  *             schema:
  *               type: object
  *               properties:
- *                 sessionId:
- *                   type: string
- *                   example: "66fe4c6b76f99374f4c87165"
- *                 email:
- *                   type: array
- *                   items:
- *                      type: string
- *                   example: "abc@gmail.com"
- *   
+ *                 message:
+ *                    type: string
+ *                    example: "User was deleted successfully"
  *       "400":
- *         description: Bad Request - Invalid input
+ *         description: Bad Request
  *         content:
  *           application/json:
  *             schema:

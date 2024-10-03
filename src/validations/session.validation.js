@@ -7,22 +7,26 @@ const createSession = {
     startTime: Joi.date().required(),
     duration: Joi.number().integer().min(1).required(), 
     email: Joi.array().items(Joi.string().email()).required(),
-    createdBy: Joi.string().hex().length(24).required(),
+    createdBy: Joi.string(),
   }),
 };
 
 const addUserToSession = {
-    body: Joi.object().keys({
-      sessionId: Joi.string().hex().length(24).required(),
-      email: Joi.array().items(Joi.string().email()).required(),
-    }),
+  params: Joi.object().keys({
+    sessionId: Joi.string().required(),
+  }),
+  body: Joi.object().keys({
+    email: Joi.array().items(Joi.string()).required(),
+  }),
 };
 
 const deleteUserOutOfSession = {
-    body: Joi.object().keys({
-      sessionId: Joi.string().hex().length(24).required(),
-      email: Joi.array().items(Joi.string().email()).required(),
-    }),
+  params: Joi.object().keys({
+    sessionId: Joi.string().required(),
+  }),
+  body: Joi.object().keys({
+    email: Joi.array().items(Joi.string()).required(),
+  }),
 };
 
 module.exports = { 

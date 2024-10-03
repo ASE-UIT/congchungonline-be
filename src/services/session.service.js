@@ -4,35 +4,32 @@ const ApiError = require('../utils/ApiError');
 const validator = require('validator'); // Thêm thư viện validator
 const catchAsync = require('../utils/catchAsync');
 const { userService } = require('./'); 
+const mongoose = require('mongoose');
 
-// Hàm kiểm tra email
+// Hàm kiểm tra email 
 const validateEmails = async (email) => {
   const invalidEmails = [];
   const notFoundEmails = [];
 
   for (const emailItem of email) {
-    // Kiểm tra định dạng email có hợp lệ không
     if (!validator.isEmail(emailItem)) {
       invalidEmails.push(emailItem);
     } else {
-      // Kiểm tra email có tồn tại trong database không
       const user = await userService.getUserByEmail(emailItem);
       if (!user) {
         notFoundEmails.push(emailItem);
-      }
+      } 
     }
   }
-
-  // Nếu có email không hợp lệ
+  
   if (invalidEmails.length > 0) {
     throw new ApiError(httpStatus.BAD_REQUEST, `Invalid email(s): ${invalidEmails.join(', ')}`);
   }
-
-  // Nếu có email không tồn tại trong database
   if (notFoundEmails.length > 0) {
     throw new ApiError(httpStatus.NOT_FOUND, `Email(s) not found: ${notFoundEmails.join(', ')}`);
   }
 };
+
 
 // Hàm tạo session
 const createSession = async (Data) => {
@@ -61,7 +58,7 @@ const addUserToSession = async (Data) => {
     const newEmails = Data.email.filter(emailItem => !existingEmails.includes(emailItem)); 
 
     if (newEmails.length === 0) {
-      throw new ApiError(httpStatus.BAD_REQUEST, 'All emails are already in the session');
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Email(s) are already in the session');
     }
     session.email = [...existingEmails, ...newEmails];
     await session.save();
@@ -71,9 +68,13 @@ const addUserToSession = async (Data) => {
   }
 };
 
-
+// Hàm tìm session id
 const findBySessionId = async (sessionId) => {
   try {
+    const isValidObjectId = (sessionId) => mongoose.Types.ObjectId.isValid(sessionId);
+    if (!isValidObjectId(sessionId)) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid session ID');
+    }
     const session = await Session.findById(sessionId);
     if (!session) {
       throw new ApiError(httpStatus.NOT_FOUND, 'Session not found');
@@ -84,6 +85,7 @@ const findBySessionId = async (sessionId) => {
   }
 };
 
+// Hàm xóa người dùng ra khỏi session
 const deleteUserOutOfSession = async (Data) => {
   try {
     const session = await Session.findById(Data.sessionId);

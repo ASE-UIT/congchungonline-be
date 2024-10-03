@@ -3,7 +3,7 @@ const { toJSON, paginate } = require('./plugins');
 
 const sessionSchema = new mongoose.Schema({
   sessionId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
   },
   sessionName: {
     type: String,

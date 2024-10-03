@@ -3,7 +3,8 @@ const catchAsync = require('../utils/catchAsync');
 const { sessionService } = require('../services');
 
 const createSession = catchAsync(async (req, res) => {
-  const { sessionName, startTime, startDate, duration, email, createdBy } = req.body;
+  const { sessionName, startTime, startDate, duration, email} = req.body;
+  const createdBy = req.user.id;
   const checkemail = await sessionService.validateEmails(email);
   const session = await sessionService.createSession({
     sessionName,
@@ -18,7 +19,8 @@ const createSession = catchAsync(async (req, res) => {
 
 
 const addUserToSession = catchAsync(async (req, res) => {
-    const { sessionId, email } = req.body;
+    const sessionId = req.params.sessionId;
+    const { email } = req.body;
     const session = await sessionService.findBySessionId(sessionId);
     const checkemail = await sessionService.validateEmails(email);
     const updatedSession = await sessionService.addUserToSession({
@@ -30,7 +32,8 @@ const addUserToSession = catchAsync(async (req, res) => {
 
 
 const deleteUserOutOfSession = catchAsync(async (req, res) => {
-    const { sessionId, email } = req.body;
+    const sessionId = req.params.sessionId;
+    const { email } = req.body;
     const session = await sessionService.findBySessionId(sessionId);
     const checkemail = await sessionService.validateEmails(email);
     const updatedSession = await sessionService.deleteUserOutOfSession({
