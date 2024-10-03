@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { Document, StatusTracking } = require('../models');
+const { Document, StatusTracking, ApproveHistory } = require('../models');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const { bucket } = require('../config/firebase');
@@ -67,7 +67,6 @@ const getHistoryByUserId = async (userId) => {
   return Document.find({ userId });
 };
 
-
 const getDocumentStatus = async (documentId) => {
   try {
     const statusTracking = await StatusTracking.findOne({ documentId });
@@ -81,7 +80,7 @@ const getDocumentStatus = async (documentId) => {
 const getDocumentByRole = async (role) => {
   try {
     let statusFilter = [];
-    
+
     if (role === 'notary') {
       statusFilter = ['processing'];
     } else if (role === 'secretary') {
@@ -91,21 +90,20 @@ const getDocumentByRole = async (role) => {
     }
 
     const statusTrackings = await StatusTracking.find({ status: { $in: statusFilter } });
-    
-    const documentIds = statusTrackings.map(tracking => tracking.documentId);
-    
+
+    const documentIds = statusTrackings.map((tracking) => tracking.documentId);
+
     const documents = await Document.find({ _id: { $in: documentIds } });
 
-    const result = documents.map(doc => {
-      const statusTracking = statusTrackings.find(tracking => tracking.documentId.toString() === doc._id.toString());
+    const result = documents.map((doc) => {
+      const statusTracking = statusTrackings.find((tracking) => tracking.documentId.toString() === doc._id.toString());
       return {
-        ...doc.toObject(),   
+        ...doc.toObject(),
         status: statusTracking.status,
       };
     });
 
-    return result; 
-
+    return result;
   } catch (error) {
     if (error instanceof ApiError) {
       throw error;
@@ -114,17 +112,16 @@ const getDocumentByRole = async (role) => {
     console.error('Error retrieving documents by role:', error.message);
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to retrieve documents');
   }
-}
+};
 
-const forwardDocumentStatus = async (documentId, action, role) => {
+const forwardDocumentStatus = async (documentId, action, role, userId) => {
   try {
-    
-    const validStatuses = ['pending', 'verification', 'processing','digitalSignature', 'completed'];
+    const validStatuses = ['pending', 'verification', 'processing', 'digitalSignature', 'completed'];
     const roleStatusMap = {
       notary: ['processing'],
-      secretary: ['verification', 'digitalSignature']
+      secretary: ['verification', 'digitalSignature'],
     };
-    
+
     let newStatus;
 
     if (action === 'accept') {
@@ -147,19 +144,26 @@ const forwardDocumentStatus = async (documentId, action, role) => {
       if (!newStatus) {
         throw new ApiError(httpStatus.BAD_REQUEST, 'Document has already reached final status');
       }
-      
     } else if (action === 'reject') {
       newStatus = 'rejected';
     } else {
       throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid action provided');
     }
 
- 
+    const approveHistory = new ApproveHistory({
+      userId,
+      documentId,
+      beforeStatus: (await StatusTracking.findOne({ documentId }, 'status')).status,
+      afterStatus: newStatus,
+    });
+
+    await approveHistory.save();
+
     const result = await StatusTracking.updateOne(
       { documentId },
       {
-        status: newStatus, 
-        updatedAt: new Date()
+        status: newStatus,
+        updatedAt: new Date(),
       }
     );
 
@@ -180,11 +184,30 @@ const forwardDocumentStatus = async (documentId, action, role) => {
   }
 };
 
+const getApproveHistory = async (userId) => {
+  try {
+    const history = await ApproveHistory.find({ userId });
+
+    if (history.length === 0) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'No approval history found for this user.');
+    }
+
+    return history;
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    console.error('Error fetching approve history:', error.message);
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to fetch approve history');
+  }
+};
+
 module.exports = {
   createDocument,
   createStatusTracking,
   getHistoryByUserId,
   getDocumentStatus,
   getDocumentByRole,
-  forwardDocumentStatus
+  forwardDocumentStatus,
+  getApproveHistory,
 };
