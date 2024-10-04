@@ -57,19 +57,11 @@ const router = express.Router();
 
 router
   .route('/createSession')
-  .post(
-    auth('createSession'),
-    validate(sessionValidation.createSession),
-    sessionController.createSession
-  );
+  .post(auth('createSession'), validate(sessionValidation.createSession), sessionController.createSession);
 
 router
   .route('/addUser/:sessionId')
-  .patch(
-    auth('addUserToSession'),
-    validate(sessionValidation.addUserToSession),
-    sessionController.addUserToSession
-  );
+  .patch(auth('addUserToSession'), validate(sessionValidation.addUserToSession), sessionController.addUserToSession);
 
 router
   .route('/deleteUser/:sessionId')
@@ -98,6 +90,14 @@ router
  *                 type: string
  *                 description: The name of the session
  *                 example: "Notarization Session"
+ *               notaryField:
+ *                 type: string
+ *                 description: The field of the notary
+ *                 example: "Notary Field"
+ *               notaryService:
+ *                 type: string
+ *                 description: The Service of the notary
+ *                 example: "Notary Service"
  *               startTime:
  *                 type: string
  *                 format: date-time
@@ -123,6 +123,8 @@ router
  *               - startDate
  *               - duration
  *               - email
+ *               - notaryField
+ *               - notaryService
  *     responses:
  *       "201":
  *         description: Session created successfully
@@ -134,6 +136,12 @@ router
  *                 sessionName:
  *                   type: string
  *                   example: "Notarization Session"
+ *                 notaryField:
+ *                    type: string
+ *                    example: "Notary Field"
+ *                 notaryService:
+ *                    type: string
+ *                    example: "Notary Service"
  *                 startTime:
  *                   type: string
  *                   format: date-time
@@ -152,7 +160,7 @@ router
  *                   example: "abc@gmail.com"
  *                 createdBy:
  *                   type: string
- *  
+ *
  *       "400":
  *         description: Bad Request
  *         content:
@@ -229,9 +237,9 @@ router
  *                   items:
  *                      type: string
  *                   example: "abc@gmail.com"
- *   
+ *
  *       "400":
- *         description: Bad Request 
+ *         description: Bad Request
  *         content:
  *           application/json:
  *             schema:
