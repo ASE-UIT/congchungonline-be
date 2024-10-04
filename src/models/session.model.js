@@ -5,6 +5,14 @@ const sessionSchema = new mongoose.Schema({
   sessionId: {
     type: String,
   },
+  notaryField: {
+    type: String,
+    required: true,
+  },
+  notaryService: {
+    type: String,
+    required: true,
+  },
   sessionName: {
     type: String,
     required: true,
