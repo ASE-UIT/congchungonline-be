@@ -3,9 +3,11 @@ const Joi = require('joi');
 const createSession = {
   body: Joi.object().keys({
     sessionName: Joi.string().required(),
+    notaryField: Joi.string().required(),
+    notaryService: Joi.string().required(),
     startDate: Joi.date().required(),
     startTime: Joi.date().required(),
-    duration: Joi.number().integer().min(1).required(), 
+    duration: Joi.number().integer().min(1).required(),
     email: Joi.array().items(Joi.string().email()).required(),
     createdBy: Joi.string(),
   }),
@@ -29,8 +31,8 @@ const deleteUserOutOfSession = {
   }),
 };
 
-module.exports = { 
-    createSession, 
-    addUserToSession,
-    deleteUserOutOfSession,  
+module.exports = {
+  createSession,
+  addUserToSession,
+  deleteUserOutOfSession,
 };
