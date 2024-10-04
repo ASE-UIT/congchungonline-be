@@ -55,9 +55,23 @@ If you did not create an account, then ignore this email.`;
   await sendEmail(to, subject, text);
 };
 
+/**
+ * Send invitation email
+ * @param {string} to
+ * @returns {Promise}
+ */
+const sendInvitationEmail = async (to, sessionId) => {
+  const subject = 'Session Invitation';
+  const text = `Dear user,
+You are invited to participate in the session with ID: ${sessionId}.
+If you did not create an account, then ignore this email.`;
+  await sendEmail(to, subject, text);
+};
+
 module.exports = {
   transport,
   sendEmail,
   sendResetPasswordEmail,
   sendVerificationEmail,
+  sendInvitationEmail,
 };
