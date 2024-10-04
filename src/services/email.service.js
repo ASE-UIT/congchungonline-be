@@ -58,12 +58,15 @@ If you did not create an account, then ignore this email.`;
 /**
  * Send invitation email
  * @param {string} to
+ * @param {string} sessionId
  * @returns {Promise}
  */
 const sendInvitationEmail = async (to, sessionId) => {
   const subject = 'Session Invitation';
+  const joinSessionURL = `http://localhost:3100/v1/session/joinSession/${sessionId}`;
   const text = `Dear user,
-You are invited to participate in the session with ID: ${sessionId}.
+You are invited to participate in a session
+To join the session, click this link: ${joinSessionURL}
 If you did not create an account, then ignore this email.`;
   await sendEmail(to, subject, text);
 };

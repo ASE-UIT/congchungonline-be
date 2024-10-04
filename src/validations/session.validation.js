@@ -31,8 +31,18 @@ const deleteUserOutOfSession = {
   }),
 };
 
+const joinSession = {
+  params: Joi.object().keys({
+    sessionId: Joi.string().required(),
+  }),
+  body: Joi.object().keys({
+    require: Joi.string().valid('accept', 'reject').required(),
+  }),
+};
+
 module.exports = {
   createSession,
   addUserToSession,
   deleteUserOutOfSession,
+  joinSession,
 };

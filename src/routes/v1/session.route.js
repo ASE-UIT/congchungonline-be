@@ -71,6 +71,10 @@ router
     sessionController.deleteUserOutOfSession
   );
 
+router
+  .route('/joinSession/:sessionId')
+  .post(auth('joinSession'), validate(sessionValidation.joinSession), sessionController.joinSession);
+
 /**
  * @swagger
  * /session/createSession:
@@ -339,6 +343,76 @@ router
  *                 message:
  *                   type: string
  *                   example: "Failed to delete user out of session"
+ */
+/**
+ * @swagger
+ * /session/joinSession/{sessionId}:
+ *   post:
+ *     summary: Join a session
+ *     tags: [Sessions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: sessionId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the session to join
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               require:
+ *                 type: string
+ *                 description: The request status for joining the session (e.g., "accept")
+ *                 example: "accept"
+ *             required:
+ *               - require
+ *     responses:
+ *       "201":
+ *         description: Successfully joined the session
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Join session successfully"
+ *       "400":
+ *         description: Bad request due to invalid parameters
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid request parameters"
+ *       "401":
+ *         description: Unauthorized access
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Unauthorized"
+ *       "500":
+ *         description: Internal server error - Failed to join the session
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Failed to join the session"
  */
 
 module.exports = router;

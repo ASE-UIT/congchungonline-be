@@ -39,8 +39,17 @@ const deleteUserOutOfSession = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send(updatedSession);
 });
 
+const joinSession = catchAsync(async (req, res) => {
+  const { sessionId } = req.params;
+  const { require } = req.body;
+  const userId = req.user.id;
+  const joinSession = await sessionService.joinSession({ sessionId, require, userId });
+  res.status(httpStatus.OK).send(joinSession);
+});
+
 module.exports = {
   createSession,
   addUserToSession,
   deleteUserOutOfSession,
+  joinSession,
 };

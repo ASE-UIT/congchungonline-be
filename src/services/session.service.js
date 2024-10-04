@@ -74,6 +74,29 @@ const deleteUserOutOfSession = async ({ sessionId, email, userId }) => {
   return session;
 };
 
+// Hàm tham gia session
+const joinSession = async ({ sessionId, require, userId }) => {
+  const session = await findBySessionId(sessionId);
+  const user = await userService.getUserById(userId);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  if (require === 'accept') {
+    if (session.createdBy !== userId && !session.email.includes(user.email)) {
+      throw new ApiError(httpStatus.FORBIDDEN, 'You are not invited to this session');
+    }
+    return session;
+  } else if (require === 'reject') {
+    console.log('userId:', userId, 'sessionUserId:', session.createdBy);
+    if (session.createdBy !== userId && !session.email.includes(user.email)) {
+      throw new ApiError(httpStatus.FORBIDDEN, 'You cannot reject the session');
+    }
+    return { message: 'You have rejected the invitation to join the session' };
+  } else {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid request type. It must be either "accept" or "reject".');
+  }
+};
+
 // Hàm kiểm tra authenticate
 const isAuthenticated = async (sessionId, userId) => {
   const session = await findBySessionId(sessionId);
@@ -90,4 +113,5 @@ module.exports = {
   findBySessionId,
   deleteUserOutOfSession,
   isAuthenticated,
+  joinSession,
 };
