@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const faker = require('faker');
-const { Token } = require('../../../src/models');
+const { Token }  = require('../../../src/models');
 const { tokenTypes } = require('../../../src/config/tokens');
 
 let mongoServer;
