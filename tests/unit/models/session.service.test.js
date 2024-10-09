@@ -1,6 +1,4 @@
-// Thiết lập các biến môi trường cần thiết
-process.env.MONGODB_URL = 'mongodb://127.0.0.1:27017/node-boilerplate-test';
-process.env.JWT_SECRET = 'thisisasamplesecret';
+require('dotenv').config();
 
 const httpStatus = require('http-status');
 const sessionService = require('../../../src/services/session.service');
