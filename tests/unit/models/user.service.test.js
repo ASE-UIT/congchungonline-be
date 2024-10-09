@@ -6,7 +6,6 @@ const ApiError = require('../../../src/utils/ApiError');
 const userService = require('../../../src/services/user.service');
 
 
-// User Service Unit test
 jest.mock('../../../src/models/user.model');
 
 describe('User Service', () => {
