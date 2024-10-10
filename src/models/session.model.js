@@ -18,7 +18,7 @@ const sessionSchema = new mongoose.Schema({
     required: true,
   },
   startTime: {
-    type: Date,
+    type: String,
     required: true,
   },
   startDate: {
@@ -31,6 +31,7 @@ const sessionSchema = new mongoose.Schema({
   },
   email: {
     type: [String],
+    required: true,
   },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
