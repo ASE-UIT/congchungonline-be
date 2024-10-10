@@ -14,6 +14,7 @@ const allRoles = {
     'getUserMonthly',
     'getTodayDocumentsByNotaryField',
     'getMonthDocumentsByNotaryField',
+    'getSessions',
   ],
   notary: ['getDocumentsByRole', 'forwardDocumentStatus', 'getApproveHistory','joinSession'],
   secretary: ['getDocumentsByRole', 'forwardDocumentStatus', 'getApproveHistory','joinSession'],
