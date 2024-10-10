@@ -203,10 +203,9 @@ const getApproveHistory = async (userId) => {
 };
 
 const getAllNotarizations = async (filter, options) => {
-
   const notatizations = await Document.paginate(filter, options);
   return notatizations;
-}
+};
 
 module.exports = {
   createDocument,
@@ -216,5 +215,5 @@ module.exports = {
   getDocumentByRole,
   forwardDocumentStatus,
   getApproveHistory,
-  getAllNotarizations
+  getAllNotarizations,
 };
