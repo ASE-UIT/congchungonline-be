@@ -14,32 +14,32 @@ const router = express.Router();
  */
 
 router.post(
-  '/createNotarizationService',
+  '/create-notarization-service',
   auth('manageNotarizationServices'),
   validate(notarizationServiceValidation.createNotarizationService),
   notarizationServiceController.createNotarizationService
 );
 
 router.get(
-  '/getAllNotarizationServices',
-  auth('manageNotarizationServices'),
+  '/get-all-notarization-services',
+  auth('getNotarizationServices'),
   notarizationServiceController.getAllNotarizationServices
 );
 
 router.get(
-  '/getNotarizationService/:serviceId',
-  auth('manageNotarizationServices'),
+  '/get-notarization-service/:serviceId',
+  auth('getNotarizationServices'),
   notarizationServiceController.getNotarizationService
 );
 
 router.delete(
-  '/deleteNotarizationService/:serviceId',
+  '/delete-notarization-service/:serviceId',
   auth('manageNotarizationServices'),
   notarizationServiceController.deleteNotarizationService
 );
 
 router.patch(
-  '/updateNotarizationService/:serviceId',
+  '/update-notarization-service/:serviceId',
   auth('manageNotarizationServices'),
   validate(notarizationServiceValidation.updateNotarizationService),
   notarizationServiceController.updateNotarizationService
@@ -84,7 +84,7 @@ router.patch(
 
 /**
  * @swagger
- * /notarizationServices/createNotarizationService:
+ * /notarization-services/create-notarization-service:
  *   post:
  *     summary: Create a notarization service
  *     description: Only admins can create notarization services.
@@ -143,10 +143,9 @@ router.patch(
 
 /**
  * @swagger
- * /notarizationServices/getAllNotarizationServices:
+ * /notarization-services/get-all-notarization-services:
  *   get:
  *     summary: Get all notarization services
- *     description: Only admins can retrieve all notarization services.
  *     tags: [NotarizationServices]
  *     security:
  *       - bearerAuth: []
@@ -170,10 +169,9 @@ router.patch(
 
 /**
  * @swagger
- * /notarizationServices/getNotarizationService/{serviceId}:
+ * /notarization-services/get-notarization-service/{notarization-service-id}:
  *   get:
  *     summary: Get a notarization service
- *     description: Only admins can fetch notarization service details.
  *     tags: [NotarizationServices]
  *     security:
  *       - bearerAuth: []
@@ -210,7 +208,7 @@ router.patch(
 
 /**
  * @swagger
- * /notarizationServices/updateNotarizationService/{serviceId}:
+ * /notarization-services/update-notarization-service/{notarization-service-id}:
  *   patch:
  *     summary: Update a notarization service
  *     description: Only admins can update notarization services.
@@ -286,7 +284,7 @@ router.patch(
 
 /**
  * @swagger
- * /notarizationServices/deleteNotarizationService/{serviceId}:
+ * /notarization-services/delete-notarization-service/{notarization-service-id}:
  *   delete:
  *     summary: Delete a notarization service
  *     description: Only admins can delete notarization services.
