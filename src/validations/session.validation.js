@@ -6,7 +6,7 @@ const createSession = {
     notaryField: Joi.string().required(),
     notaryService: Joi.string().required(),
     startDate: Joi.date().required(),
-    startTime: Joi.date().required(),
+    startTime: Joi.string().pattern(/^\d{2}:\d{2}$/, { name: 'time' }).required(),
     duration: Joi.number().integer().min(1).required(),
     email: Joi.array().items(Joi.string().email()).required(),
     createdBy: Joi.string(),
@@ -40,9 +40,24 @@ const joinSession = {
   }),
 };
 
+const getSessionsByDate = {
+  query: Joi.object().keys({
+    date: Joi.string().required(),
+  })
+}
+
+const getSessionsByMonth = {
+  query: Joi.object().keys({
+    date: Joi.string().required(),
+  })
+}
+
+
 module.exports = {
   createSession,
   addUserToSession,
   deleteUserOutOfSession,
   joinSession,
+  getSessionsByDate,
+  getSessionsByMonth,
 };
