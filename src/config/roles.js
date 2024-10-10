@@ -21,6 +21,8 @@ const allRoles = {
     'getUserMonthly',
     'getTodayDocumentsByNotaryField',
     'getMonthDocumentsByNotaryField',
+    'getEmployeeCount',
+    'getEmployeeList',
   ],
   notary: ['getDocumentsByRole', 'forwardDocumentStatus', 'getApproveHistory', 'joinSession'],
   secretary: ['getDocumentsByRole', 'forwardDocumentStatus', 'getApproveHistory', 'joinSession'],

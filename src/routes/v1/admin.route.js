@@ -10,9 +10,21 @@ router.get('/users/today', auth('getToDayUserCount'), adminController.getToDayUs
 
 router.get('/users/monthly', auth('getUserMonthly'), adminController.getUserMonthly);
 
-router.get('/documents/fields/daily', auth('getTodayDocumentsByNotaryField'), adminController.getTodayDocumentsByNotaryField);
+router.get('/employees/count', auth('getEmployeeCount'), adminController.getEmployeeCount);
 
-router.get('/documents/fields/monthly', auth('getMonthDocumentsByNotaryField'), adminController.getMonthDocumentsByNotaryField);
+router.get('/employees/list', auth('getEmployeeList'), adminController.getEmployeeList);
+
+router.get(
+  '/documents/fields/daily',
+  auth('getTodayDocumentsByNotaryField'),
+  adminController.getTodayDocumentsByNotaryField
+);
+
+router.get(
+  '/documents/fields/monthly',
+  auth('getMonthDocumentsByNotaryField'),
+  adminController.getMonthDocumentsByNotaryField
+);
 
 module.exports = router;
 
@@ -222,6 +234,108 @@ module.exports = router;
  *                         type: integer
  *                         description: The number of documents created today for this notary field
  *                         example: 1
+ *       "401":
+ *         description: Unauthorized access - invalid token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         description: Forbidden - the user doesn't have access
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/responses/Forbidden'
+ *       "404":
+ *         description: Not found - endpoint does not exist
+ */
+
+/**
+ * @swagger
+ * /admin/metrics/employees/count:
+ *   get:
+ *     summary: Get the count of employees with role 'notary'
+ *     description: Retrieve the total number of employees with the role of 'notary'.
+ *     tags: [Admins]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       "200":
+ *         description: Successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 notaryCount:
+ *                   type: integer
+ *                   description: The number of employees with the role 'notary'
+ *                   example: 10
+ *       "401":
+ *         description: Unauthorized access - invalid token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         description: Forbidden - the user doesn't have access
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/responses/Forbidden'
+ *       "404":
+ *         description: Not found - endpoint does not exist
+ */
+
+/**
+ * @swagger
+ * /admin/metrics/employees/list:
+ *   get:
+ *     summary: Get the list of employees with roles 'notary' and 'secretary'
+ *     description: Retrieve a list of all employees with the roles of 'notary' and 'secretary'. Only admins can access this information.
+ *     tags: [Admins]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       "200":
+ *         description: Successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                     description: The unique identifier of the employee
+ *                     example: "66e4419a9eb09a1314b9378f"
+ *                   name:
+ *                     type: string
+ *                     description: The name of the employee
+ *                     example: "Huỳnh Gia Bảo"
+ *                   email:
+ *                     type: string
+ *                     description: The email address of the employee
+ *                     example: "baobak9g@gmail.com"
+ *                   role:
+ *                     type: string
+ *                     description: The role of the employee
+ *                     example: "notary"
+ *                   isEmailVerified:
+ *                     type: boolean
+ *                     description: Whether the employee's email is verified
+ *                     example: false
+ *                   createdAt:
+ *                     type: string
+ *                     format: date-time
+ *                     description: The date and time when the employee was created
+ *                     example: "2024-09-13T13:43:54.937+00:00"
+ *                   updatedAt:
+ *                     type: string
+ *                     format: date-time
+ *                     description: The date and time when the employee was last updated
+ *                     example: "2024-09-13T13:43:54.937+00:00"
  *       "401":
  *         description: Unauthorized access - invalid token
  *         content:

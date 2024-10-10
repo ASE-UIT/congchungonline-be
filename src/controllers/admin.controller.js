@@ -1,4 +1,3 @@
-const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
 const { adminService } = require('../services');
 
@@ -30,10 +29,24 @@ const getMonthDocumentsByNotaryField = catchAsync(async (req, res) => {
   res.send(MonthDocumentsByNotaryField);
 });
 
+const getEmployeeCount = catchAsync(async (req, res) => {
+  const EmployeeCount = await adminService.getEmployeeCount();
+  console.log(EmployeeCount);
+  res.send(EmployeeCount);
+});
+
+const getEmployeeList = catchAsync(async (req, res) => {
+  const EmployeeList = await adminService.getEmployeeList();
+  console.log(EmployeeList);
+  res.send(EmployeeList);
+});
+
 module.exports = {
   getToDayDocumentCount,
   getToDayUserCount,
   getUserMonthly,
   getTodayDocumentsByNotaryField,
   getMonthDocumentsByNotaryField,
+  getEmployeeCount,
+  getEmployeeList,
 };
