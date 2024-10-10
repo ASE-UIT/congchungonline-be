@@ -1,9 +1,9 @@
 const httpStatus = require('http-status');
 const httpMocks = require('node-mocks-http');
 const passport = require('passport');
-const ApiError = require('../utils/ApiError');
-const auth = require('./auth');
-const rolesConfig = require('../config/roles');
+const ApiError = require('../../../src/utils/ApiError');
+const auth = require('../../../src/middlewares/auth');
+const rolesConfig = require('../../../src/config/roles');
 
 jest.mock('passport');
 
@@ -18,7 +18,7 @@ describe('Auth middleware', () => {
     const next = jest.fn();
 
     const user = { id: 'userId123', role: 'user' };
-    passport.authenticate.mockImplementation((strategy, options, callback) => (req, res, next) => {
+    passport.authenticate.mockImplementation((strategy, options, callback) => () => {
       callback(null, user, null);
     });
     const requiredRights = ['uploadDocuments'];
@@ -33,7 +33,7 @@ describe('Auth middleware', () => {
     const res = httpMocks.createResponse();
     const next = jest.fn();
 
-    passport.authenticate.mockImplementation((strategy, options, callback) => (req, res, next) => {
+    passport.authenticate.mockImplementation((strategy, options, callback) => () => {
       callback(null, false, null);
     });
 
@@ -52,7 +52,7 @@ describe('Auth middleware', () => {
 
     const user = { id: 'userId123', role: 'user' };
 
-    passport.authenticate.mockImplementation((strategy, options, callback) => (req, res, next) => {
+    passport.authenticate.mockImplementation((strategy, options, callback) => () => {
       callback(null, user, null);
     });
 
@@ -73,12 +73,10 @@ describe('Auth middleware', () => {
 
     const user = { id: 'userId123', role: 'user' };
 
- 
-    passport.authenticate.mockImplementation((strategy, options, callback) => (req, res, next) => {
+    passport.authenticate.mockImplementation((strategy, options, callback) => () => {
       callback(null, user, null);
     });
 
-  
     jest.spyOn(rolesConfig, 'getPermissionsByRoleName').mockImplementation(() => {
       throw new Error('Database error');
     });
@@ -102,8 +100,7 @@ describe('Auth middleware', () => {
 
     const user = { id: 'userId123', role: 'user' };
 
-    
-    passport.authenticate.mockImplementation((strategy, options, callback) => (req, res, next) => {
+    passport.authenticate.mockImplementation((strategy, options, callback) => () => {
       callback(null, user, null);
     });
 
@@ -124,8 +121,7 @@ describe('Auth middleware', () => {
 
     const user = { id: 'userId123', role: 'user' };
 
-
-    passport.authenticate.mockImplementation((strategy, options, callback) => (req, res, next) => {
+    passport.authenticate.mockImplementation((strategy, options, callback) => () => {
       callback(null, user, null);
     });
 

@@ -1,6 +1,6 @@
 const httpMocks = require('node-mocks-http');
-const { authLimiter } = require('./rateLimiter');
 const rateLimit = require('express-rate-limit');
+const { authLimiter } = require('../../../src/middlewares/rateLimiter');
 
 jest.mock('express-rate-limit');
 
@@ -28,7 +28,7 @@ describe('Rate Limiter Middleware', () => {
   });
 
   test('should allow requests under the limit', () => {
-    const mockRateLimiter = jest.fn((req, res, next) => next());
+    const mockRateLimiter = jest.fn((request, response, nextFunc) => nextFunc());
     rateLimit.mockReturnValue(mockRateLimiter);
 
     authLimiter(req, res, next);
@@ -39,7 +39,7 @@ describe('Rate Limiter Middleware', () => {
 
   test('should block requests over the limit', () => {
     const error = new Error('Too many requests');
-    const mockRateLimiter = jest.fn((req, res, next) => next(error));
+    const mockRateLimiter = jest.fn((request, response, nextFunc) => nextFunc(error));
     rateLimit.mockReturnValue(mockRateLimiter);
 
     authLimiter(req, res, next);

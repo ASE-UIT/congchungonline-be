@@ -1,8 +1,8 @@
 const httpStatus = require('http-status');
 const httpMocks = require('node-mocks-http');
 const Joi = require('joi');
-const validate = require('./validate');
-const ApiError = require('../utils/ApiError');
+const validate = require('../../../src/middlewares/validate');
+const ApiError = require('../../../src/utils/ApiError');
 
 describe('Validation Middleware', () => {
   let req;

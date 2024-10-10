@@ -1,8 +1,8 @@
 const httpStatus = require('http-status');
 const httpMocks = require('node-mocks-http');
-const ApiError = require('../utils/ApiError');
-const firebaseAuth = require('./firebase');
-const { app } = require('../config/firebase');
+const ApiError = require('../../../src/utils/ApiError');
+const firebaseAuth = require('../../../src/middlewares/firebase');
+const { app } = require('../../../src/config/firebase');
 
 jest.mock('../config/firebase', () => ({
   app: {
