@@ -14,32 +14,32 @@ const router = express.Router();
  */
 
 router.post(
-  '/createNotarizationService',
+  '/create-notarization-service',
   auth('manageNotarizationServices'),
   validate(notarizationServiceValidation.createNotarizationService),
   notarizationServiceController.createNotarizationService
 );
 
 router.get(
-  '/getAllNotarizationServices',
-  auth('manageNotarizationServices'),
+  '/get-all-notarization-services',
+  auth('getNotarizationServices'),
   notarizationServiceController.getAllNotarizationServices
 );
 
 router.get(
-  '/getNotarizationService/:serviceId',
-  auth('manageNotarizationServices'),
+  '/get-notarization-service/:serviceId',
+  auth('getNotarizationServices'),
   notarizationServiceController.getNotarizationService
 );
 
 router.delete(
-  '/deleteNotarizationService/:serviceId',
+  '/delete-notarization-service/:serviceId',
   auth('manageNotarizationServices'),
   notarizationServiceController.deleteNotarizationService
 );
 
 router.patch(
-  '/updateNotarizationService/:serviceId',
+  '/update-notarization-service/:serviceId',
   auth('manageNotarizationServices'),
   validate(notarizationServiceValidation.updateNotarizationService),
   notarizationServiceController.updateNotarizationService
@@ -49,7 +49,6 @@ router.patch(
  * @swagger
  * components:
  *   schemas:
- *
  *     NotarizationService:
  *       type: object
  *       properties:
@@ -66,20 +65,26 @@ router.patch(
  *         description:
  *           type: string
  *           description: Description of the notarization service
+ *         price:
+ *           type: number
+ *           format: float
+ *           description: Price of the notarization service
  *       required:
  *         - name
  *         - fieldId
  *         - description
+ *         - price
  *       example:
  *         id: "12345"
  *         name: "Notarization Service Example"
  *         fieldId: "5f2b2b23c3a2b16f2e143b67"
  *         description: "This is an example of a notarization service."
+ *         price: 10000.00
  */
 
 /**
  * @swagger
- * /notarizationServices/createNotarizationService:
+ * /notarization-services/create-notarization-service:
  *   post:
  *     summary: Create a notarization service
  *     description: Only admins can create notarization services.
@@ -96,6 +101,7 @@ router.patch(
  *               - name
  *               - fieldId
  *               - description
+ *               - price
  *             properties:
  *               name:
  *                 type: string
@@ -103,10 +109,14 @@ router.patch(
  *                 type: string
  *               description:
  *                 type: string
+ *               price:
+ *                 type: number
+ *                 format: float
  *             example:
  *               name: Notarization Service Example
  *               fieldId: "5f2b2b23c3a2b16f2e143b67"  # example of a NotarizationField ID
  *               description: "This is an example of a notarization service."
+ *               price: 10000.00
  *     responses:
  *       "201":
  *         description: Created
@@ -133,10 +143,9 @@ router.patch(
 
 /**
  * @swagger
- * /notarizationServices/getAllNotarizationServices:
+ * /notarization-services/get-all-notarization-services:
  *   get:
  *     summary: Get all notarization services
- *     description: Only admins can retrieve all notarization services.
  *     tags: [NotarizationServices]
  *     security:
  *       - bearerAuth: []
@@ -160,10 +169,9 @@ router.patch(
 
 /**
  * @swagger
- * /notarizationServices/getNotarizationService/{serviceId}:
+ * /notarization-services/get-notarization-service/{notarization-service-id}:
  *   get:
  *     summary: Get a notarization service
- *     description: Only admins can fetch notarization service details.
  *     tags: [NotarizationServices]
  *     security:
  *       - bearerAuth: []
@@ -200,7 +208,7 @@ router.patch(
 
 /**
  * @swagger
- * /notarizationServices/updateNotarizationService/{serviceId}:
+ * /notarization-services/update-notarization-service/{notarization-service-id}:
  *   patch:
  *     summary: Update a notarization service
  *     description: Only admins can update notarization services.
@@ -230,10 +238,15 @@ router.patch(
  *               description:
  *                 type: string
  *                 description: Detailed description of the notarization service.
+ *               price:
+ *                 type: number
+ *                 format: float
+ *                 description: Price of the notarization service.
  *             example:
  *               name: Updated Notarization Service
  *               fieldId: "5f2b2b23c3a2b16f2e143b67"  # example of a NotarizationField ID
  *               description: "This service has been updated with new details."
+ *               price: 12000.00
  *     responses:
  *       "200":
  *         description: OK
@@ -257,12 +270,21 @@ router.patch(
  *       "403":
  *         $ref: '#/components/responses/Forbidden'
  *       "404":
- *         $ref: '#/components/responses/NotFound'
+ *         description: Notarization service not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *               example:
+ *                 message: "Notarization service not found."
  */
 
 /**
  * @swagger
- * /notarizationServices/deleteNotarizationService/{serviceId}:
+ * /notarization-services/delete-notarization-service/{notarization-service-id}:
  *   delete:
  *     summary: Delete a notarization service
  *     description: Only admins can delete notarization services.
@@ -277,17 +299,8 @@ router.patch(
  *           type: string
  *         description: Notarization service ID
  *     responses:
- *       "200":
- *         description: Successfully deleted
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *               example:
- *                 message: "Notarization service deleted successfully."
+ *       "204":
+ *         description: No Content
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":

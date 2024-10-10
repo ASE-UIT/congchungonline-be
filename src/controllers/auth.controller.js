@@ -4,22 +4,22 @@ const { authService, userService, tokenService, emailService } = require('../ser
 const { auth, db } = require('../config/firebase');
 
 const register = catchAsync(async (req, res) => {
-  const { email, password, name } = req.body;
+  // Create user in Firebase
+  // const { email, password, name } = req.body;
+  // const firebaseUser = await auth.createUser({
+  //   email,
+  //   password,
+  // });
+  // db.ref(`users/${firebaseUser.uid}`).set({
+  //   role: 'user',
+  //   name,
+  //   email,
+  //   password,
+  //   createdAt: new Date().toISOString(),
+  //   updatedAt: new Date().toISOString(),
+  // });
   // Create user in MongoDB
   const user = await userService.createUser(req.body);
-  // Create user in Firebase
-  const firebaseUser = await auth.createUser({
-    email,
-    password,
-  });
-  db.ref(`users/${firebaseUser.uid}`).set({
-    role: 'user',
-    name,
-    email,
-    password,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  });
   const tokens = await tokenService.generateAuthTokens(user);
   await emailService.sendEmail(user.email, 'Hi', '123');
   res.status(httpStatus.CREATED).send({ user, tokens });
@@ -92,6 +92,8 @@ const loginWithGoogle = catchAsync(async (req, res) => {
       throw error;
     }
   }
+
+  await userService.updateUserById(user.id, { isEmailVerified: true });
 
   res.redirect(`${process.env.CLIENT_URL}?token=${tokens.access.token}&refreshToken=${tokens.refresh.token}`);
 });

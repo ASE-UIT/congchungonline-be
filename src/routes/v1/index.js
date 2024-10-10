@@ -37,11 +37,11 @@ const defaultRoutes = [
     route: roleRoute,
   },
   {
-    path: '/notarizationFields',
+    path: '/notarization-fields',
     route: notarizationFieldRoute,
   },
   {
-    path: '/notarizationServices',
+    path: '/notarization-services',
     route: notarizationServiceRoute,
   },
   {
@@ -51,7 +51,7 @@ const defaultRoutes = [
   {
     path: '/session',
     route: sessionRoute,
-  }
+  },
 ];
 
 const devRoutes = [
