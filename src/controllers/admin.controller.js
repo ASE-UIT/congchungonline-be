@@ -41,6 +41,11 @@ const getEmployeeList = catchAsync(async (req, res) => {
   res.send(EmployeeList);
 });
 
+const getDailyRevenue = catchAsync(async (req, res) => {});
+const getMonthlyRevenue = catchAsync(async (req, res) => {});
+const getDailyRevenueByField = catchAsync(async (req, res) => {});
+const getMonthlyRevenueByField = catchAsync(async (req, res) => {});
+
 module.exports = {
   getToDayDocumentCount,
   getToDayUserCount,
@@ -49,4 +54,8 @@ module.exports = {
   getMonthDocumentsByNotaryField,
   getEmployeeCount,
   getEmployeeList,
+  getDailyRevenue,
+  getMonthlyRevenue,
+  getDailyRevenueByField,
+  getMonthlyRevenueByField,
 };

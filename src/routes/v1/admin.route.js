@@ -26,6 +26,13 @@ router.get(
   adminController.getMonthDocumentsByNotaryField
 );
 
+router.get('/metrics/revenue/today', auth('getDailyRevenue'), adminController.getDailyRevenue);
+
+router.get('/metrics/revenue/monthly', auth('getMonthlyRevenue'), adminController.getMonthlyRevenue);
+
+router.get('/metrics/revenue/fields/daily', auth('getDailyRevenueByField'), adminController.getDailyRevenueByField);
+
+router.get('/metrics/revenue/fields/monthly', auth('getMonthlyRevenueByField'), adminController.getMonthlyRevenueByField);
 module.exports = router;
 
 /**
@@ -348,6 +355,134 @@ module.exports = router;
  *           application/json:
  *             schema:
  *               $ref: '#/components/responses/Forbidden'
+ *       "404":
+ *         description: Not found - endpoint does not exist
+ */
+
+/**
+ * @swagger
+ * /admin/metrics/revenue/today:
+ *   get:
+ *     summary: Get today's revenue
+ *     description: Retrieve the revenue generated today. Only admins can access this information.
+ *     tags: [Admins]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       "200":
+ *         description: Successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 totalRevenue:
+ *                   type: number
+ *                   description: The total revenue generated today
+ *                   example: 1000.50
+ *       "401":
+ *         description: Unauthorized access - invalid token
+ *       "403":
+ *         description: Forbidden - the user doesn't have access
+ *       "404":
+ *         description: Not found - endpoint does not exist
+ */
+
+/**
+ * @swagger
+ * /admin/metrics/revenue/monthly:
+ *   get:
+ *     summary: Get monthly revenue
+ *     description: Retrieve the revenue generated this month. Only admins can access this information.
+ *     tags: [Admins]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       "200":
+ *         description: Successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 totalRevenue:
+ *                   type: number
+ *                   description: The total revenue generated this month
+ *                   example: 15000.75
+ *       "401":
+ *         description: Unauthorized access - invalid token
+ *       "403":
+ *         description: Forbidden - the user doesn't have access
+ *       "404":
+ *         description: Not found - endpoint does not exist
+ */
+
+/**
+ * @swagger
+ * /admin/metrics/revenue/fields/daily:
+ *   get:
+ *     summary: Get today's revenue by fields
+ *     description: Retrieve the revenue generated today, grouped by fields. Only admins can access this information.
+ *     tags: [Admins]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       "200":
+ *         description: Successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   field:
+ *                     type: string
+ *                     description: The name of the revenue field
+ *                     example: "Field A"
+ *                   revenue:
+ *                     type: number
+ *                     description: The revenue generated for this field today
+ *                     example: 500.25
+ *       "401":
+ *         description: Unauthorized access - invalid token
+ *       "403":
+ *         description: Forbidden - the user doesn't have access
+ *       "404":
+ *         description: Not found - endpoint does not exist
+ */
+
+/**
+ * @swagger
+ * /admin/metrics/revenue/fields/monthly:
+ *   get:
+ *     summary: Get monthly revenue by fields
+ *     description: Retrieve the revenue generated this month, grouped by fields. Only admins can access this information.
+ *     tags: [Admins]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       "200":
+ *         description: Successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   field:
+ *                     type: string
+ *                     description: The name of the revenue field
+ *                     example: "Field B"
+ *                   revenue:
+ *                     type: number
+ *                     description: The revenue generated for this field this month
+ *                     example: 7500.75
+ *       "401":
+ *         description: Unauthorized access - invalid token
+ *       "403":
+ *         description: Forbidden - the user doesn't have access
  *       "404":
  *         description: Not found - endpoint does not exist
  */

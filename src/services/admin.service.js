@@ -101,6 +101,10 @@ const getEmployeeList = async () => {
   return employeeList;
 };
 
+const getDailyRevenue = async () => {};
+const getMonthlyRevenue = async () => {};
+const getDailyRevenueByField = async () => {};
+const getMonthlyRevenueByField = async () => {};
 module.exports = {
   getToDayDocumentCount,
   getToDayUserCount,
@@ -109,4 +113,8 @@ module.exports = {
   getMonthDocumentsByNotaryField,
   getEmployeeCount,
   getEmployeeList,
+  getDailyRevenue,
+  getMonthlyRevenue,
+  getDailyRevenueByField,
+  getMonthlyRevenueByField,
 };
