@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const { Session } = require('../models');
 const ApiError = require('../utils/ApiError');
 const validator = require('validator');
-const { userService } = require('./');
+const { userService, sessionService } = require('./');
 const mongoose = require('mongoose');
 
 // Hàm kiểm tra email
@@ -106,6 +106,140 @@ const isAuthenticated = async (sessionId, userId) => {
   return true;
 };
 
+const getAllSessions = async () => {
+  try {
+    const sessions = await Session.find();
+    if (sessions.length === 0) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'No sessions found');
+    }
+    return sessions;
+  } catch (error) {
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'An error occurred while retrieving sessions');
+  }
+};
+
+const getSessionsByDate = async (date) => {
+  try {
+    if (!date) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Date is required');
+    }
+    await isValidFullDate(date);
+    const startOfDay = new Date(date);
+    startOfDay.setUTCHours(0, 0, 0, 0);
+    const endOfDay = new Date(date);
+    endOfDay.setUTCHours(23, 59, 59, 999);
+    const sessions = await Session.find({
+      startDate: {
+        $gte: startOfDay,
+        $lt: endOfDay,
+      },
+    });
+
+    if (!sessions || sessions.length === 0) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'No sessions found for the specified date');
+    }
+
+    return sessions;
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'An error occurred while retrieving sessions');
+  }
+};
+
+const getSessionsByMonth = async (date) => {
+  try {
+    if (!date) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Date is required');
+    }
+    await isValidMonth(date);
+    const givenDate = new Date(date);
+    const startOfMonth = new Date(givenDate.getFullYear(), givenDate.getMonth(), 1, 0, 0, 0, 0);
+    const endOfMonth = new Date(givenDate.getFullYear(), givenDate.getMonth() + 1, 0);
+    endOfMonth.setHours(23, 59, 59, 999);
+    console.log('startofmonth: ', startOfMonth, 'endofmonth: ', endOfMonth);
+    const sessions = await Session.find({
+      startDate: {
+        $gte: startOfMonth,
+        $lt: endOfMonth,
+      },
+    });
+    if (!sessions || sessions.length === 0) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'No sessions found for the specified month');
+    }
+    return sessions;
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'An error occurred while retrieving sessions');
+  }
+};
+
+const getActiveSessions = async () => {
+  try {
+    const now = new Date();
+    const present = new Date(now.getTime() + 7 * 60 * 60 * 1000);
+    console.log('present: ',present);
+    const sessions = await Session.find({
+      $and: [
+        {
+          startDate: { $lte: present },
+        },
+        {
+          $expr: {
+            $gte: [
+              {
+                $add: ['$startDate', { $multiply: ['$duration', 60 * 1000] }],
+              },
+              present,
+            ],
+          },
+        },
+      ],
+    });
+
+    if (!sessions || sessions.length === 0) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'No sessions found at present');
+    }
+
+    return sessions;
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    console.log(error);
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'An error occurred while retrieving sessions');
+  }
+};
+
+const isValidFullDate = async (input) => {
+  const fullDateRegex = /^\d{4}-\d{2}-\d{2}$/;
+  const isValidFormat = fullDateRegex.test(input);
+  if (!isValidFormat) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid date format');
+  }
+  const date = new Date(input);
+  if (!(date instanceof Date) || isNaN(date)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid date');
+  }
+  return true;
+};
+
+const isValidMonth = async (input) => {
+  const fullDateRegex = /^\d{4}-\d{2}$/;
+  const isValidFormat = fullDateRegex.test(input);
+  if (!isValidFormat) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid date format');
+  }
+  const date = new Date(input);
+  if (!(date instanceof Date) || isNaN(date)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid month');
+  }
+  return true;
+};
+
 module.exports = {
   validateEmails,
   createSession,
@@ -114,4 +248,10 @@ module.exports = {
   deleteUserOutOfSession,
   isAuthenticated,
   joinSession,
+  getAllSessions,
+  getSessionsByDate,
+  getSessionsByMonth,
+  getActiveSessions,
+  isValidFullDate,
+  isValidMonth,
 };
