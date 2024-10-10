@@ -91,12 +91,6 @@ const getApproveHistory = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send(approveHistory);
 });
 
-const getNotarizations = catchAsync(async (req, res) => {
-  const options = pick(req.query, ['sortBy', 'limit', 'page']);
-  const notarizations = await notarizationService.getNotarizations({}, options);
-  res.send(notarizations);
-});
-
 const getAllNotarizations = catchAsync(async (req, res) => {
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   const notarizations = await notarizationService.getAllNotarizations({}, options);

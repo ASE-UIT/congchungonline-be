@@ -49,7 +49,6 @@ router.patch(
  * @swagger
  * components:
  *   schemas:
- *
  *     NotarizationService:
  *       type: object
  *       properties:
@@ -66,15 +65,21 @@ router.patch(
  *         description:
  *           type: string
  *           description: Description of the notarization service
+ *         price:
+ *           type: number
+ *           format: float
+ *           description: Price of the notarization service
  *       required:
  *         - name
  *         - fieldId
  *         - description
+ *         - price
  *       example:
  *         id: "12345"
  *         name: "Notarization Service Example"
  *         fieldId: "5f2b2b23c3a2b16f2e143b67"
  *         description: "This is an example of a notarization service."
+ *         price: 10000.00
  */
 
 /**
@@ -96,6 +101,7 @@ router.patch(
  *               - name
  *               - fieldId
  *               - description
+ *               - price
  *             properties:
  *               name:
  *                 type: string
@@ -103,10 +109,14 @@ router.patch(
  *                 type: string
  *               description:
  *                 type: string
+ *               price:
+ *                 type: number
+ *                 format: float
  *             example:
  *               name: Notarization Service Example
  *               fieldId: "5f2b2b23c3a2b16f2e143b67"  # example of a NotarizationField ID
  *               description: "This is an example of a notarization service."
+ *               price: 10000.00
  *     responses:
  *       "201":
  *         description: Created
@@ -230,10 +240,15 @@ router.patch(
  *               description:
  *                 type: string
  *                 description: Detailed description of the notarization service.
+ *               price:
+ *                 type: number
+ *                 format: float
+ *                 description: Price of the notarization service.
  *             example:
  *               name: Updated Notarization Service
  *               fieldId: "5f2b2b23c3a2b16f2e143b67"  # example of a NotarizationField ID
  *               description: "This service has been updated with new details."
+ *               price: 12000.00
  *     responses:
  *       "200":
  *         description: OK
@@ -257,7 +272,16 @@ router.patch(
  *       "403":
  *         $ref: '#/components/responses/Forbidden'
  *       "404":
- *         $ref: '#/components/responses/NotFound'
+ *         description: Notarization service not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *               example:
+ *                 message: "Notarization service not found."
  */
 
 /**
@@ -277,17 +301,8 @@ router.patch(
  *           type: string
  *         description: Notarization service ID
  *     responses:
- *       "200":
- *         description: Successfully deleted
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *               example:
- *                 message: "Notarization service deleted successfully."
+ *       "204":
+ *         description: No Content
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
