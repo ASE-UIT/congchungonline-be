@@ -71,6 +71,5 @@ jobs:
 
       - name: Deploy
         run: railway up --service ${{ secrets.RAILWAY_SERVICE_NAME}}
-          npm run dev
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
