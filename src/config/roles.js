@@ -26,6 +26,8 @@ const allRoles = {
     'getNotarizationFields',
     'getNotarizationServices',
     'getSessions',
+    'getDailySessionCount',
+    'getMonthlySessionCount',
   ],
   notary: ['getDocumentsByRole', 'forwardDocumentStatus', 'getApproveHistory', 'joinSession'],
   secretary: ['getDocumentsByRole', 'forwardDocumentStatus', 'getApproveHistory', 'joinSession'],
