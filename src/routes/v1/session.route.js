@@ -75,6 +75,17 @@ router
   .route('/joinSession/:sessionId')
   .post(auth('joinSession'), validate(sessionValidation.joinSession), sessionController.joinSession);
 
+router.route('/getAllSessions').get(auth('getSessions'), sessionController.getAllSessions);
+
+router
+  .route('/getSessionsByDate')
+  .get(auth('getSessions'), validate(sessionValidation.getSessionsByDate), sessionController.getSessionsByDate);
+
+router
+  .route('/getSessionsByMonth')
+  .get(auth('getSessions'), validate(sessionValidation.getSessionsByMonth), sessionController.getSessionsByMonth);
+
+router.route('/getActiveSessions').get(auth('getSessions'), sessionController.getActiveSessions);
 /**
  * @swagger
  * /session/createSession:
@@ -104,9 +115,9 @@ router
  *                 example: "Notary Service"
  *               startTime:
  *                 type: string
- *                 format: date-time
- *                 description: The time of session in ISO format
- *                 example: "2024-10-10T20:00:00Z"
+ *                 format: time
+ *                 description: The time of session
+ *                 example: "14:00"
  *               startDate:
  *                 type: string
  *                 format: date
@@ -414,5 +425,204 @@ router
  *                   type: string
  *                   example: "Failed to join the session"
  */
-
+/**
+ * @swagger
+ * /session/getAllSessions:
+ *   get:
+ *     summary: Get all sessions
+ *     tags: [Sessions]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *     responses:
+ *       "201":
+ *         description: Successfully get all sessions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Get all sessions successfully"
+ *       "401":
+ *         description: Unauthorized access
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Unauthorized"
+ *       "500":
+ *         description: Internal server error - Failed to get all sessions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Failed to get all sessions"
+ */
+/**
+ * @swagger
+ * /session/getSessionsByDate:
+ *   get:
+ *     summary: Get sessions by date
+ *     tags: [Sessions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: date
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *           example: "2024-10-06"
+ *         description: The date to filter sessions
+ *     responses:
+ *       "200":
+ *         description: Get sessions successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 date:
+ *                   type: string
+ *                   example: "2024-10-06"
+ *       "400":
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid request parameters"
+ *       "401":
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Unauthorized"
+ *       "500":
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Failed to get sessions"
+ */
+/**
+ * @swagger
+ * /session/getSessionsByMonth:
+ *   get:
+ *     summary: Get sessions by month
+ *     tags: [Sessions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: date
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *           example: "2024-10"
+ *         description: The month to filter sessions
+ *     responses:
+ *       "200":
+ *         description: Get sessions successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 date:
+ *                   type: string
+ *                   example: "2024-10"
+ *       "400":
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid request parameters"
+ *       "401":
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Unauthorized"
+ *       "500":
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Failed to get sessions"
+ */
+/**
+ * @swagger
+ * /session/getActiveSessions:
+ *   get:
+ *     summary: Get all sessions
+ *     tags: [Sessions]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *     responses:
+ *       "201":
+ *         description: Successfully get active sessions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Get active sessions successfully"
+ *       "401":
+ *         description: Unauthorized access
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Unauthorized"
+ *       "500":
+ *         description: Internal server error - Failed to get active session
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Failed to get active sessions"
+ */
 module.exports = router;

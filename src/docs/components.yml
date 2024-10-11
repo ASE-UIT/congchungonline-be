@@ -91,6 +91,39 @@ components:
         name: 'user'
         permissions: ['viewNotarizationHistory', 'uploadDocuments']
 
+    Session:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        expires:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        email:
+          type: array
+          items:
+            type: string
+        sessionName:
+          type: string
+        notaryField:
+          type: string
+        notaryService:
+          type: string
+        startTime:
+          type: string
+        startDate:
+          type: string
+          format: date-time
+        duration:
+          type: number
+        createdBy:
+          type: string
+
   responses:
     DuplicateEmail:
       description: Email already taken
