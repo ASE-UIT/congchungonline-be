@@ -181,7 +181,6 @@ const getActiveSessions = async () => {
   try {
     const now = new Date();
     const present = new Date(now.getTime() + 7 * 60 * 60 * 1000);
-    console.log('present: ',present);
     const sessions = await Session.find({
       $and: [
         {
