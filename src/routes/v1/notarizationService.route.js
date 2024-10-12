@@ -45,6 +45,12 @@ router.patch(
   notarizationServiceController.updateNotarizationService
 );
 
+router.get(
+  '/get-notarization-services-by-field-id/:fieldId',
+  auth('getNotarizationServices'),
+  notarizationServiceController.getNotarizationServicesByFieldId
+);
+
 /**
  * @swagger
  * components:
@@ -316,6 +322,65 @@ router.patch(
  *                   type: string
  *               example:
  *                 message: "Notarization service not found."
+ */
+
+/**
+ * @swagger
+ * /notarization-services/get-notarization-services-by-field-id/{notarization-field-id}:
+ *   get:
+ *     summary: Get notarization services by field ID
+ *     tags: [NotarizationServices]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: fieldId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Notarization field ID
+ *     responses:
+ *       "200":
+ *         description: List of notarization services found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/NotarizationService'
+ *       "400":
+ *         description: Invalid field ID provided
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *               example:
+ *                 message: "Invalid fieldId provided."
+ *       "404":
+ *         description: No notarization services found for the given field
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *               example:
+ *                 message: "No notarization services found for the given field."
+ *       "500":
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *               example:
+ *                 message: "Error fetching notarization services by field."
  */
 
 module.exports = router;
