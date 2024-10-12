@@ -1,4 +1,3 @@
-const httpStatus = require('http-status');
 const moment = require('moment');
 const { Document, User, Session } = require('../models');
 
@@ -14,7 +13,7 @@ const getToDayDocumentCount = async () => {
   const yesterdayDocumentCount = await Document.count({
     createdAt: { $gte: moment().subtract(1, 'd').startOf('day'), $lte: moment().subtract(1, 'd').endOf('day') },
   });
-  percentDocumentGrowth = yesterdayDocumentCount
+  const percentDocumentGrowth = yesterdayDocumentCount
     ? (toDayDocumentCount - yesterdayDocumentCount) / yesterdayDocumentCount
     : 100;
   return {
@@ -35,7 +34,7 @@ const getToDayUserCount = async () => {
   const yesterdayUserCount = await User.count({
     createdAt: { $gte: moment().subtract(1, 'd').startOf('day'), $lte: moment().subtract(1, 'd').endOf('day') },
   });
-  percentUserGrowth = yesterdayUserCount ? (toDayUserCount - yesterdayUserCount) / yesterdayUserCount : 100;
+  const percentUserGrowth = yesterdayUserCount ? (toDayUserCount - yesterdayUserCount) / yesterdayUserCount : 100;
   return {
     toDayUserCount,
     percentUserGrowth,
@@ -43,11 +42,7 @@ const getToDayUserCount = async () => {
 };
 
 const getUserMonthly = async () => {
-  const startOfToday = new Date();
-  startOfToday.setHours(0, 0, 0, 0);
-  const endOfToday = new Date();
-  endOfToday.setHours(23, 59, 59, 999);
-  // user month and last month
+  // user count for this month and last month
   const userThisMonthCount = await User.count({
     createdAt: { $gte: moment().startOf('month'), $lte: moment().endOf('month') },
   });
@@ -73,11 +68,8 @@ const getTodayDocumentsByNotaryField = async () => {
     todayDocumentsByNotaryField,
   };
 };
+
 const getMonthDocumentsByNotaryField = async () => {
-  const startOfToday = new Date();
-  startOfToday.setHours(0, 0, 0, 0);
-  const endOfToday = new Date();
-  endOfToday.setHours(23, 59, 59, 999);
   // Document count by notaryField for this month
   const monthDocumentsByNotaryField = await Document.aggregate([
     { $match: { createdAt: { $gte: moment().startOf('month').toDate(), $lte: moment().endOf('month').toDate() } } },
@@ -86,6 +78,20 @@ const getMonthDocumentsByNotaryField = async () => {
   return {
     monthDocumentsByNotaryField,
   };
+};
+
+const getEmployeeCount = async () => {
+  const notaryCount = await User.countDocuments({ role: 'notary' });
+  const secretaryCount = await User.countDocuments({ role: 'secretary' });
+  return {
+    notaryCount,
+    secretaryCount,
+  };
+};
+
+const getEmployeeList = async () => {
+  const employeeList = await User.find({ role: { $in: ['notary', 'secretary'] } });
+  return employeeList;
 };
 
 const getDailySessionCount = async () => {
@@ -114,6 +120,8 @@ module.exports = {
   getUserMonthly,
   getTodayDocumentsByNotaryField,
   getMonthDocumentsByNotaryField,
+  getEmployeeCount,
+  getEmployeeList,
   getDailySessionCount,
   getMonthlySessionCount,
 };

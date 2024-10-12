@@ -1,5 +1,6 @@
 const httpStatus = require('http-status');
 const { adminService } = require('../services');
+const catchAsync = require('../utils/catchAsync');
 
 const getToDayDocumentCount = async (req, res) => {
   const result = await adminService.getToDayDocumentCount();
@@ -28,13 +29,25 @@ const getMonthDocumentsByNotaryField = async (req, res) => {
 
 const getDailySessionCount = async (req, res) => {
   const result = await adminService.getDailySessionCount();
-  res.status(httpStatus.OK).send({ dailySessionCount: result }); // Wrap the result in an object
+  res.status(httpStatus.OK).send({ dailySessionCount: result });
 };
 
 const getMonthlySessionCount = async (req, res) => {
   const result = await adminService.getMonthlySessionCount();
-  res.status(httpStatus.OK).send({ monthlySessionCount: result }); // Wrap the result in an object
+  res.status(httpStatus.OK).send({ monthlySessionCount: result });
 };
+
+const getEmployeeCount = catchAsync(async (req, res) => {
+  const EmployeeCount = await adminService.getEmployeeCount();
+  console.log(EmployeeCount);
+  res.send(EmployeeCount);
+});
+
+const getEmployeeList = catchAsync(async (req, res) => {
+  const EmployeeList = await adminService.getEmployeeList();
+  console.log(EmployeeList);
+  res.send(EmployeeList);
+});
 
 module.exports = {
   getToDayDocumentCount,
@@ -42,6 +55,8 @@ module.exports = {
   getUserMonthly,
   getTodayDocumentsByNotaryField,
   getMonthDocumentsByNotaryField,
+  getEmployeeCount,
+  getEmployeeList,
   getDailySessionCount,
   getMonthlySessionCount,
 };

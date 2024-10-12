@@ -47,7 +47,7 @@ const deleteUser = {
 
 const getUserByEmail = {
   params: Joi.object().keys({
-    email: Joi.string().required().email(),
+    email: Joi.string().required(),
   }),
 };
 

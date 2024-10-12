@@ -42,18 +42,32 @@ const getUserById = async (id) => {
  * @param {string} email
  * @returns {Promise<User>}
  */
-const getUserByEmail = async (email) => {
+const escapeRegExp = (string) => {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+};
+
+const getUserByEmail = async (input) => {
   try {
-    const user = await User.findOne({ email });
-    if (!user) {
-      throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+    if (typeof input !== 'string') {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Input must be a string');
     }
-    return user;
+
+    const escapedInput = escapeRegExp(input);
+
+    const regex = new RegExp(`^${escapedInput}`, 'i');
+
+    const users = await User.find({ email: regex }, 'id name role email');
+
+    if (users.length === 0) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'No users found with the provided input');
+    }
+
+    return users;
   } catch (error) {
     if (error instanceof ApiError) {
       throw error;
     }
-    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Error get user by email');
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Error retrieving users by input');
   }
 };
 
