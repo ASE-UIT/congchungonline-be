@@ -1,5 +1,5 @@
-const { Document, User } = require('../models');
 const moment = require('moment');
+const { Document, User, Session } = require('../models');
 
 const getToDayDocumentCount = async () => {
   const startOfToday = new Date();
@@ -42,11 +42,7 @@ const getToDayUserCount = async () => {
 };
 
 const getUserMonthly = async () => {
-  const startOfToday = new Date();
-  startOfToday.setHours(0, 0, 0, 0);
-  const endOfToday = new Date();
-  endOfToday.setHours(23, 59, 59, 999);
-  //user month and last month
+  // user count for this month and last month
   const userThisMonthCount = await User.count({
     createdAt: { $gte: moment().startOf('month'), $lte: moment().endOf('month') },
   });
@@ -72,11 +68,8 @@ const getTodayDocumentsByNotaryField = async () => {
     todayDocumentsByNotaryField,
   };
 };
+
 const getMonthDocumentsByNotaryField = async () => {
-  const startOfToday = new Date();
-  startOfToday.setHours(0, 0, 0, 0);
-  const endOfToday = new Date();
-  endOfToday.setHours(23, 59, 59, 999);
   // Document count by notaryField for this month
   const monthDocumentsByNotaryField = await Document.aggregate([
     { $match: { createdAt: { $gte: moment().startOf('month').toDate(), $lte: moment().endOf('month').toDate() } } },
@@ -105,6 +98,26 @@ const getDailyRevenue = async () => {};
 const getMonthlyRevenue = async () => {};
 const getDailyRevenueByField = async () => {};
 const getMonthlyRevenueByField = async () => {};
+const getDailySessionCount = async () => {
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+  const endOfToday = new Date();
+  endOfToday.setHours(23, 59, 59, 999);
+  const dailySessionCount = await Session.countDocuments({
+    createdAt: { $gte: startOfToday, $lte: endOfToday },
+  });
+  return dailySessionCount;
+};
+
+const getMonthlySessionCount = async () => {
+  const startOfMonth = moment().startOf('month').toDate();
+  const endOfMonth = moment().endOf('month').toDate();
+  const monthlySessionCount = await Session.countDocuments({
+    createdAt: { $gte: startOfMonth, $lte: endOfMonth },
+  });
+  return monthlySessionCount;
+};
+
 module.exports = {
   getToDayDocumentCount,
   getToDayUserCount,
@@ -117,4 +130,6 @@ module.exports = {
   getMonthlyRevenue,
   getDailyRevenueByField,
   getMonthlyRevenueByField,
+  getDailySessionCount,
+  getMonthlySessionCount,
 };

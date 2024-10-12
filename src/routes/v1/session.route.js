@@ -75,6 +75,17 @@ router
   .route('/joinSession/:sessionId')
   .post(auth('joinSession'), validate(sessionValidation.joinSession), sessionController.joinSession);
 
+router.route('/getAllSessions').get(auth('getSessions'), sessionController.getAllSessions);
+
+router
+  .route('/getSessionsByDate')
+  .get(auth('getSessions'), validate(sessionValidation.getSessionsByDate), sessionController.getSessionsByDate);
+
+router
+  .route('/getSessionsByMonth')
+  .get(auth('getSessions'), validate(sessionValidation.getSessionsByMonth), sessionController.getSessionsByMonth);
+
+router.route('/getActiveSessions').get(auth('getSessions'), sessionController.getActiveSessions);
 /**
  * @swagger
  * /session/createSession:
@@ -95,38 +106,49 @@ router
  *                 description: The name of the session
  *                 example: "Notarization Session"
  *               notaryField:
- *                 type: string
+ *                 type: object
  *                 description: The field of the notary
- *                 example: "Notary Field"
+ *                 example: {"name": "Notary Field"}
  *               notaryService:
- *                 type: string
+ *                 type: object
  *                 description: The Service of the notary
- *                 example: "Notary Service"
+ *                 example: {"name": "Notary Service"}
  *               startTime:
  *                 type: string
- *                 format: date-time
- *                 description: The time of session in ISO format
- *                 example: "2024-10-10T20:00:00Z"
+ *                 format: time
+ *                 description: The time of session
+ *                 example: "14:00"
  *               startDate:
  *                 type: string
  *                 format: date
  *                 description: The date of session
  *                 example: "2024-10-10"
- *               duration:
- *                 type: number
- *                 description: The duration of the session in minutes
- *                 example: 120
- *               email:
+ *               endTime:
+ *                 type: string
+ *                 format: time
+ *                 description: The time of session
+ *                 example: "15:00"
+ *               endDate:
+ *                 type: string
+ *                 format: date
+ *                 description: The date of session
+ *                 example: "2024-10-10"
+ *               users:
  *                 type: array
  *                 items:
- *                   type: string
- *                 description: List of email addresses related to the session
+ *                   type: object
+ *                   properties:
+ *                     email:
+ *                       type: string
+ *                 description: List of users related to the session
+ *                 example: [{email: "abc@gmail.com"}, {email: "def@gmail.com"}]
  *             required:
  *               - sessionName
  *               - startTime
  *               - startDate
- *               - duration
- *               - email
+ *               - endTime
+ *               - endDate
+ *               - users
  *               - notaryField
  *               - notaryService
  *     responses:
@@ -154,13 +176,21 @@ router
  *                   type: string
  *                   format: date
  *                   example: "2024-10-10"
- *                 duration:
- *                   type: number
- *                   example: 120
- *                 email:
+ *                 endTime:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2024-10-10T21:00:00Z"
+ *                 endDate:
+ *                   type: string
+ *                   format: date
+ *                   example: "2024-10-10"
+ *                 users:
  *                   type: array
  *                   items:
- *                      type: string
+ *                      type: object
+ *                      properties:
+ *                        email:
+ *                          type: string
  *                   example: "abc@gmail.com"
  *                 createdBy:
  *                   type: string
@@ -195,7 +225,7 @@ router
  *                 message:
  *                   type: string
  *                   example: "Failed to create session"
- */
+ * */
 /**
  * @swagger
  * /session/addUser/{sessionId}:
@@ -218,13 +248,14 @@ router
  *           schema:
  *             type: object
  *             properties:
- *               email:
+ *               emails:
  *                 type: array
  *                 items:
  *                   type: string
  *                 description: List of email addresses add to the session
+ *                 example: ["abc@gmail.com", "def@gmail.com"]
  *             required:
- *               - email
+ *               - emails
  *     responses:
  *       "201":
  *         description: User was added successfully
@@ -236,12 +267,11 @@ router
  *                 sessionId:
  *                   type: string
  *                   example: "66fe4c6b76f99374f4c87165"
- *                 email:
+ *                 emails:
  *                   type: array
  *                   items:
  *                      type: string
  *                   example: "abc@gmail.com"
- *
  *       "400":
  *         description: Bad Request
  *         content:
@@ -272,12 +302,12 @@ router
  *                 message:
  *                   type: string
  *                   example: "Failed to add user to session"
- */
+ * */
 /**
  * @swagger
  * /session/deleteUser/{sessionId}:
  *   patch:
- *     summary: Delete user out of session
+ *     summary: Delete user from session
  *     tags: [Sessions]
  *     security:
  *       - bearerAuth: []
@@ -295,24 +325,30 @@ router
  *           schema:
  *             type: object
  *             properties:
- *               email:
+ *               emails:
  *                 type: array
  *                 items:
  *                   type: string
- *                 description: List of email addresses delete out of the session
+ *                 description: List of email addresses to delete from the session
+ *                 example: ["abc@gmail.com", "def@gmail.com"]
  *             required:
- *               - email
+ *               - emails
  *     responses:
- *       "201":
+ *       "200":
  *         description: User was deleted successfully
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 message:
- *                    type: string
- *                    example: "User was deleted successfully"
+ *                 sessionId:
+ *                   type: string
+ *                   example: "66fe4c6b76f99374f4c87165"
+ *                 emails:
+ *                   type: array
+ *                   items:
+ *                      type: string
+ *                   example: "abc@gmail.com"
  *       "400":
  *         description: Bad Request
  *         content:
@@ -334,7 +370,7 @@ router
  *                   type: string
  *                   example: "Unauthorized"
  *       "500":
- *         description: Internal Server Error - Failed to delete user out of session
+ *         description: Internal Server Error - Failed to delete user from session
  *         content:
  *           application/json:
  *             schema:
@@ -342,13 +378,13 @@ router
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Failed to delete user out of session"
- */
+ *                   example: "Failed to delete user from session"
+ * */
 /**
  * @swagger
  * /session/joinSession/{sessionId}:
  *   post:
- *     summary: Join a session
+ *     summary: Join session
  *     tags: [Sessions]
  *     security:
  *       - bearerAuth: []
@@ -358,33 +394,38 @@ router
  *         required: true
  *         schema:
  *           type: string
- *         description: The ID of the session to join
+ *         description: ID of the session
  *     requestBody:
- *       required: true
+ *       action: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
  *             properties:
- *               require:
+ *               action:
  *                 type: string
- *                 description: The request status for joining the session (e.g., "accept")
+ *                 description: The action of the session
  *                 example: "accept"
  *             required:
- *               - require
+ *               - action
  *     responses:
- *       "201":
- *         description: Successfully joined the session
+ *       "200":
+ *         description: Session joined successfully
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 message:
+ *                 sessionId:
  *                   type: string
- *                   example: "Join session successfully"
+ *                   example: "66fe4c6b76f99374f4c87165"
+ *                 email:
+ *                   type: array
+ *                   items:
+ *                      type: string
+ *                   example: "abc@gmail.com"
  *       "400":
- *         description: Bad request due to invalid parameters
+ *         description: Bad Request
  *         content:
  *           application/json:
  *             schema:
@@ -394,7 +435,7 @@ router
  *                   type: string
  *                   example: "Invalid request parameters"
  *       "401":
- *         description: Unauthorized access
+ *         description: Unauthorized
  *         content:
  *           application/json:
  *             schema:
@@ -404,7 +445,7 @@ router
  *                   type: string
  *                   example: "Unauthorized"
  *       "500":
- *         description: Internal server error - Failed to join the session
+ *         description: Internal Server Error - Failed to join session
  *         content:
  *           application/json:
  *             schema:
@@ -412,7 +453,328 @@ router
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Failed to join the session"
- */
-
+ *                   example: "Failed to join session"
+ * */
+/**
+ * @swagger
+ * /session/getAllSessions:
+ *   get:
+ *     summary: Get all sessions
+ *     tags: [Sessions]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       "200":
+ *         description: All sessions retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   sessionName:
+ *                     type: string
+ *                     example: "Notarization Session"
+ *                   notaryField:
+ *                      type: string
+ *                      example: "Notary Field"
+ *                   notaryService:
+ *                      type: string
+ *                      example: "Notary Service"
+ *                   startTime:
+ *                     type: string
+ *                     format: date-time
+ *                     example: "2024-10-10T20:00:00Z"
+ *                   startDate:
+ *                     type: string
+ *                     format: date
+ *                     example: "2024-10-10"
+ *                   endTime:
+ *                     type: string
+ *                     format: date-time
+ *                     example: "2024-10-10T21:00:00Z"
+ *                   endDate:
+ *                     type: string
+ *                     format: date
+ *                     example: "2024-10-10"
+ *                   email:
+ *                     type: array
+ *                     items:
+ *                        type: string
+ *                     example: "abc@gmail.com"
+ *                   createdBy:
+ *                     type: string
+ *       "401":
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Unauthorized"
+ *       "500":
+ *         description: Internal Server Error - Failed to retrieve sessions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Failed to retrieve sessions"
+ * */
+/**
+ * @swagger
+ * /session/getSessionsByDate:
+ *   get:
+ *     summary: Get sessions by date
+ *     tags: [Sessions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: date
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: The date of the sessions
+ *         example: "2024-10-10"
+ *     responses:
+ *       "200":
+ *         description: Sessions retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   sessionName:
+ *                     type: string
+ *                     example: "Notarization Session"
+ *                   notaryField:
+ *                      type: string
+ *                      example: "Notary Field"
+ *                   notaryService:
+ *                      type: string
+ *                      example: "Notary Service"
+ *                   startTime:
+ *                     type: string
+ *                     format: date-time
+ *                     example: "2024-10-10T20:00:00Z"
+ *                   startDate:
+ *                     type: string
+ *                     format: date
+ *                     example: "2024-10-10"
+ *                   endTime:
+ *                     type: string
+ *                     format: date-time
+ *                     example: "2024-10-10T21:00:00Z"
+ *                   endDate:
+ *                     type: string
+ *                     format: date
+ *                     example: "2024-10-10"
+ *                   email:
+ *                     type: array
+ *                     items:
+ *                        type: string
+ *                     example: "abc@gmail.com"
+ *                   createdBy:
+ *                     type: string
+ *       "400":
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid request parameters"
+ *       "401":
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Unauthorized"
+ *       "500":
+ *         description: Internal Server Error - Failed to retrieve sessions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Failed to retrieve sessions"
+ * */
+/**
+ * @swagger
+ * /session/getSessionsByMonth:
+ *   get:
+ *     summary: Get sessions by month
+ *     tags: [Sessions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: date
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: The month of the sessions
+ *         example: "2024-10"
+ *     responses:
+ *       "200":
+ *         description: Sessions retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   sessionName:
+ *                     type: string
+ *                     example: "Notarization Session"
+ *                   notaryField:
+ *                      type: string
+ *                      example: "Notary Field"
+ *                   notaryService:
+ *                      type: string
+ *                      example: "Notary Service"
+ *                   startTime:
+ *                     type: string
+ *                     format: date-time
+ *                     example: "2024-10-10T20:00:00Z"
+ *                   startDate:
+ *                     type: string
+ *                     format: date
+ *                     example: "2024-10-10"
+ *                   endTime:
+ *                     type: string
+ *                     format: date-time
+ *                     example: "2024-10-10T21:00:00Z"
+ *                   endDate:
+ *                     type: string
+ *                     format: date
+ *                     example: "2024-10-10"
+ *                   email:
+ *                     type: array
+ *                     items:
+ *                        type: string
+ *                     example: "abc@gmail.com"
+ *                   createdBy:
+ *                     type: string
+ *       "400":
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid request parameters"
+ *       "401":
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Unauthorized"
+ *       "500":
+ *         description: Internal Server Error - Failed to retrieve sessions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Failed to retrieve sessions"
+ * */
+/**
+ * @swagger
+ * /session/getActiveSessions:
+ *   get:
+ *     summary: Get active sessions
+ *     tags: [Sessions]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       "200":
+ *         description: Active sessions retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   sessionName:
+ *                     type: string
+ *                     example: "Notarization Session"
+ *                   notaryField:
+ *                      type: string
+ *                      example: "Notary Field"
+ *                   notaryService:
+ *                      type: string
+ *                      example: "Notary Service"
+ *                   startTime:
+ *                     type: string
+ *                     format: date-time
+ *                     example: "2024-10-10T20:00:00Z"
+ *                   startDate:
+ *                     type: string
+ *                     format: date
+ *                     example: "2024-10-10"
+ *                   endTime:
+ *                     type: string
+ *                     format: date-time
+ *                     example: "2024-10-10T21:00:00Z"
+ *                   endDate:
+ *                     type: string
+ *                     format: date
+ *                     example: "2024-10-10"
+ *                   email:
+ *                     type: array
+ *                     items:
+ *                        type: string
+ *                     example: "abc@gmail.com"
+ *                   createdBy:
+ *                     type: string
+ *       "401":
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Unauthorized"
+ *       "500":
+ *         description: Internal Server Error - Failed to retrieve sessions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Failed to retrieve sessions"
+ * */
 module.exports = router;

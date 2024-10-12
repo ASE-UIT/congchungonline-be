@@ -1,18 +1,15 @@
 const express = require('express');
 const auth = require('../../middlewares/auth');
-const validate = require('../../middlewares/validate');
 const { adminController } = require('../../controllers');
+
 const router = express.Router();
 
+// Document metrics
 router.get('/documents/today', auth('getToDayDocumentCount'), adminController.getToDayDocumentCount);
 
 router.get('/users/today', auth('getToDayUserCount'), adminController.getToDayUserCount);
 
 router.get('/users/monthly', auth('getUserMonthly'), adminController.getUserMonthly);
-
-router.get('/employees/count', auth('getEmployeeCount'), adminController.getEmployeeCount);
-
-router.get('/employees/list', auth('getEmployeeList'), adminController.getEmployeeList);
 
 router.get(
   '/documents/fields/daily',
@@ -33,6 +30,17 @@ router.get('/metrics/revenue/monthly', auth('getMonthlyRevenue'), adminControlle
 router.get('/metrics/revenue/fields/daily', auth('getDailyRevenueByField'), adminController.getDailyRevenueByField);
 
 router.get('/metrics/revenue/fields/monthly', auth('getMonthlyRevenueByField'), adminController.getMonthlyRevenueByField);
+
+// Employee metrics
+router.get('/employees/count', auth('getEmployeeCount'), adminController.getEmployeeCount);
+
+router.get('/employees/list', auth('getEmployeeList'), adminController.getEmployeeList);
+
+// Session metrics
+router.get('/sessions/daily', auth('getDailySessionCount'), adminController.getDailySessionCount);
+
+router.get('/sessions/monthly', auth('getMonthlySessionCount'), adminController.getMonthlySessionCount);
+
 module.exports = router;
 
 /**
@@ -102,53 +110,12 @@ module.exports = router;
  *               properties:
  *                 userCount:
  *                   type: integer
- *                   description: The number of user created today
+ *                   description: The number of users created today
  *                   example: 20
  *                 percentGrowth:
  *                   type: number
- *                   description: The percentage growth of user from previous day
+ *                   description: The percentage growth of users from previous day
  *                   example: 15.5
- *       "401":
- *         description: Unauthorized access - invalid token
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/responses/Unauthorized'
- *       "403":
- *         description: Forbidden - the user doesn't have access
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/responses/Forbidden'
- *       "404":
- *         description: Not found - endpoint does not exist
- */
-
-/**
- * @swagger
- * /admin/metrics/users/monthly:
- *   get:
- *     summary: Get user count for this month and last month
- *     description: Retrieve the number of users registered this month and last month. Only admins can access this information.
- *     tags: [Admins]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       "200":
- *         description: Successful operation
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 userThisMonthCount:
- *                   type: integer
- *                   description: The number of users registered this month
- *                   example: 2
- *                 userLastMonthCount:
- *                   type: integer
- *                   description: The number of users registered last month
- *                   example: 12
  *       "401":
  *         description: Unauthorized access - invalid token
  *         content:
@@ -190,53 +157,7 @@ module.exports = router;
  *                       _id:
  *                         type: string
  *                         description: The name of the notary field
- *                         example: "Example1 Notary Field"
- *                       count:
- *                         type: integer
- *                         description: The number of documents created today for this notary field
- *                         example: 1
- *       "401":
- *         description: Unauthorized access - invalid token
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/responses/Unauthorized'
- *       "403":
- *         description: Forbidden - the user doesn't have access
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/responses/Forbidden'
- *       "404":
- *         description: Not found - endpoint does not exist
- */
-
-/**
- * @swagger
- * /admin/metrics/documents/fields/monthly:
- *   get:
- *     summary: Get month's document count by notary field
- *     description: Retrieve the number of documents created month, grouped by notary fields. Only admins can access this information.
- *     tags: [Admins]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       "200":
- *         description: Successful operation
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 monthDocumentsByNotaryField:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       _id:
- *                         type: string
- *                         description: The name of the notary field
- *                         example: "Example1 Notary Field"
+ *                         example: "Example Notary Field"
  *                       count:
  *                         type: integer
  *                         description: The number of documents created today for this notary field
@@ -298,8 +219,8 @@ module.exports = router;
  * @swagger
  * /admin/metrics/employees/list:
  *   get:
- *     summary: Get the list of employees with roles 'notary' and 'secretary'
- *     description: Retrieve a list of all employees with the roles of 'notary' and 'secretary'. Only admins can access this information.
+ *     summary: Get the list of employees with role 'notary' and 'secretary'
+ *     description: Retrieve a list of employees with the role of 'notary' and 'secretary'.
  *     tags: [Admins]
  *     security:
  *       - bearerAuth: []
@@ -311,38 +232,77 @@ module.exports = router;
  *             schema:
  *               type: array
  *               items:
- *                 type: object
- *                 properties:
- *                   _id:
- *                     type: string
- *                     description: The unique identifier of the employee
- *                     example: "66e4419a9eb09a1314b9378f"
- *                   name:
- *                     type: string
- *                     description: The name of the employee
- *                     example: "Huỳnh Gia Bảo"
- *                   email:
- *                     type: string
- *                     description: The email address of the employee
- *                     example: "baobak9g@gmail.com"
- *                   role:
- *                     type: string
- *                     description: The role of the employee
- *                     example: "notary"
- *                   isEmailVerified:
- *                     type: boolean
- *                     description: Whether the employee's email is verified
- *                     example: false
- *                   createdAt:
- *                     type: string
- *                     format: date-time
- *                     description: The date and time when the employee was created
- *                     example: "2024-09-13T13:43:54.937+00:00"
- *                   updatedAt:
- *                     type: string
- *                     format: date-time
- *                     description: The date and time when the employee was last updated
- *                     example: "2024-09-13T13:43:54.937+00:00"
+ *                 $ref: '#/components/schemas/User'
+ *       "401":
+ *         description: Unauthorized access - invalid token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         description: Forbidden - the user doesn't have access
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/responses/Forbidden'
+ *       "404":
+ *         description: Not found - endpoint does not exist
+ *       "500":
+ *         description: Internal server error
+ */
+
+/**
+ * @swagger
+ * /admin/metrics/sessions/daily:
+ *   get:
+ *     summary: Get today's session count
+ *     description: Retrieve the number of sessions created today. Only admins can access this information.
+ *     tags: [Admins]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       "200":
+ *         description: Successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: integer
+ *               description: The number of sessions created today
+ *               example: 1
+ *       "401":
+ *         description: Unauthorized access - invalid token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         description: Forbidden - the user doesn't have access
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/responses/Forbidden'
+ *       "404":
+ *         description: Not found - endpoint does not exist
+ */
+
+/**
+ * @swagger
+ * /admin/metrics/sessions/monthly:
+ *   get:
+ *     summary: Get month's session count
+ *     description: Retrieve the number of sessions created this month. Only admins can access this information.
+ *     tags: [Admins]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       "200":
+ *         description: Successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: integer
+ *               description: The number of sessions created this month
+ *               example: 1
  *       "401":
  *         description: Unauthorized access - invalid token
  *         content:

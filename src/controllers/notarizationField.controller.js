@@ -8,7 +8,7 @@ const createNotarizationField = catchAsync(async (req, res) => {
 });
 
 const getNotarizationField = catchAsync(async (req, res) => {
-  const notarizationField = await notarizationFieldService.getNotarizationFieldById(req.params.id);
+  const notarizationField = await notarizationFieldService.getNotarizationFieldById(req.params.fieldId);
   res.status(httpStatus.OK).send(notarizationField);
 });
 
@@ -18,12 +18,12 @@ const getAllNotarizationFields = catchAsync(async (req, res) => {
 });
 
 const updateNotarizationField = catchAsync(async (req, res) => {
-  const notarizationField = await notarizationFieldService.updateNotarizationFieldById(req.params.id, req.body);
+  const notarizationField = await notarizationFieldService.updateNotarizationFieldById(req.params.fieldId, req.body);
   res.status(httpStatus.OK).send(notarizationField);
 });
 
 const deleteNotarizationField = catchAsync(async (req, res) => {
-  await notarizationFieldService.deleteNotarizationFieldById(req.params.id);
+  await notarizationFieldService.deleteNotarizationFieldById(req.params.fieldId);
   res.status(httpStatus.OK).json({ message: 'Notarization field deleted successfully' });
 });
 
