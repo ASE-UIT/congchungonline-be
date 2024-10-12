@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const faker = require('faker');
-const { Document } = require('../../../src/models');
+const Document = require('../../../src/models/document.model');
 
 let mongoServer;
 
@@ -30,10 +30,10 @@ describe('Document model', () => {
             firebaseUrl: faker.internet.url(),
           },
         ],
-        notaryService: faker.lorem.word(),
-        notaryField: faker.lorem.word(),
+        notarizationServiceId: new mongoose.Types.ObjectId(),
+        notarizationFieldId: new mongoose.Types.ObjectId(),
         requesterInfo: {
-          citizenId: faker.random.alphaNumeric(10),
+          citizenId: faker.datatype.uuid(),
           phoneNumber: faker.phone.phoneNumber(),
           email: faker.internet.email(),
         },
@@ -45,18 +45,13 @@ describe('Document model', () => {
       await expect(new Document(newDocument).validate()).resolves.toBeUndefined();
     });
 
-    test('should throw a validation error if files is missing', async () => {
-      newDocument.files = undefined;
+    test('should throw a validation error if notarizationServiceId is missing', async () => {
+      newDocument.notarizationServiceId = undefined;
       await expect(new Document(newDocument).validate()).rejects.toThrow();
     });
 
-    test('should throw a validation error if notaryService is missing', async () => {
-      newDocument.notaryService = undefined;
-      await expect(new Document(newDocument).validate()).rejects.toThrow();
-    });
-
-    test('should throw a validation error if notaryField is missing', async () => {
-      newDocument.notaryField = undefined;
+    test('should throw a validation error if notarizationFieldId is missing', async () => {
+      newDocument.notarizationFieldId = undefined;
       await expect(new Document(newDocument).validate()).rejects.toThrow();
     });
 
@@ -80,10 +75,10 @@ describe('Document model', () => {
             firebaseUrl: faker.internet.url(),
           },
         ],
-        notaryService: faker.lorem.word(),
-        notaryField: faker.lorem.word(),
+        notarizationServiceId: new mongoose.Types.ObjectId(),
+        notarizationFieldId: new mongoose.Types.ObjectId(),
         requesterInfo: {
-          citizenId: faker.random.alphaNumeric(10),
+          citizenId: faker.datatype.uuid(),
           phoneNumber: faker.phone.phoneNumber(),
           email: faker.internet.email(),
         },

@@ -1,5 +1,4 @@
-require('dotenv').config();
-
+const setupTestDB = require('../../utils/setupTestDB');
 const httpStatus = require('http-status');
 const tokenService = require('../../../src/services/token.service');
 const userService = require('../../../src/services/user.service');
@@ -9,6 +8,7 @@ const ApiError = require('../../../src/utils/ApiError');
 const { tokenTypes } = require('../../../src/config/tokens');
 const authService = require('../../../src/services/auth.service');
 
+setupTestDB();
 jest.mock('../../../src/services/token.service');
 jest.mock('../../../src/services/user.service');
 jest.mock('../../../src/models/token.model');

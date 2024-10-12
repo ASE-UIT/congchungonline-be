@@ -1,6 +1,5 @@
 const express = require('express');
 const auth = require('../../middlewares/auth');
-const validate = require('../../middlewares/validate');
 const { adminController } = require('../../controllers');
 const router = express.Router();
 
@@ -10,9 +9,21 @@ router.get('/users/today', auth('getToDayUserCount'), adminController.getToDayUs
 
 router.get('/users/monthly', auth('getUserMonthly'), adminController.getUserMonthly);
 
-router.get('/documents/fields/daily', auth('getTodayDocumentsByNotaryField'), adminController.getTodayDocumentsByNotaryField);
+router.get(
+  '/documents/fields/daily',
+  auth('getTodayDocumentsByNotaryField'),
+  adminController.getTodayDocumentsByNotaryField
+);
 
-router.get('/documents/fields/monthly', auth('getMonthDocumentsByNotaryField'), adminController.getMonthDocumentsByNotaryField);
+router.get(
+  '/documents/fields/monthly',
+  auth('getMonthDocumentsByNotaryField'),
+  adminController.getMonthDocumentsByNotaryField
+);
+
+router.get('/sessions/daily', auth('getDailySessionCount'), adminController.getDailySessionCount);
+
+router.get('/sessions/monthly', auth('getMonthlySessionCount'), adminController.getMonthlySessionCount);
 
 module.exports = router;
 
@@ -222,6 +233,74 @@ module.exports = router;
  *                         type: integer
  *                         description: The number of documents created today for this notary field
  *                         example: 1
+ *       "401":
+ *         description: Unauthorized access - invalid token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         description: Forbidden - the user doesn't have access
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/responses/Forbidden'
+ *       "404":
+ *         description: Not found - endpoint does not exist
+ */
+
+/**
+ * @swagger
+ * /admin/metrics/sessions/daily:
+ *   get:
+ *     summary: Get today's session count
+ *     description: Retrieve the number of sessions created today. Only admins can access this information.
+ *     tags: [Admins]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       "200":
+ *         description: Successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: integer
+ *               description: The number of sessions created today
+ *               example: 1
+ *       "401":
+ *         description: Unauthorized access - invalid token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         description: Forbidden - the user doesn't have access
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/responses/Forbidden'
+ *       "404":
+ *         description: Not found - endpoint does not exist
+ */
+
+/**
+ * @swagger
+ * /admin/metrics/sessions/monthly:
+ *   get:
+ *     summary: Get month's session count
+ *     description: Retrieve the number of sessions created this month. Only admins can access this information.
+ *     tags: [Admins]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       "200":
+ *         description: Successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: integer
+ *               description: The number of sessions created this month
+ *               example: 1
  *       "401":
  *         description: Unauthorized access - invalid token
  *         content:

@@ -12,6 +12,9 @@ beforeAll(async () => {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
+
+  // Tạo chỉ mục unique trên trường name
+  await NotarizationField.createIndexes();
 });
 
 afterAll(async () => {
@@ -24,7 +27,7 @@ describe('NotarizationField model', () => {
     let newNotarizationField;
     beforeEach(() => {
       newNotarizationField = {
-        name: faker.company.companyName(), 
+        name: faker.company.companyName(),
       };
     });
 
@@ -47,7 +50,7 @@ describe('NotarizationField model', () => {
   describe('NotarizationField toJSON()', () => {
     test('should not return __v when toJSON is called', () => {
       const newNotarizationField = {
-        name: faker.company.companyName(), 
+        name: faker.company.companyName(),
       };
       expect(new NotarizationField(newNotarizationField).toJSON()).not.toHaveProperty('__v');
     });

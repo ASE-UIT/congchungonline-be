@@ -1,7 +1,6 @@
 const httpStatus = require('http-status');
-const { Document, StatusTracking, ApproveHistory } = require('../models');
+const { Document, StatusTracking, ApproveHistory, NotarizationService, NotarizationField } = require('../models');
 const ApiError = require('../utils/ApiError');
-const catchAsync = require('../utils/catchAsync');
 const { bucket } = require('../config/firebase');
 
 const uploadFileToFirebase = async (file, folderName) => {
@@ -23,6 +22,16 @@ const createDocument = async (documentBody, files) => {
   }
 
   try {
+    const notarizationFieldId = await NotarizationField.findById(documentBody.notarizationFieldId);
+    if (!notarizationFieldId) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid fieldId provided');
+    }
+
+    const notarizationServiceId = await NotarizationService.findById(documentBody.notarizationServiceId);
+    if (!notarizationServiceId) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid serviceId provided');
+    }
+
     const newDocument = new Document({
       ...documentBody,
       files: [],
@@ -42,6 +51,9 @@ const createDocument = async (documentBody, files) => {
 
     return newDocument;
   } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
     console.error('Error uploading file:', error.message);
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to upload file');
   }
@@ -203,10 +215,9 @@ const getApproveHistory = async (userId) => {
 };
 
 const getAllNotarizations = async (filter, options) => {
-
   const notatizations = await Document.paginate(filter, options);
   return notatizations;
-}
+};
 
 module.exports = {
   createDocument,
@@ -216,5 +227,5 @@ module.exports = {
   getDocumentByRole,
   forwardDocumentStatus,
   getApproveHistory,
-  getAllNotarizations
+  getAllNotarizations,
 };

@@ -1,5 +1,15 @@
 const allRoles = {
-  user: ['uploadDocuments', 'viewNotarizationHistory','createSession','addUserToSession','deleteUserOutOfSession','joinSession'],
+  user: [
+    'uploadDocuments',
+    'viewNotarizationHistory',
+    'createSession',
+    'addUserToSession',
+    'deleteUserOutOfSession',
+    'joinSession',
+    'getNotarizationFields',
+    'getNotarizationServices',
+    'getUserByEmail',
+  ],
   admin: [
     'getUsers',
     'manageUsers',
@@ -14,9 +24,15 @@ const allRoles = {
     'getUserMonthly',
     'getTodayDocumentsByNotaryField',
     'getMonthDocumentsByNotaryField',
+    'getNotarizationFields',
+    'getNotarizationServices',
+    'getSessions',
+    'getDailySessionCount',
+    'getMonthlySessionCount',
+    'getUserByEmail',
   ],
-  notary: ['getDocumentsByRole', 'forwardDocumentStatus', 'getApproveHistory','joinSession'],
-  secretary: ['getDocumentsByRole', 'forwardDocumentStatus', 'getApproveHistory','joinSession'],
+  notary: ['getDocumentsByRole', 'forwardDocumentStatus', 'getApproveHistory', 'joinSession'],
+  secretary: ['getDocumentsByRole', 'forwardDocumentStatus', 'getApproveHistory', 'joinSession'],
 };
 
 const roles = Object.keys(allRoles);

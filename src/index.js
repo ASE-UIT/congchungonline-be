@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const app = require('./app');
 const config = require('./config/config');
+const { startCronJob } = require('./services/cron.service');
 const logger = require('./config/logger');
 
 let server;
@@ -9,6 +10,7 @@ mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
   server = app.listen(config.port, () => {
     logger.info(`Listening to port ${config.port}`);
   });
+  startCronJob();
 });
 
 const exitHandler = () => {

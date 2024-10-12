@@ -9,32 +9,15 @@ const tokenService = require('../../../src/services/token.service');
 const Token = require('../../../src/models/token.model');
 const ApiError = require('../../../src/utils/ApiError');
 const { tokenTypes } = require('../../../src/config/tokens');
-const config = require('../../../src/config/config');
+const setupTestDB = require('../../utils/setupTestDB');
 
 // Mock các phương thức của jwt và userService
 jest.mock('jsonwebtoken');
 jest.mock('../../../src/services/user.service');
 
+setupTestDB();
+
 describe('Token Service', () => {
-  beforeAll(async () => {
-    await mongoose.connect(process.env.MONGODB_URL, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-  });
-
-  afterAll(async () => {
-    await mongoose.disconnect();
-  });
-
-  afterEach(async () => {
-    const collections = mongoose.connection.collections;
-    for (const key in collections) {
-      const collection = collections[key];
-      await collection.deleteMany({});
-    }
-  });
-
   describe('generateToken', () => {
     test('should return a JWT token', () => {
       const userId = new mongoose.Types.ObjectId();

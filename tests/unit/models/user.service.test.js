@@ -5,12 +5,11 @@ const httpStatus = require('http-status');
 const ApiError = require('../../../src/utils/ApiError');
 const userService = require('../../../src/services/user.service');
 
-
 jest.mock('../../../src/models/user.model');
 
 describe('User Service', () => {
   beforeEach(() => {
-    jest.clearAllMocks(); 
+    jest.clearAllMocks();
   });
 
   describe('createUser', () => {
@@ -91,15 +90,12 @@ describe('User Service', () => {
       expect(result).toEqual(user);
     });
 
-    test('should return null if user not found', async () => {
+    test('should throw an error if user not found', async () => {
       const email = 'test@example.com';
 
       User.findOne.mockResolvedValue(null);
 
-      const result = await userService.getUserByEmail(email);
-
-      expect(User.findOne).toHaveBeenCalledWith({ email });
-      expect(result).toBeNull();
+      await expect(userService.getUserByEmail(email)).rejects.toThrow(new ApiError(httpStatus.NOT_FOUND, 'User not found'));
     });
   });
 
@@ -151,9 +147,7 @@ describe('User Service', () => {
 
       User.findById.mockResolvedValue(null);
 
-      await expect(userService.deleteUserById(userId)).rejects.toThrow(
-        new ApiError(httpStatus.NOT_FOUND, 'User not found')
-      );
+      await expect(userService.deleteUserById(userId)).rejects.toThrow(new ApiError(httpStatus.NOT_FOUND, 'User not found'));
     });
 
     test('should delete and return user if found', async () => {

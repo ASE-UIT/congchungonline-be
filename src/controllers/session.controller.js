@@ -6,12 +6,15 @@ const createSession = catchAsync(async (req, res) => {
   const { sessionName, notaryField, notaryService, startTime, startDate, duration, email } = req.body;
   const createdBy = req.user.id;
   await sessionService.validateEmails(email);
+  const [hours, minutes] = startTime.split(':').map(Number);
+  const startDateTime = new Date(startDate);
+  startDateTime.setUTCHours(hours, minutes, 0, 0);
   const session = await sessionService.createSession({
     sessionName,
     notaryField,
     notaryService,
-    startTime: new Date(startTime),
-    startDate: new Date(startDate),
+    startTime,
+    startDate: startDateTime,
     duration,
     email,
     createdBy,
@@ -47,9 +50,35 @@ const joinSession = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send(joinSession);
 });
 
+const getAllSessions = catchAsync(async (req, res) => {
+  const getSessions = await sessionService.getAllSessions();
+  res.status(httpStatus.OK).send(getSessions);
+});
+
+const getSessionsByDate = catchAsync(async (req, res) => {
+  const date = req.query['date'];
+  const getSessions = await sessionService.getSessionsByDate(date);
+  res.status(httpStatus.OK).send(getSessions);
+});
+
+const getSessionsByMonth = catchAsync(async (req, res) => {
+  const date = req.query['date'];
+  const getSessions = await sessionService.getSessionsByMonth(date);
+  res.status(httpStatus.OK).send(getSessions);
+});
+
+const getActiveSessions = catchAsync(async (req, res) => {
+  const getSessions = await sessionService.getActiveSessions();
+  res.status(httpStatus.OK).send(getSessions);
+});
+
 module.exports = {
   createSession,
   addUserToSession,
   deleteUserOutOfSession,
   joinSession,
+  getAllSessions,
+  getSessionsByDate,
+  getSessionsByMonth,
+  getActiveSessions,
 };

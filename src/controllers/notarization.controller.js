@@ -1,4 +1,5 @@
 const httpStatus = require('http-status');
+const mongoose = require('mongoose');
 const catchAsync = require('../utils/catchAsync');
 const pick = require('lodash/pick');
 const { notarizationService, emailService } = require('../services');
@@ -57,14 +58,14 @@ const getHistoryByUserId = catchAsync(async (req, res) => {
 const getDocumentStatus = catchAsync(async (req, res) => {
   const { documentId } = req.params;
 
-  const status = await notarizationService.getDocumentStatus(documentId);
-
-  if (!status) {
+  if (!mongoose.Types.ObjectId.isValid(documentId) || !(await notarizationService.getDocumentStatus(documentId))) {
     return res.status(httpStatus.NOT_FOUND).json({
       code: httpStatus.NOT_FOUND,
-      message: 'Notarizations does not exist in document',
+      message: 'Document not found or does not have notarization status',
     });
   }
+
+  const status = await notarizationService.getDocumentStatus(documentId);
 
   res.status(httpStatus.OK).json(status);
 });
@@ -90,17 +91,11 @@ const getApproveHistory = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send(approveHistory);
 });
 
-const getNotarizations = catchAsync(async (req, res) => {
-  const options = pick(req.query, ['sortBy', 'limit', 'page']);
-  const notarizations = await notarizationService.getNotarizations({}, options)
-  res.send(notarizations);
-})
-
 const getAllNotarizations = catchAsync(async (req, res) => {
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
-  const notarizations = await notarizationService.getAllNotarizations({}, options)
+  const notarizations = await notarizationService.getAllNotarizations({}, options);
   res.send(notarizations);
-})
+});
 
 module.exports = {
   createDocument,

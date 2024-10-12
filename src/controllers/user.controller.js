@@ -3,6 +3,7 @@ const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const { userService } = require('../services');
+const { auth } = require('../config/firebase');
 
 const createUser = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
@@ -30,8 +31,31 @@ const updateUser = catchAsync(async (req, res) => {
 });
 
 const deleteUser = catchAsync(async (req, res) => {
+  const user = await userService.getUserById(req.params.userId);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+
+  try {
+    const firebaseUser = await auth.getUserByEmail(user.email);
+    if (firebaseUser) {
+      await auth.deleteUser(firebaseUser.uid);
+    }
+  } catch (error) {
+    if (error.code === 'auth/user-not-found') {
+      console.log(`Firebase user with email ${user.email} does not exist, skipping deletion.`);
+    } else {
+      console.error('Error deleting user from Firebase:', error);
+    }
+  }
+
   await userService.deleteUserById(req.params.userId);
   res.status(httpStatus.NO_CONTENT).send();
+});
+
+const getUserByEmail = catchAsync(async (req, res) => {
+  const user = await userService.getUserByEmail(req.params.email);
+  res.status(httpStatus.OK).send(user);
 });
 
 module.exports = {
@@ -40,4 +64,5 @@ module.exports = {
   getUser,
   updateUser,
   deleteUser,
+  getUserByEmail,
 };

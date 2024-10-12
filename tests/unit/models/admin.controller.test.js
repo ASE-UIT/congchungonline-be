@@ -1,6 +1,7 @@
-require('dotenv').config();
-
+const setupTestDB = require('../../utils/setupTestDB');
 const mockFirebase = require('./firebase.mock');
+
+setupTestDB();
 mockFirebase();
 
 const request = require('supertest');
@@ -20,6 +21,8 @@ app.get('/today-user-count', adminController.getToDayUserCount);
 app.get('/user-monthly', adminController.getUserMonthly);
 app.get('/today-documents-by-notary-field', adminController.getTodayDocumentsByNotaryField);
 app.get('/month-documents-by-notary-field', adminController.getMonthDocumentsByNotaryField);
+app.get('/daily-session-count', adminController.getDailySessionCount);
+app.get('/monthly-session-count', adminController.getMonthlySessionCount);
 
 describe('Admin Controller', () => {
   afterEach(() => {
@@ -94,6 +97,32 @@ describe('Admin Controller', () => {
       expect(res.status).toBe(httpStatus.OK);
       expect(res.body).toEqual(monthDocumentsByNotaryField);
       expect(adminService.getMonthDocumentsByNotaryField).toHaveBeenCalled();
+    });
+  });
+
+  describe('GET /daily-session-count', () => {
+    it("should return today's session count", async () => {
+      const dailySessionCount = 100;
+      adminService.getDailySessionCount.mockResolvedValue(dailySessionCount);
+
+      const res = await request(app).get('/daily-session-count').send();
+
+      expect(res.status).toBe(httpStatus.OK);
+      expect(res.body).toEqual({ dailySessionCount });
+      expect(adminService.getDailySessionCount).toHaveBeenCalled();
+    });
+  });
+
+  describe('GET /monthly-session-count', () => {
+    it("should return this month's session count", async () => {
+      const monthlySessionCount = 3000;
+      adminService.getMonthlySessionCount.mockResolvedValue(monthlySessionCount);
+
+      const res = await request(app).get('/monthly-session-count').send();
+
+      expect(res.status).toBe(httpStatus.OK);
+      expect(res.body).toEqual({ monthlySessionCount });
+      expect(adminService.getMonthlySessionCount).toHaveBeenCalled();
     });
   });
 });

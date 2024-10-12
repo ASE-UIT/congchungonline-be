@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const faker = require('faker');
-const { StatusTracking } = require('../../../src/models');
-const { Document } = require('../../../src/models');
+const StatusTracking = require('../../../src/models/statusTracking.model');
 
 let mongoServer;
 
@@ -23,30 +22,11 @@ afterAll(async () => {
 describe('StatusTracking model', () => {
   describe('StatusTracking validation', () => {
     let newStatusTracking;
-    let documentId;
-    beforeEach(async () => {
-      const document = await Document.create({
-        files: [
-          {
-            filename: faker.system.fileName(),
-            firebaseUrl: faker.internet.url(),
-          },
-        ],
-        notaryService: faker.lorem.word(),
-        notaryField: faker.lorem.word(),
-        requesterInfo: {
-          citizenId: faker.random.alphaNumeric(10),
-          phoneNumber: faker.phone.phoneNumber(),
-          email: faker.internet.email(),
-        },
-        userId: new mongoose.Types.ObjectId(),
-      });
-      documentId = document._id;
-
+    beforeEach(() => {
       newStatusTracking = {
-        documentId,
-        status: faker.lorem.word(),
-        updatedAt: faker.date.recent(),
+        documentId: new mongoose.Types.ObjectId(),
+        status: 'pending',
+        updatedAt: new Date(),
       };
     });
 
@@ -74,8 +54,8 @@ describe('StatusTracking model', () => {
     test('should not return __v when toJSON is called', () => {
       const newStatusTracking = {
         documentId: new mongoose.Types.ObjectId(),
-        status: faker.lorem.word(),
-        updatedAt: faker.date.recent(),
+        status: 'pending',
+        updatedAt: new Date(),
       };
       expect(new StatusTracking(newStatusTracking).toJSON()).not.toHaveProperty('__v');
     });

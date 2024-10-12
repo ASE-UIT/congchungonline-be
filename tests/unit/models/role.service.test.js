@@ -1,61 +1,36 @@
 const httpStatus = require('http-status');
-const roleService = require('../../../src/services/role.service');
 const { Role } = require('../../../src/models');
 const ApiError = require('../../../src/utils/ApiError');
-const mongoose = require('mongoose');
+const roleService = require('../../../src/services/role.service');
 
-// Mock các phương thức của Role model
-jest.mock('../../../src/models/role.model');
+jest.mock('../../../src/models');
 
 describe('Role Service', () => {
-  beforeAll(async () => {
-    // Thiết lập các biến môi trường cần thiết
-    process.env.MONGODB_URL = 'mongodb://127.0.0.1:27017/node-boilerplate-test';
-    process.env.JWT_SECRET = 'thisisasamplesecret';
-
-    await mongoose.connect(process.env.MONGODB_URL, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-  });
-
-  afterAll(async () => {
-    await mongoose.disconnect();
-  });
-
-  afterEach(async () => {
-    jest.clearAllMocks();
-  });
-
   describe('createRole', () => {
-    test('should create a new role if role name is not taken', async () => {
-      const roleBody = { name: 'admin' };
-
-      Role.isRoleNameTaken.mockResolvedValue(false);
-      Role.create.mockResolvedValue(roleBody);
-
-      const result = await roleService.createRole(roleBody);
-
-      expect(Role.isRoleNameTaken).toHaveBeenCalledWith(roleBody.name);
-      expect(Role.create).toHaveBeenCalledWith(roleBody);
-      expect(result).toEqual(roleBody);
-    });
-
     test('should throw an error if role name is already taken', async () => {
-      const roleBody = { name: 'admin' };
-
       Role.isRoleNameTaken.mockResolvedValue(true);
 
-      await expect(roleService.createRole(roleBody)).rejects.toThrow(
-        new ApiError(httpStatus.BAD_REQUEST, 'Role name already taken')
-      );
+      await expect(roleService.createRole({ name: 'admin' })).rejects.toThrow('Role name already taken');
+    });
+
+    test('should create a new role if role name is not taken', async () => {
+      Role.isRoleNameTaken.mockResolvedValue(false);
+      Role.create.mockResolvedValue({ id: '1', name: 'admin' });
+
+      const result = await roleService.createRole({ name: 'admin' });
+
+      expect(Role.isRoleNameTaken).toHaveBeenCalledWith('admin');
+      expect(Role.create).toHaveBeenCalledWith({ name: 'admin' });
+      expect(result).toEqual({ id: '1', name: 'admin' });
     });
   });
 
   describe('getRoles', () => {
     test('should return all roles', async () => {
-      const roles = [{ name: 'admin' }, { name: 'user' }];
-
+      const roles = [
+        { id: '1', name: 'admin' },
+        { id: '2', name: 'user' },
+      ];
       Role.find.mockResolvedValue(roles);
 
       const result = await roleService.getRoles();
@@ -66,75 +41,55 @@ describe('Role Service', () => {
   });
 
   describe('getRole', () => {
-    test('should return the role if it exists', async () => {
-      const roleId = new mongoose.Types.ObjectId();
-      const role = { id: roleId, name: 'admin' };
-
-      Role.findById.mockResolvedValue(role);
-
-      const result = await roleService.getRole(roleId);
-
-      expect(Role.findById).toHaveBeenCalledWith(roleId);
-      expect(result).toEqual(role);
-    });
-
-    test('should throw an error if role does not exist', async () => {
-      const roleId = new mongoose.Types.ObjectId();
-
+    test('should throw an error if role is not found', async () => {
       Role.findById.mockResolvedValue(null);
 
-      await expect(roleService.getRole(roleId)).rejects.toThrow(
-        new ApiError(httpStatus.NOT_FOUND, 'Role not found')
-      );
+      await expect(roleService.getRole('1')).rejects.toThrow('Role not found');
+    });
+
+    test('should return the role if found', async () => {
+      const role = { id: '1', name: 'admin' };
+      Role.findById.mockResolvedValue(role);
+
+      const result = await roleService.getRole('1');
+
+      expect(Role.findById).toHaveBeenCalledWith('1');
+      expect(result).toEqual(role);
     });
   });
 
   describe('updateRole', () => {
-    test('should update the role if it exists', async () => {
-      const roleId = new mongoose.Types.ObjectId();
-      const updateBody = { name: 'superadmin' };
-      const updatedRole = { id: roleId, name: 'superadmin' };
-
-      Role.findByIdAndUpdate.mockResolvedValue(updatedRole);
-
-      const result = await roleService.updateRole(roleId, updateBody);
-
-      expect(Role.findByIdAndUpdate).toHaveBeenCalledWith(roleId, updateBody, { new: true });
-      expect(result).toEqual(updatedRole);
-    });
-
-    test('should throw an error if role does not exist', async () => {
-      const roleId = new mongoose.Types.ObjectId();
-      const updateBody = { name: 'superadmin' };
-
+    test('should throw an error if role is not found', async () => {
       Role.findByIdAndUpdate.mockResolvedValue(null);
 
-      await expect(roleService.updateRole(roleId, updateBody)).rejects.toThrow(
-        new ApiError(httpStatus.NOT_FOUND, 'Role not found')
-      );
+      await expect(roleService.updateRole('1', { name: 'admin' })).rejects.toThrow('Role not found');
+    });
+
+    test('should update the role if found', async () => {
+      const role = { id: '1', name: 'admin' };
+      Role.findByIdAndUpdate.mockResolvedValue(role);
+
+      const result = await roleService.updateRole('1', { name: 'admin' });
+
+      expect(Role.findByIdAndUpdate).toHaveBeenCalledWith('1', { name: 'admin' }, { new: true });
+      expect(result).toEqual(role);
     });
   });
 
   describe('deleteRole', () => {
-    test('should delete the role if it exists', async () => {
-      const roleId = new mongoose.Types.ObjectId();
-      const role = { id: roleId, name: 'admin' };
-
-      Role.findByIdAndDelete.mockResolvedValue(role);
-
-      await roleService.deleteRole(roleId);
-
-      expect(Role.findByIdAndDelete).toHaveBeenCalledWith(roleId);
-    });
-
-    test('should throw an error if role does not exist', async () => {
-      const roleId = new mongoose.Types.ObjectId();
-
+    test('should throw an error if role is not found', async () => {
       Role.findByIdAndDelete.mockResolvedValue(null);
 
-      await expect(roleService.deleteRole(roleId)).rejects.toThrow(
-        new ApiError(httpStatus.NOT_FOUND, 'Role not found')
-      );
+      await expect(roleService.deleteRole('1')).rejects.toThrow('Role not found');
+    });
+
+    test('should delete the role if found', async () => {
+      const role = { id: '1', name: 'admin' };
+      Role.findByIdAndDelete.mockResolvedValue(role);
+
+      await roleService.deleteRole('1');
+
+      expect(Role.findByIdAndDelete).toHaveBeenCalledWith('1');
     });
   });
 });

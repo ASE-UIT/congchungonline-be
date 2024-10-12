@@ -1,8 +1,7 @@
-require('dotenv').config();
-
+const setupTestDB = require('../../utils/setupTestDB');
 const mockFirebase = require('./firebase.mock');
 mockFirebase();
-
+setupTestDB();
 const request = require('supertest');
 const express = require('express');
 const httpStatus = require('http-status');

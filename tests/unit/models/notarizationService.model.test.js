@@ -33,6 +33,7 @@ describe('NotarizationService model', () => {
         name: faker.company.companyName(), 
         fieldId, 
         description: faker.lorem.sentence(), 
+        price: faker.datatype.number({ min: 1, max: 1000 }), // Thêm trường price
       };
     });
 
@@ -54,6 +55,11 @@ describe('NotarizationService model', () => {
       newNotarizationService.description = undefined;
       await expect(new NotarizationService(newNotarizationService).validate()).rejects.toThrow();
     });
+
+    test('should throw a validation error if price is missing', async () => {
+      newNotarizationService.price = undefined;
+      await expect(new NotarizationService(newNotarizationService).validate()).rejects.toThrow();
+    });
   });
 
   describe('NotarizationService toJSON()', () => {
@@ -62,6 +68,7 @@ describe('NotarizationService model', () => {
         name: faker.company.companyName(), 
         fieldId: new mongoose.Types.ObjectId(),
         description: faker.lorem.sentence(), 
+        price: faker.datatype.number({ min: 1, max: 1000 }), // Thêm trường price
       };
       expect(new NotarizationService(newNotarizationService).toJSON()).not.toHaveProperty('__v');
     });

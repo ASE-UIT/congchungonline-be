@@ -14,24 +14,28 @@ const router = express.Router();
  */
 
 router.post(
-  '/createNotarizationField',
+  '/create-notarization-field',
   auth('manageNotarizationFields'),
   validate(notarizationFieldValidation.createNotarizationField),
   notarizationFieldController.createNotarizationField
 );
 router.get(
-  '/getAllNotarizationFields',
-  auth('manageNotarizationFields'),
+  '/get-all-notarization-fields',
+  auth('getNotarizationFields'),
   notarizationFieldController.getAllNotarizationFields
 );
-router.get('/getNotarizationField/:id', auth('manageNotarizationFields'), notarizationFieldController.getNotarizationField);
+router.get(
+  '/get-notarization-field/:fieldId',
+  auth('getNotarizationFields'),
+  notarizationFieldController.getNotarizationField
+);
 router.delete(
-  '/deleteNotarizationField/:id',
+  '/delete-notarization-field/:fieldId',
   auth('manageNotarizationFields'),
   notarizationFieldController.deleteNotarizationField
 );
 router.patch(
-  '/updateNotarizationField/:id',
+  '/update-notarization-field/:fieldId',
   auth('manageNotarizationFields'),
   validate(notarizationFieldValidation.updateNotarizationField),
   notarizationFieldController.updateNotarizationField
@@ -106,7 +110,7 @@ router.patch(
 
 /**
  * @swagger
- * /notarizationFields/createNotarizationField:
+ * /notarization-fields/create-notarization-field:
  *   post:
  *     summary: Create a notarization field
  *     description: Only admins can create notarization fields.
@@ -142,10 +146,9 @@ router.patch(
  *       "403":
  *         $ref: '#/components/responses/Forbidden'
  *
- * /notarizationFields/getAllNotarizationFields:
+ * /notarization-fields/get-all-notarization-fields:
  *   get:
  *     summary: Get all notarization fields
- *     description: Only admins can retrieve all notarization fields.
  *     tags: [NotarizationFields]
  *     security:
  *       - bearerAuth: []
@@ -166,16 +169,15 @@ router.patch(
  *       "403":
  *         $ref: '#/components/responses/Forbidden'
  *
- * /notarizationFields/getNotarizationField/{notarizationFieldId}:
+ * /notarization-fields/get-notarization-field/{fieldId}:
  *   get:
  *     summary: Get a notarization field
- *     description: Only admins can fetch notarization field details.
  *     tags: [NotarizationFields]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: notarizationFieldId
+ *         name: fieldId
  *         required: true
  *         schema:
  *           type: string
@@ -194,7 +196,7 @@ router.patch(
  *       "404":
  *         $ref: '#/components/responses/NotFound'
  *
- * /notarizationFields/deleteNotarizationField/{notarizationFieldId}:
+ * /notarization-fields/delete-notarization-field/{fieldId}:
  *   delete:
  *     summary: Delete a notarization field
  *     description: Only admins can delete notarization fields.
@@ -203,7 +205,7 @@ router.patch(
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: notarizationFieldId
+ *         name: fieldId
  *         required: true
  *         schema:
  *           type: string
@@ -227,7 +229,7 @@ router.patch(
  *       "404":
  *         $ref: '#/components/responses/NotFound'
  *
- * /notarizationFields/updateNotarizationField/{notarizationFieldId}:
+ * /notarization-fields/update-notarization-field/{fieldId}:
  *   patch:
  *     summary: Update a notarization field
  *     description: Only admins can update notarization fields.
@@ -236,7 +238,7 @@ router.patch(
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: notarizationFieldId
+ *         name: fieldId
  *         required: true
  *     requestBody:
  *       required: true

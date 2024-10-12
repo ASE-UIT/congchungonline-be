@@ -1,4 +1,4 @@
-const { Document, User } = require('../../../src/models');
+const { Document, User, Session } = require('../../../src/models');
 const moment = require('moment');
 const adminService = require('../../../src/services/admin.service');
 
@@ -125,6 +125,36 @@ describe('Admin Service', () => {
         { $group: { _id: '$notaryField', count: { $sum: 1 } } },
       ]);
       expect(result).toEqual({ monthDocumentsByNotaryField });
+    });
+  });
+
+  describe('getDailySessionCount', () => {
+    it("should return today's session count", async () => {
+      const dailySessionCount = 100;
+
+      Session.countDocuments.mockResolvedValue(dailySessionCount);
+
+      const result = await adminService.getDailySessionCount();
+
+      expect(Session.countDocuments).toHaveBeenCalledWith({
+        createdAt: { $gte: expect.any(Date), $lte: expect.any(Date) },
+      });
+      expect(result).toEqual(dailySessionCount);
+    });
+  });
+
+  describe('getMonthlySessionCount', () => {
+    it("should return this month's session count", async () => {
+      const monthlySessionCount = 3000;
+
+      Session.countDocuments.mockResolvedValue(monthlySessionCount);
+
+      const result = await adminService.getMonthlySessionCount();
+
+      expect(Session.countDocuments).toHaveBeenCalledWith({
+        createdAt: { $gte: expect.any(Date), $lte: expect.any(Date) },
+      });
+      expect(result).toEqual(monthlySessionCount);
     });
   });
 });
