@@ -8,6 +8,7 @@ const allRoles = {
     'joinSession',
     'getNotarizationFields',
     'getNotarizationServices',
+    'getUserByEmail',
   ],
   admin: [
     'getUsers',
@@ -28,8 +29,7 @@ const allRoles = {
     'getSessions',
     'getDailySessionCount',
     'getMonthlySessionCount',
-    'createSession',
-    'addUserToSession',
+    'getUserByEmail',
   ],
   notary: ['getDocumentsByRole', 'forwardDocumentStatus', 'getApproveHistory', 'joinSession'],
   secretary: ['getDocumentsByRole', 'forwardDocumentStatus', 'getApproveHistory', 'joinSession'],

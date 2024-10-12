@@ -175,7 +175,7 @@ router.get(
 
 /**
  * @swagger
- * /notarization-services/get-notarization-service/{notarization-service-id}:
+ * /notarization-services/get-notarization-service/{serviceId}:
  *   get:
  *     summary: Get a notarization service
  *     tags: [NotarizationServices]
@@ -214,7 +214,7 @@ router.get(
 
 /**
  * @swagger
- * /notarization-services/update-notarization-service/{notarization-service-id}:
+ * /notarization-services/update-notarization-service/{serviceId}:
  *   patch:
  *     summary: Update a notarization service
  *     description: Only admins can update notarization services.
@@ -290,7 +290,7 @@ router.get(
 
 /**
  * @swagger
- * /notarization-services/delete-notarization-service/{notarization-service-id}:
+ * /notarization-services/delete-notarization-service/{serviceId}:
  *   delete:
  *     summary: Delete a notarization service
  *     description: Only admins can delete notarization services.
@@ -326,7 +326,7 @@ router.get(
 
 /**
  * @swagger
- * /notarization-services/get-notarization-services-by-field-id/{notarization-field-id}:
+ * /notarization-services/get-notarization-services-by-field-id/{fieldId}:
  *   get:
  *     summary: Get notarization services by field ID
  *     tags: [NotarizationServices]
