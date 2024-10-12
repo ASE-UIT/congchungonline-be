@@ -1,9 +1,9 @@
 const httpStatus = require('http-status');
+const validator = require('validator');
+const mongoose = require('mongoose');
 const { Session } = require('../models');
 const ApiError = require('../utils/ApiError');
-const validator = require('validator');
-const { userService, sessionService } = require('./');
-const mongoose = require('mongoose');
+const { userService, sessionService } = require('.');
 
 // Hàm kiểm tra email
 const validateEmails = async (email) => {
@@ -86,15 +86,15 @@ const joinSession = async ({ sessionId, require, userId }) => {
       throw new ApiError(httpStatus.FORBIDDEN, 'You are not invited to this session');
     }
     return session;
-  } else if (require === 'reject') {
+  }
+  if (require === 'reject') {
     console.log('userId:', userId, 'sessionUserId:', session.createdBy);
     if (session.createdBy !== userId && !session.email.includes(user.email)) {
       throw new ApiError(httpStatus.FORBIDDEN, 'You cannot reject the session');
     }
     return { message: 'You have rejected the invitation to join the session' };
-  } else {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid request type. It must be either "accept" or "reject".');
   }
+  throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid request type. It must be either "accept" or "reject".');
 };
 
 // Hàm kiểm tra authenticate
