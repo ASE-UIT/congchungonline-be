@@ -94,10 +94,31 @@ const deleteNotarizationServiceById = async (serviceId) => {
   }
 };
 
+const getNotarizationServicesByFieldId = async (fieldId) => {
+  try {
+    const fieldExists = await NotarizationField.findById(fieldId);
+    if (!fieldExists) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid fieldId provided');
+    }
+
+    const services = await NotarizationService.find({ fieldId });
+    if (!services || services.length === 0) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'No notarization services found for the given field');
+    }
+    return services;
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Error fetching notarization services by field');
+  }
+};
+
 module.exports = {
   createNotarizationService,
   getAllNotarizationServices,
   getNotarizationServiceById,
   updateNotarizationServiceById,
   deleteNotarizationServiceById,
+  getNotarizationServicesByFieldId,
 };

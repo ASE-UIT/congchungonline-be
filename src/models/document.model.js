@@ -16,12 +16,14 @@ const documentSchema = new mongoose.Schema({
       },
     },
   ],
-  notaryService: {
-    type: String,
+  notarizationServiceId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'NotarizationService',
     required: true,
   },
-  notaryField: {
-    type: String,
+  notarizationFieldId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'NotarizationField',
     required: true,
   },
   requesterInfo: {

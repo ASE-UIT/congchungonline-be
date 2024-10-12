@@ -8,7 +8,6 @@ const createNotarizationField = async (notarizationFieldBody) => {
       throw new ApiError(httpStatus.BAD_REQUEST, 'Notarization field name already exists');
     }
     return await NotarizationField.create(notarizationFieldBody);
-
   } catch (error) {
     if (error instanceof ApiError) {
       throw error;
@@ -24,7 +23,6 @@ const getAllNotarizationFields = async () => {
       throw new ApiError(httpStatus.NOT_FOUND, 'No notarization fields found');
     }
     return notarizationFields;
-
   } catch (error) {
     if (error instanceof ApiError) {
       throw error;
@@ -63,7 +61,6 @@ const updateNotarizationFieldById = async (notarizationFieldId, updateBody) => {
     Object.assign(notarizationField, updateBody);
     await notarizationField.save();
     return notarizationField;
-
   } catch (error) {
     if (error instanceof ApiError) {
       throw error;
@@ -81,7 +78,6 @@ const deleteNotarizationFieldById = async (notarizationFieldId) => {
 
     await notarizationField.remove();
     return notarizationField;
-    
   } catch (error) {
     if (error instanceof ApiError) {
       throw error;

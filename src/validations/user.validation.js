@@ -45,10 +45,17 @@ const deleteUser = {
   }),
 };
 
+const getUserByEmail = {
+  params: Joi.object().keys({
+    email: Joi.string().required().email(),
+  }),
+};
+
 module.exports = {
   createUser,
   getUsers,
   getUser,
   updateUser,
   deleteUser,
+  getUserByEmail,
 };
