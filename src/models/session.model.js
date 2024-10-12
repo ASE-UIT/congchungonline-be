@@ -25,8 +25,12 @@ const sessionSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-  duration: {
-    type: Number,
+  endTime: {
+    type: String,
+    required: true,
+  },
+  endDate: {
+    type: Date,
     required: true,
   },
   email: {

@@ -123,10 +123,16 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *                 format: date
  *                 description: The date of session
  *                 example: "2024-10-10"
- *               duration:
- *                 type: number
- *                 description: The duration of the session in minutes
- *                 example: 120
+ *               endTime:
+ *                 type: string
+ *                 format: time
+ *                 description: The time of session
+ *                 example: "15:00"
+ *               endDate:
+ *                 type: string
+ *                 format: date
+ *                 description: The date of session
+ *                 example: "2024-10-10"
  *               email:
  *                 type: array
  *                 items:
@@ -136,7 +142,8 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *               - sessionName
  *               - startTime
  *               - startDate
- *               - duration
+ *               - endTime
+ *               - endDate
  *               - email
  *               - notaryField
  *               - notaryService
@@ -165,9 +172,14 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *                   type: string
  *                   format: date
  *                   example: "2024-10-10"
- *                 duration:
- *                   type: number
- *                   example: 120
+ *                 endTime:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2024-10-10T21:00:00Z"
+ *                 endDate:
+ *                   type: string
+ *                   format: date
+ *                   example: "2024-10-10"
  *                 email:
  *                   type: array
  *                   items:
@@ -206,7 +218,7 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *                 message:
  *                   type: string
  *                   example: "Failed to create session"
- */
+ * */
 /**
  * @swagger
  * /session/addUser/{sessionId}:
@@ -252,7 +264,6 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *                   items:
  *                      type: string
  *                   example: "abc@gmail.com"
- *
  *       "400":
  *         description: Bad Request
  *         content:
@@ -283,12 +294,12 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *                 message:
  *                   type: string
  *                   example: "Failed to add user to session"
- */
+ * */
 /**
  * @swagger
  * /session/deleteUser/{sessionId}:
  *   patch:
- *     summary: Delete user out of session
+ *     summary: Delete user from session
  *     tags: [Sessions]
  *     security:
  *       - bearerAuth: []
@@ -310,20 +321,25 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *                 type: array
  *                 items:
  *                   type: string
- *                 description: List of email addresses delete out of the session
+ *                 description: List of email addresses to delete from the session
  *             required:
  *               - email
  *     responses:
- *       "201":
+ *       "200":
  *         description: User was deleted successfully
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 message:
- *                    type: string
- *                    example: "User was deleted successfully"
+ *                 sessionId:
+ *                   type: string
+ *                   example: "66fe4c6b76f99374f4c87165"
+ *                 email:
+ *                   type: array
+ *                   items:
+ *                      type: string
+ *                   example: "abc@gmail.com"
  *       "400":
  *         description: Bad Request
  *         content:
@@ -345,7 +361,7 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *                   type: string
  *                   example: "Unauthorized"
  *       "500":
- *         description: Internal Server Error - Failed to delete user out of session
+ *         description: Internal Server Error - Failed to delete user from session
  *         content:
  *           application/json:
  *             schema:
@@ -353,13 +369,13 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Failed to delete user out of session"
- */
+ *                   example: "Failed to delete user from session"
+ * */
 /**
  * @swagger
  * /session/joinSession/{sessionId}:
  *   post:
- *     summary: Join a session
+ *     summary: Join session
  *     tags: [Sessions]
  *     security:
  *       - bearerAuth: []
@@ -369,7 +385,7 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *         required: true
  *         schema:
  *           type: string
- *         description: The ID of the session to join
+ *         description: ID of the session
  *     requestBody:
  *       required: true
  *       content:
@@ -379,23 +395,28 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *             properties:
  *               require:
  *                 type: string
- *                 description: The request status for joining the session (e.g., "accept")
+ *                 description: The require of the session
  *                 example: "accept"
  *             required:
  *               - require
  *     responses:
- *       "201":
- *         description: Successfully joined the session
+ *       "200":
+ *         description: Session joined successfully
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 message:
+ *                 sessionId:
  *                   type: string
- *                   example: "Join session successfully"
+ *                   example: "66fe4c6b76f99374f4c87165"
+ *                 email:
+ *                   type: array
+ *                   items:
+ *                      type: string
+ *                   example: "abc@gmail.com"
  *       "400":
- *         description: Bad request due to invalid parameters
+ *         description: Bad Request
  *         content:
  *           application/json:
  *             schema:
@@ -405,7 +426,7 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *                   type: string
  *                   example: "Invalid request parameters"
  *       "401":
- *         description: Unauthorized access
+ *         description: Unauthorized
  *         content:
  *           application/json:
  *             schema:
@@ -415,7 +436,7 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *                   type: string
  *                   example: "Unauthorized"
  *       "500":
- *         description: Internal server error - Failed to join the session
+ *         description: Internal Server Error - Failed to join session
  *         content:
  *           application/json:
  *             schema:
@@ -423,8 +444,8 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Failed to join the session"
- */
+ *                   example: "Failed to join session"
+ * */
 /**
  * @swagger
  * /session/getAllSessions:
@@ -433,20 +454,50 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *     tags: [Sessions]
  *     security:
  *       - bearerAuth: []
- *     requestBody:
  *     responses:
- *       "201":
- *         description: Successfully get all sessions
+ *       "200":
+ *         description: All sessions retrieved successfully
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Get all sessions successfully"
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   sessionName:
+ *                     type: string
+ *                     example: "Notarization Session"
+ *                   notaryField:
+ *                      type: string
+ *                      example: "Notary Field"
+ *                   notaryService:
+ *                      type: string
+ *                      example: "Notary Service"
+ *                   startTime:
+ *                     type: string
+ *                     format: date-time
+ *                     example: "2024-10-10T20:00:00Z"
+ *                   startDate:
+ *                     type: string
+ *                     format: date
+ *                     example: "2024-10-10"
+ *                   endTime:
+ *                     type: string
+ *                     format: date-time
+ *                     example: "2024-10-10T21:00:00Z"
+ *                   endDate:
+ *                     type: string
+ *                     format: date
+ *                     example: "2024-10-10"
+ *                   email:
+ *                     type: array
+ *                     items:
+ *                        type: string
+ *                     example: "abc@gmail.com"
+ *                   createdBy:
+ *                     type: string
  *       "401":
- *         description: Unauthorized access
+ *         description: Unauthorized
  *         content:
  *           application/json:
  *             schema:
@@ -456,7 +507,7 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *                   type: string
  *                   example: "Unauthorized"
  *       "500":
- *         description: Internal server error - Failed to get all sessions
+ *         description: Internal Server Error - Failed to retrieve sessions
  *         content:
  *           application/json:
  *             schema:
@@ -464,8 +515,8 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Failed to get all sessions"
- */
+ *                   example: "Failed to retrieve sessions"
+ * */
 /**
  * @swagger
  * /session/getSessionsByDate:
@@ -481,19 +532,50 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *         schema:
  *           type: string
  *           format: date
- *           example: "2024-10-06"
- *         description: The date to filter sessions
+ *         description: The date of the sessions
+ *         example: "2024-10-10"
  *     responses:
  *       "200":
- *         description: Get sessions successfully
+ *         description: Sessions retrieved successfully
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 date:
- *                   type: string
- *                   example: "2024-10-06"
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   sessionName:
+ *                     type: string
+ *                     example: "Notarization Session"
+ *                   notaryField:
+ *                      type: string
+ *                      example: "Notary Field"
+ *                   notaryService:
+ *                      type: string
+ *                      example: "Notary Service"
+ *                   startTime:
+ *                     type: string
+ *                     format: date-time
+ *                     example: "2024-10-10T20:00:00Z"
+ *                   startDate:
+ *                     type: string
+ *                     format: date
+ *                     example: "2024-10-10"
+ *                   endTime:
+ *                     type: string
+ *                     format: date-time
+ *                     example: "2024-10-10T21:00:00Z"
+ *                   endDate:
+ *                     type: string
+ *                     format: date
+ *                     example: "2024-10-10"
+ *                   email:
+ *                     type: array
+ *                     items:
+ *                        type: string
+ *                     example: "abc@gmail.com"
+ *                   createdBy:
+ *                     type: string
  *       "400":
  *         description: Bad Request
  *         content:
@@ -515,7 +597,7 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *                   type: string
  *                   example: "Unauthorized"
  *       "500":
- *         description: Internal Server Error
+ *         description: Internal Server Error - Failed to retrieve sessions
  *         content:
  *           application/json:
  *             schema:
@@ -523,8 +605,8 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Failed to get sessions"
- */
+ *                   example: "Failed to retrieve sessions"
+ * */
 /**
  * @swagger
  * /session/getSessionsByMonth:
@@ -540,19 +622,50 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *         schema:
  *           type: string
  *           format: date
- *           example: "2024-10"
- *         description: The month to filter sessions
+ *         description: The month of the sessions
+ *         example: "2024-10"
  *     responses:
  *       "200":
- *         description: Get sessions successfully
+ *         description: Sessions retrieved successfully
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 date:
- *                   type: string
- *                   example: "2024-10"
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   sessionName:
+ *                     type: string
+ *                     example: "Notarization Session"
+ *                   notaryField:
+ *                      type: string
+ *                      example: "Notary Field"
+ *                   notaryService:
+ *                      type: string
+ *                      example: "Notary Service"
+ *                   startTime:
+ *                     type: string
+ *                     format: date-time
+ *                     example: "2024-10-10T20:00:00Z"
+ *                   startDate:
+ *                     type: string
+ *                     format: date
+ *                     example: "2024-10-10"
+ *                   endTime:
+ *                     type: string
+ *                     format: date-time
+ *                     example: "2024-10-10T21:00:00Z"
+ *                   endDate:
+ *                     type: string
+ *                     format: date
+ *                     example: "2024-10-10"
+ *                   email:
+ *                     type: array
+ *                     items:
+ *                        type: string
+ *                     example: "abc@gmail.com"
+ *                   createdBy:
+ *                     type: string
  *       "400":
  *         description: Bad Request
  *         content:
@@ -574,7 +687,7 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *                   type: string
  *                   example: "Unauthorized"
  *       "500":
- *         description: Internal Server Error
+ *         description: Internal Server Error - Failed to retrieve sessions
  *         content:
  *           application/json:
  *             schema:
@@ -582,30 +695,60 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Failed to get sessions"
- */
+ *                   example: "Failed to retrieve sessions"
+ * */
 /**
  * @swagger
  * /session/getActiveSessions:
  *   get:
- *     summary: Get all sessions
+ *     summary: Get active sessions
  *     tags: [Sessions]
  *     security:
  *       - bearerAuth: []
- *     requestBody:
  *     responses:
- *       "201":
- *         description: Successfully get active sessions
+ *       "200":
+ *         description: Active sessions retrieved successfully
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Get active sessions successfully"
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   sessionName:
+ *                     type: string
+ *                     example: "Notarization Session"
+ *                   notaryField:
+ *                      type: string
+ *                      example: "Notary Field"
+ *                   notaryService:
+ *                      type: string
+ *                      example: "Notary Service"
+ *                   startTime:
+ *                     type: string
+ *                     format: date-time
+ *                     example: "2024-10-10T20:00:00Z"
+ *                   startDate:
+ *                     type: string
+ *                     format: date
+ *                     example: "2024-10-10"
+ *                   endTime:
+ *                     type: string
+ *                     format: date-time
+ *                     example: "2024-10-10T21:00:00Z"
+ *                   endDate:
+ *                     type: string
+ *                     format: date
+ *                     example: "2024-10-10"
+ *                   email:
+ *                     type: array
+ *                     items:
+ *                        type: string
+ *                     example: "abc@gmail.com"
+ *                   createdBy:
+ *                     type: string
  *       "401":
- *         description: Unauthorized access
+ *         description: Unauthorized
  *         content:
  *           application/json:
  *             schema:
@@ -615,7 +758,7 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *                   type: string
  *                   example: "Unauthorized"
  *       "500":
- *         description: Internal server error - Failed to get active session
+ *         description: Internal Server Error - Failed to retrieve sessions
  *         content:
  *           application/json:
  *             schema:
@@ -623,6 +766,6 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Failed to get active sessions"
- */
+ *                   example: "Failed to retrieve sessions"
+ * */
 module.exports = router;

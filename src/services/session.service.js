@@ -35,77 +35,53 @@ const findBySessionId = async (sessionId) => {
 };
 
 // Hàm tạo session
-const createSession = async (data) => {
-  try {
-    return await Session.create(data);
-  } catch (error) {
-    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to create session');
-  }
-};
-
-// Hàm thêm người dùng vào session
-const addUserToSession = async ({ sessionId, email, userId }) => {
-  const session = await findBySessionId(sessionId);
-  await isAuthenticated(sessionId, userId);
-  await validateEmails(email);
-  const existingEmails = session.email || [];
-  const newEmails = email.filter((emailItem) => !existingEmails.includes(emailItem));
-  if (!newEmails.length) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Email(s) are already in the session');
-  }
-  session.email = [...existingEmails, ...newEmails];
-  await session.save();
+const createSession = async (sessionBody) => {
+  const session = await Session.create(sessionBody);
   return session;
 };
 
-// Hàm xóa người dùng ra khỏi session
-const deleteUserOutOfSession = async ({ sessionId, email, userId }) => {
-  const session = await findBySessionId(sessionId);
-  await isAuthenticated(sessionId, userId);
+// Hàm thêm người dùng vào session
+const addUserToSession = async (sessionId, email) => {
   await validateEmails(email);
-  const existingEmails = session.email || [];
-  const emailsToDelete = email.filter((emailItem) => existingEmails.includes(emailItem));
-  if (!emailsToDelete.length) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Email(s) not found in this session');
+  const session = await findBySessionId(sessionId);
+  const existingUsers = session.users.map((user) => user.email);
+  const newUsers = email.filter((emailItem) => !existingUsers.includes(emailItem));
+  if (newUsers.length) {
+    session.users.push(...newUsers.map((emailItem) => ({ email: emailItem })));
+    await session.save();
   }
+  return session;
+};
 
-  session.email = existingEmails.filter((emailItem) => !emailsToDelete.includes(emailItem));
+// Hàm xóa người dùng khỏi session
+const deleteUserOutOfSession = async (sessionId, email, userId) => {
+  await validateEmails(email);
+  const session = await findBySessionId(sessionId);
+  if (session.createdBy.toString() !== userId.toString()) {
+    throw new ApiError(httpStatus.FORBIDDEN, 'You are not authorized to delete users from this session');
+  }
+  session.users = session.users.filter((user) => !email.includes(user.email));
   await session.save();
   return session;
 };
 
 // Hàm tham gia session
-const joinSession = async ({ sessionId, require, userId }) => {
+const joinSession = async (sessionId, require, userId) => {
   const session = await findBySessionId(sessionId);
   const user = await userService.getUserById(userId);
-  if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  if (session.users.some((userItem) => userItem.email === user.email)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'You are already in this session');
   }
   if (require === 'accept') {
-    if (session.createdBy !== userId && !session.email.includes(user.email)) {
-      throw new ApiError(httpStatus.FORBIDDEN, 'You are not invited to this session');
-    }
-    return session;
+    session.users.push({ email: user.email, status: 'accepted' });
+  } else if (require === 'reject') {
+    session.users.push({ email: user.email, status: 'rejected' });
   }
-  if (require === 'reject') {
-    console.log('userId:', userId, 'sessionUserId:', session.createdBy);
-    if (session.createdBy !== userId && !session.email.includes(user.email)) {
-      throw new ApiError(httpStatus.FORBIDDEN, 'You cannot reject the session');
-    }
-    return { message: 'You have rejected the invitation to join the session' };
-  }
-  throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid request type. It must be either "accept" or "reject".');
+  await session.save();
+  return session;
 };
 
-// Hàm kiểm tra authenticate
-const isAuthenticated = async (sessionId, userId) => {
-  const session = await findBySessionId(sessionId);
-  if (session.createdBy.toString() !== userId) {
-    throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
-  }
-  return true;
-};
-
+// Hàm lấy tất cả session
 const getAllSessions = async () => {
   try {
     const sessions = await Session.find();
@@ -118,6 +94,7 @@ const getAllSessions = async () => {
   }
 };
 
+// Hàm lấy session theo ngày
 const getSessionsByDate = async (date) => {
   try {
     if (!date) {
@@ -148,6 +125,7 @@ const getSessionsByDate = async (date) => {
   }
 };
 
+// Hàm lấy session theo tháng
 const getSessionsByMonth = async (date) => {
   try {
     if (!date) {
@@ -158,7 +136,6 @@ const getSessionsByMonth = async (date) => {
     const startOfMonth = new Date(givenDate.getFullYear(), givenDate.getMonth(), 1, 0, 0, 0, 0);
     const endOfMonth = new Date(givenDate.getFullYear(), givenDate.getMonth() + 1, 0);
     endOfMonth.setHours(23, 59, 59, 999);
-    console.log('startofmonth: ', startOfMonth, 'endofmonth: ', endOfMonth);
     const sessions = await Session.find({
       startDate: {
         $gte: startOfMonth,
@@ -177,10 +154,12 @@ const getSessionsByMonth = async (date) => {
   }
 };
 
+// Hàm lấy session đang hoạt động
 const getActiveSessions = async () => {
   try {
     const now = new Date();
-    const present = new Date(now.getTime() + 7 * 60 * 60 * 1000);
+    const present = new Date(now.getTime() + 7 * 60 * 60 * 1000); // Adjust to the desired time zone
+
     const sessions = await Session.find({
       $and: [
         {
@@ -190,7 +169,25 @@ const getActiveSessions = async () => {
           $expr: {
             $gte: [
               {
-                $add: ['$startDate', { $multiply: ['$duration', 60 * 1000] }],
+                $add: [
+                  '$endDate',
+                  {
+                    $multiply: [
+                      {
+                        $toInt: { $substr: ['$endTime', 0, 2] }, // Extract hours from "15:00"
+                      },
+                      60 * 60 * 1000,
+                    ],
+                  },
+                  {
+                    $multiply: [
+                      {
+                        $toInt: { $substr: ['$endTime', 3, 2] }, // Extract minutes from "15:00"
+                      },
+                      60 * 1000,
+                    ],
+                  },
+                ],
               },
               present,
             ],
@@ -208,11 +205,12 @@ const getActiveSessions = async () => {
     if (error instanceof ApiError) {
       throw error;
     }
-    console.log(error);
+    console.error('Error retrieving active sessions:', error);
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'An error occurred while retrieving sessions');
   }
 };
 
+// Hàm kiểm tra định dạng ngày
 const isValidFullDate = async (input) => {
   const fullDateRegex = /^\d{4}-\d{2}-\d{2}$/;
   const isValidFormat = fullDateRegex.test(input);
@@ -226,26 +224,26 @@ const isValidFullDate = async (input) => {
   return true;
 };
 
+// Hàm kiểm tra định dạng tháng
 const isValidMonth = async (input) => {
-  const fullDateRegex = /^\d{4}-\d{2}$/;
-  const isValidFormat = fullDateRegex.test(input);
+  const monthRegex = /^\d{4}-\d{2}$/;
+  const isValidFormat = monthRegex.test(input);
   if (!isValidFormat) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid date format');
   }
   const date = new Date(input);
   if (!(date instanceof Date) || isNaN(date)) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid month');
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid date');
   }
   return true;
 };
 
 module.exports = {
   validateEmails,
+  findBySessionId,
   createSession,
   addUserToSession,
-  findBySessionId,
   deleteUserOutOfSession,
-  isAuthenticated,
   joinSession,
   getAllSessions,
   getSessionsByDate,

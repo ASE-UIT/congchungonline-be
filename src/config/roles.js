@@ -28,6 +28,8 @@ const allRoles = {
     'getSessions',
     'getDailySessionCount',
     'getMonthlySessionCount',
+    'createSession',
+    'addUserToSession',
   ],
   notary: ['getDocumentsByRole', 'forwardDocumentStatus', 'getApproveHistory', 'joinSession'],
   secretary: ['getDocumentsByRole', 'forwardDocumentStatus', 'getApproveHistory', 'joinSession'],
