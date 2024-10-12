@@ -106,13 +106,13 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *                 description: The name of the session
  *                 example: "Notarization Session"
  *               notaryField:
- *                 type: string
+ *                 type: object
  *                 description: The field of the notary
- *                 example: "Notary Field"
+ *                 example: {"name": "Notary Field"}
  *               notaryService:
- *                 type: string
+ *                 type: object
  *                 description: The Service of the notary
- *                 example: "Notary Service"
+ *                 example: {"name": "Notary Service"}
  *               startTime:
  *                 type: string
  *                 format: time

@@ -6,11 +6,11 @@ const sessionSchema = new mongoose.Schema({
     type: String,
   },
   notaryField: {
-    type: String,
+    type: Object,
     required: true,
   },
   notaryService: {
-    type: String,
+    type: Object,
     required: true,
   },
   sessionName: {

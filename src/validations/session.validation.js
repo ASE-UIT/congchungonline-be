@@ -3,8 +3,8 @@ const Joi = require('joi');
 const createSession = {
   body: Joi.object().keys({
     sessionName: Joi.string().required(),
-    notaryField: Joi.string().required(),
-    notaryService: Joi.string().required(),
+    notaryField: Joi.object().required(),
+    notaryService: Joi.object().required(),
     startDate: Joi.date().required(),
     startTime: Joi.string()
       .pattern(/^\d{2}:\d{2}$/, { name: 'time' })
