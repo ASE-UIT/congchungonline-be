@@ -1,5 +1,4 @@
 const moment = require('moment');
-const httpStatus = require('http-status');
 const { Document, User, Session } = require('../models');
 
 const getToDayDocumentCount = async () => {

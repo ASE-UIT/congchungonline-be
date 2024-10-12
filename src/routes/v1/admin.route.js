@@ -1,6 +1,7 @@
 const express = require('express');
 const auth = require('../../middlewares/auth');
 const { adminController } = require('../../controllers');
+
 const router = express.Router();
 
 // Document metrics
@@ -204,6 +205,42 @@ module.exports = router;
  *               $ref: '#/components/responses/Forbidden'
  *       "404":
  *         description: Not found - endpoint does not exist
+ */
+
+/**
+ * @swagger
+ * /admin/metrics/employees/list:
+ *   get:
+ *     summary: Get the list of employees with role 'notary' and 'secretary'
+ *     description: Retrieve a list of employees with the role of 'notary' and 'secretary'.
+ *     tags: [Admins]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       "200":
+ *         description: Successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/User'
+ *       "401":
+ *         description: Unauthorized access - invalid token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         description: Forbidden - the user doesn't have access
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/responses/Forbidden'
+ *       "404":
+ *         description: Not found - endpoint does not exist
+ *       "500":
+ *         description: Internal server error
  */
 
 /**
