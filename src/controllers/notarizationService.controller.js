@@ -27,10 +27,16 @@ const deleteNotarizationService = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).json({ message: 'Notarization service deleted successfully' });
 });
 
+const getNotarizationServicesByFieldId = catchAsync(async (req, res) => {
+  const notarizationServices = await notarizationServiceService.getNotarizationServicesByFieldId(req.params.fieldId);
+  res.status(httpStatus.OK).send(notarizationServices);
+});
+
 module.exports = {
   createNotarizationService,
   getNotarizationService,
   getAllNotarizationServices,
   updateNotarizationService,
   deleteNotarizationService,
+  getNotarizationServicesByFieldId,
 };
