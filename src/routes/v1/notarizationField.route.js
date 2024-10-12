@@ -169,7 +169,7 @@ router.patch(
  *       "403":
  *         $ref: '#/components/responses/Forbidden'
  *
- * /notarization-fields/get-notarization-field/{notarization-field-id}:
+ * /notarization-fields/get-notarization-field/{fieldId}:
  *   get:
  *     summary: Get a notarization field
  *     tags: [NotarizationFields]
@@ -196,7 +196,7 @@ router.patch(
  *       "404":
  *         $ref: '#/components/responses/NotFound'
  *
- * /notarization-fields/delete-notarization-field/{notarization-field-id}:
+ * /notarization-fields/delete-notarization-field/{fieldId}:
  *   delete:
  *     summary: Delete a notarization field
  *     description: Only admins can delete notarization fields.
@@ -229,7 +229,7 @@ router.patch(
  *       "404":
  *         $ref: '#/components/responses/NotFound'
  *
- * /notarization-fields/update-notarization-field/{notarization-field-id}:
+ * /notarization-fields/update-notarization-field/{fieldId}:
  *   patch:
  *     summary: Update a notarization field
  *     description: Only admins can update notarization fields.
