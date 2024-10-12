@@ -97,6 +97,18 @@ const getAllNotarizations = catchAsync(async (req, res) => {
   res.send(notarizations);
 });
 
+const approveSignatureByUser = catchAsync(async (req, res) => {
+  const { documentId, amount } = req.body;
+  const signatureImage = req.file.originalname;
+  const requestApproved = await notarizationService.approveSignatureByUser(documentId, amount, signatureImage);
+  res.status(httpStatus.CREATED).send(requestApproved);
+});
+
+const approveSignatureBySecretary = catchAsync(async (req, res) => {
+  const requestApproved = await notarizationService.approveSignatureBySecretary(req.body.documentId, req.user.id);
+  res.status(httpStatus.OK).send(requestApproved);
+});
+
 module.exports = {
   createDocument,
   getHistoryByUserId,
@@ -105,4 +117,6 @@ module.exports = {
   forwardDocumentStatus,
   getApproveHistory,
   getAllNotarizations,
+  approveSignatureByUser,
+  approveSignatureBySecretary,
 };

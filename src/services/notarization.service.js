@@ -1,7 +1,6 @@
 const httpStatus = require('http-status');
-const { Document, StatusTracking, ApproveHistory } = require('../models');
+const { Document, StatusTracking, ApproveHistory, RequestSignature } = require('../models');
 const ApiError = require('../utils/ApiError');
-const catchAsync = require('../utils/catchAsync');
 const { bucket } = require('../config/firebase');
 
 const uploadFileToFirebase = async (file, folderName) => {
@@ -119,7 +118,7 @@ const forwardDocumentStatus = async (documentId, action, role, userId) => {
     const validStatuses = ['pending', 'verification', 'processing', 'digitalSignature', 'completed'];
     const roleStatusMap = {
       notary: ['processing'],
-      secretary: ['verification', 'digitalSignature'],
+      secretary: ['verification'],
     };
 
     let newStatus;
@@ -207,6 +206,102 @@ const getAllNotarizations = async (filter, options) => {
   return notatizations;
 };
 
+const approveSignatureByUser = async (documentId, amount, signatureImage) => {
+  try {
+    console.log(signatureImage);
+    const statusTracking = await StatusTracking.findOne({ documentId });
+    if (statusTracking.status !== 'digitalSignature') {
+      throw new ApiError(httpStatus.CONFLICT, 'Document is not ready for digital signature');
+    }
+
+    let requestSignature = await RequestSignature.findOne({ documentId });
+
+    if (!requestSignature) {
+      if (!signatureImage || signatureImage.length === 0) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'No signature image provided');
+      }
+
+      const newRequestSignature = new RequestSignature({
+        documentId,
+        amount,
+        signatureImage,
+        approvalStatus: {
+          secretary: {
+            approved: false,
+            approvedAt: null,
+          },
+          user: {
+            approved: true,
+            approvedAt: new Date(),
+          },
+        },
+      });
+
+      await newRequestSignature.save();
+      requestSignature = await RequestSignature.findOne({ documentId });
+    }
+
+    requestSignature.signatureImage = signatureImage || requestSignature.signatureImage;
+
+    await requestSignature.save();
+
+    return requestSignature;
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    console.error('Error approve signature by user:', error.message);
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to approve signature by user');
+  }
+};
+
+const approveSignatureBySecretary = async (documentId, userId) => {
+  try {
+    const requestSignature = await RequestSignature.findOne({ documentId });
+    if (!requestSignature) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'Signature request not found. User has not approved the document yet');
+    }
+
+    if (!requestSignature.approvalStatus.user.approved) {
+      throw new ApiError(httpStatus.CONFLICT, 'Cannot approve. User has not approved the document yet');
+    }
+
+    requestSignature.approvalStatus.secretary = {
+      approved: true,
+      approvedAt: new Date(),
+    };
+
+    await requestSignature.save();
+
+    await StatusTracking.updateOne(
+      { documentId },
+      {
+        status: 'completed',
+        updatedAt: new Date(),
+      }
+    );
+
+    const approveHistory = new ApproveHistory({
+      userId,
+      documentId,
+      beforeStatus: 'digitalSignature',
+      afterStatus: 'completed',
+    });
+
+    await approveHistory.save();
+    return {
+      message: 'Secretary approved and signed the document successfully',
+      documentId,
+    };
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    console.error('Error approve signature by secretary:', error.message);
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to approve signature by secretary');
+  }
+};
+
 module.exports = {
   createDocument,
   createStatusTracking,
@@ -216,4 +311,6 @@ module.exports = {
   forwardDocumentStatus,
   getApproveHistory,
   getAllNotarizations,
+  approveSignatureByUser,
+  approveSignatureBySecretary,
 };

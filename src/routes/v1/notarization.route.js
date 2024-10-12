@@ -1,12 +1,27 @@
 const express = require('express');
+const httpStatus = require('http-status');
 const multer = require('multer');
 const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
 const notarizationValidation = require('../../validations/notarization.validation');
 const notarizationController = require('../../controllers/notarization.controller');
+const ApiError = require('../../utils/ApiError');
 
 const router = express.Router();
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
+  fileFilter: (req, file, cb) => {
+    const allowedFileTypes = /jpeg|jpg|png|pdf/;
+    const mimeType = allowedFileTypes.test(file.mimetype);
+    const extname = allowedFileTypes.test(file.originalname.split('.').pop());
+
+    if (mimeType && extname) {
+      return cb(null, true);
+    }
+    cb(new ApiError(httpStatus.BAD_REQUEST, 'Only images and PDFs are allowed'));
+  },
+});
 
 /**
  * @swagger
@@ -80,6 +95,24 @@ router
 router.route('/getAllNotarization').get(auth('getAllNotarizations'), notarizationController.getAllNotarizations);
 
 router.route('/getApproveHistory').get(auth('getApproveHistory'), notarizationController.getApproveHistory);
+
+router
+  .route('/approve-signature-by-user')
+  .post(
+    auth('approveSignatureByUser'),
+    upload.single('signatureImage'),
+    validate(notarizationValidation.approveSignatureByUser),
+    notarizationController.approveSignatureByUser
+  );
+
+router
+  .route('/approve-signature-by-secretary')
+  .post(
+    auth('approveSignatureBySecretary'),
+    upload.none(),
+    validate(notarizationValidation.approveSignatureBySecretary),
+    notarizationController.approveSignatureBySecretary
+  );
 /**
  * @swagger
  * /notarization/upload-files:
@@ -488,7 +521,7 @@ router.route('/getApproveHistory').get(auth('getApproveHistory'), notarizationCo
 /**
  * @swagger
  * /notarization/getAllNotarization:
-*   get:
+ *   get:
  *     summary: Get allnotarizations
  *     description: Only admins can retrieve all notarizations.
  *     tags: [Notarizations]
@@ -542,6 +575,211 @@ router.route('/getApproveHistory').get(auth('getApproveHistory'), notarizationCo
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
  *         $ref: '#/components/responses/Forbidden'
+ */
+
+/**
+ * @swagger
+ * /notarization/approve-signature-by-user:
+ *   post:
+ *     summary: Approve a document signature by the user
+ *     tags: [Notarizations]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               documentId:
+ *                 type: string
+ *                 description: The ID of the document
+ *                 example: "66f462fa57b33d48e47ab55f"
+ *               amount:
+ *                 type: number
+ *                 description: The amount related to the document
+ *                 example: 4
+ *               signatureImage:
+ *                 type: string
+ *                 format: binary
+ *                 description: The user's signature image file
+ *             required:
+ *               - documentId
+ *               - amount
+ *               - signatureImage
+ *     responses:
+ *       "201":
+ *         description: Signature approved successfully by the user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 approvalStatus:
+ *                   type: object
+ *                   properties:
+ *                     secretary:
+ *                       type: object
+ *                       properties:
+ *                         approved:
+ *                           type: boolean
+ *                           description: Whether the secretary approved
+ *                           example: false
+ *                         approvedAt:
+ *                           type: string
+ *                           format: date-time
+ *                           example: null
+ *                     user:
+ *                       type: object
+ *                       properties:
+ *                         approved:
+ *                           type: boolean
+ *                           description: Whether the user approved
+ *                           example: true
+ *                         approvedAt:
+ *                           type: string
+ *                           format: date-time
+ *                           description: Time of user's approval
+ *                           example: "2024-10-12T04:16:37.754Z"
+ *                 documentId:
+ *                   type: string
+ *                   description: The ID of the document
+ *                   example: "66f462fa57b33d48e47ab55f"
+ *                 amount:
+ *                   type: number
+ *                   description: The amount related to the document
+ *                   example: 4
+ *                 signatureImage:
+ *                   type: string
+ *                   description: The name of the uploaded signature image
+ *                   example: "Avt.jpg"
+ *                 id:
+ *                   type: string
+ *                   description: The ID of the approval request
+ *                   example: "6709f825a9e8be589c9c775b"
+ *       "400":
+ *         description: Bad request - Missing required data or file
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: No signature image provided
+ *       "401":
+ *         description: Unauthorized - User is not authenticated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Please authenticate
+ *       "403":
+ *         $ref: '#/components/responses/Forbidden'
+ *       "409":
+ *         description: Conflict - Document is not ready for digital signature
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Document is not ready for digital signature
+ *       "500":
+ *         description: Internal server error - Failed to approve signature by user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Failed to approve signature by user
+ */
+
+/**
+ * @swagger
+ * /notarization/approve-signature-by-secretary:
+ *   post:
+ *     summary: Approve a document signature by the secretary
+ *     tags: [Notarizations]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               documentId:
+ *                 type: string
+ *                 description: The ID of the document
+ *                 example: "66f462fa57b33d48e47ab55f"
+ *             required:
+ *               - documentId
+ *     responses:
+ *       "200":
+ *         description: Signature approved successfully by the secretary
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Secretary approved and signed the document successfully
+ *                 documentId:
+ *                   type: string
+ *                   description: The ID of the document
+ *                   example: "66f462fa57b33d48e47ab55f"
+ *       "401":
+ *         description: Unauthorized - User is not authenticated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Please authenticate
+ *       "403":
+ *         $ref: '#/components/responses/Forbidden'
+ *       "404":
+ *         description: Not found - Signature request not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Signature request not found
+ *       "409":
+ *         description: Conflict - Cannot approve, user has not approved the document yet
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User has not approved the document yet
+ *       "500":
+ *         description: Internal server error - Failed to approve signature by secretary
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Failed to approve signature by secretary
  */
 
 module.exports = router;
