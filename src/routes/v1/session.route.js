@@ -133,18 +133,22 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *                 format: date
  *                 description: The date of session
  *                 example: "2024-10-10"
- *               email:
+ *               users:
  *                 type: array
  *                 items:
- *                   type: string
- *                 description: List of email addresses related to the session
+ *                   type: object
+ *                   properties:
+ *                     email:
+ *                       type: string
+ *                 description: List of users related to the session
+ *                 example: [{email: "abc@gmail.com"}, {email: "def@gmail.com"}]
  *             required:
  *               - sessionName
  *               - startTime
  *               - startDate
  *               - endTime
  *               - endDate
- *               - email
+ *               - users
  *               - notaryField
  *               - notaryService
  *     responses:
@@ -180,10 +184,13 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *                   type: string
  *                   format: date
  *                   example: "2024-10-10"
- *                 email:
+ *                 users:
  *                   type: array
  *                   items:
- *                      type: string
+ *                      type: object
+ *                      properties:
+ *                        email:
+ *                          type: string
  *                   example: "abc@gmail.com"
  *                 createdBy:
  *                   type: string
@@ -241,13 +248,14 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *           schema:
  *             type: object
  *             properties:
- *               email:
+ *               emails:
  *                 type: array
  *                 items:
  *                   type: string
  *                 description: List of email addresses add to the session
+ *                 example: ["abc@gmail.com", "def@gmail.com"]
  *             required:
- *               - email
+ *               - emails
  *     responses:
  *       "201":
  *         description: User was added successfully
@@ -259,7 +267,7 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *                 sessionId:
  *                   type: string
  *                   example: "66fe4c6b76f99374f4c87165"
- *                 email:
+ *                 emails:
  *                   type: array
  *                   items:
  *                      type: string
@@ -317,13 +325,14 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *           schema:
  *             type: object
  *             properties:
- *               email:
+ *               emails:
  *                 type: array
  *                 items:
  *                   type: string
  *                 description: List of email addresses to delete from the session
+ *                 example: ["abc@gmail.com", "def@gmail.com"]
  *             required:
- *               - email
+ *               - emails
  *     responses:
  *       "200":
  *         description: User was deleted successfully
@@ -335,7 +344,7 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *                 sessionId:
  *                   type: string
  *                   example: "66fe4c6b76f99374f4c87165"
- *                 email:
+ *                 emails:
  *                   type: array
  *                   items:
  *                      type: string
@@ -387,18 +396,18 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *           type: string
  *         description: ID of the session
  *     requestBody:
- *       required: true
+ *       action: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
  *             properties:
- *               require:
+ *               action:
  *                 type: string
- *                 description: The require of the session
+ *                 description: The action of the session
  *                 example: "accept"
  *             required:
- *               - require
+ *               - action
  *     responses:
  *       "200":
  *         description: Session joined successfully

@@ -33,9 +33,14 @@ const sessionSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-  email: {
-    type: [String],
-    required: true,
+  users: {
+    type: [
+      {
+        email: { type: String, required: true },
+        status: { type: String, default: 'pending' }, // 'pending', 'accepted', 'rejected'
+      },
+    ],
+    default: [],
   },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,

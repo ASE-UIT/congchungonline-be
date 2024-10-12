@@ -1,11 +1,12 @@
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
 const { sessionService, emailService } = require('../services');
+const { addUserToSession: addUserToSessionValidation } = require('../validations/session.validation');
 
 const createSession = catchAsync(async (req, res) => {
-  const { sessionName, notaryField, notaryService, startTime, startDate, endTime, endDate, email } = req.body;
+  const { sessionName, notaryField, notaryService, startTime, startDate, endTime, endDate, users } = req.body;
   const createdBy = req.user.id;
-  await sessionService.validateEmails(email);
+  await sessionService.validateEmails(users.map((u) => u.email));
   const [hours, minutes] = startTime.split(':').map(Number);
   const startDateTime = new Date(startDate);
   startDateTime.setUTCHours(hours, minutes, 0, 0);
@@ -20,37 +21,39 @@ const createSession = catchAsync(async (req, res) => {
     startDate: startDateTime,
     endTime,
     endDate: endDateTime,
-    email,
+    users,
     createdBy,
   });
-  await Promise.all(session.email.map((emailItem) => emailService.sendInvitationEmail(emailItem, session._id)));
+  await Promise.all(session.users.map((userItem) => emailService.sendInvitationEmail(userItem.email, session._id)));
   res.status(httpStatus.CREATED).send(session);
 });
 
 const addUserToSession = catchAsync(async (req, res) => {
   const { sessionId } = req.params;
-  const { email } = req.body;
-  const userId = req.user.id;
-  await sessionService.validateEmails(email);
-  const updatedSession = await sessionService.addUserToSession({ sessionId, email, userId });
-  await Promise.all(email.map((emailItem) => emailService.sendInvitationEmail(emailItem, sessionId)));
+  const { emails } = req.body;
+
+  await addUserToSessionValidation.body.validateAsync(req.body);
+
+  const updatedSession = await sessionService.addUserToSession(sessionId, emails);
+  await Promise.all(emails.map((email) => emailService.sendInvitationEmail(email, sessionId)));
   res.status(httpStatus.OK).send(updatedSession);
 });
 
 const deleteUserOutOfSession = catchAsync(async (req, res) => {
   const { sessionId } = req.params;
-  const { email } = req.body;
+  const { emails } = req.body;
   const userId = req.user.id;
-  const updatedSession = await sessionService.deleteUserOutOfSession({ sessionId, email, userId });
+  const updatedSession = await sessionService.deleteUserOutOfSession(sessionId, emails, userId);
   res.status(httpStatus.OK).send(updatedSession);
 });
 
 const joinSession = catchAsync(async (req, res) => {
   const { sessionId } = req.params;
-  const { require } = req.body;
+  const { action } = req.body;
   const userId = req.user.id;
-  const joinSession = await sessionService.joinSession({ sessionId, require, userId });
-  res.status(httpStatus.OK).send(joinSession);
+
+  const updatedSession = await sessionService.joinSession(sessionId, action, userId);
+  res.status(httpStatus.OK).send(updatedSession);
 });
 
 const getAllSessions = catchAsync(async (req, res) => {

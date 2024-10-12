@@ -13,7 +13,13 @@ const createSession = {
       .pattern(/^\d{2}:\d{2}$/, { name: 'time' })
       .required(),
     endDate: Joi.date().required(),
-    email: Joi.array().items(Joi.string().email()).required(),
+    users: Joi.array()
+      .items(
+        Joi.object().keys({
+          email: Joi.string().email().required(),
+        })
+      )
+      .required(),
     createdBy: Joi.string(),
   }),
 };
@@ -23,7 +29,7 @@ const addUserToSession = {
     sessionId: Joi.string().required(),
   }),
   body: Joi.object().keys({
-    email: Joi.array().items(Joi.string()).required(),
+    emails: Joi.array().items(Joi.string()).required(),
   }),
 };
 
@@ -32,7 +38,7 @@ const deleteUserOutOfSession = {
     sessionId: Joi.string().required(),
   }),
   body: Joi.object().keys({
-    email: Joi.array().items(Joi.string()).required(),
+    emails: Joi.array().items(Joi.string().email()).required(),
   }),
 };
 
@@ -41,7 +47,7 @@ const joinSession = {
     sessionId: Joi.string().required(),
   }),
   body: Joi.object().keys({
-    require: Joi.string().valid('accept', 'reject').required(),
+    action: Joi.string().valid('accept', 'reject').required(),
   }),
 };
 
