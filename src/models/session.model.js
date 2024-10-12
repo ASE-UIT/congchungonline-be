@@ -6,11 +6,11 @@ const sessionSchema = new mongoose.Schema({
     type: String,
   },
   notaryField: {
-    type: String,
+    type: Object,
     required: true,
   },
   notaryService: {
-    type: String,
+    type: Object,
     required: true,
   },
   sessionName: {
@@ -25,13 +25,22 @@ const sessionSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-  duration: {
-    type: Number,
+  endTime: {
+    type: String,
     required: true,
   },
-  email: {
-    type: [String],
+  endDate: {
+    type: Date,
     required: true,
+  },
+  users: {
+    type: [
+      {
+        email: { type: String, required: true },
+        status: { type: String, default: 'pending' }, // 'pending', 'accepted', 'rejected'
+      },
+    ],
+    default: [],
   },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
