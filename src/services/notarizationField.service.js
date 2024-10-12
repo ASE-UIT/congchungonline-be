@@ -1,6 +1,6 @@
+const httpStatus = require('http-status');
 const { NotarizationField } = require('../models');
 const ApiError = require('../utils/ApiError');
-const httpStatus = require('http-status');
 
 const createNotarizationField = async (notarizationFieldBody) => {
   try {
