@@ -101,14 +101,14 @@ router.route('/getApproveHistory').get(auth('getApproveHistory'), notarizationCo
  *                   type: string
  *                   format: binary
  *                 description: The files to upload
- *               notaryService:
+ *               notarizationServiceId:
  *                 type: string
- *                 description: Name of the notary service
- *                 example: Example Notary Service
- *               notaryField:
+ *                 description: ID of the notary service
+ *                 example: 612e26f07e5b2b1c4f83e8c7
+ *               notarizationFieldId:
  *                 type: string
- *                 description: Field of the notary service
- *                 example: Example Notary Field
+ *                 description: ID of the notary field
+ *                 example: 612e26f07e5b2b1c4f83e8d8
  *               requesterInfo:
  *                 type: object
  *                 properties:
@@ -127,13 +127,13 @@ router.route('/getApproveHistory').get(auth('getApproveHistory'), notarizationCo
  *                   - email
  *             required:
  *               - files
- *               - notaryService
- *               - notaryField
+ *               - notarizationServiceId
+ *               - notarizationFieldId
  *               - requesterInfo
  *           example:
  *             files: [file1.pdf, file2.docx]
- *             notaryService: Example Notary Service
- *             notaryField: Example Notary Field
+ *             notarizationServiceId: 612e26f07e5b2b1c4f83e8c7
+ *             notarizationFieldId: 612e26f07e5b2b1c4f83e8d8
  *             requesterInfo:
  *               citizenId: 123456789012
  *               phoneNumber: 0941788455
@@ -150,12 +150,12 @@ router.route('/getApproveHistory').get(auth('getApproveHistory'), notarizationCo
  *                   type: string
  *                   description: ID of the created document
  *                   example: 66f1818416c9ba1bfc053c3c
- *                 notaryService:
+ *                 notarizationServiceId:
  *                   type: string
- *                   example: Vay-Mượn Tài Sản
- *                 notaryField:
+ *                   example: 612e26f07e5b2b1c4f83e8c7
+ *                 notarizationFieldId:
  *                   type: string
- *                   example: Vay mượn
+ *                   example: 612e26f07e5b2b1c4f83e8d8
  *                 requesterInfo:
  *                   type: object
  *                   properties:
@@ -183,7 +183,7 @@ router.route('/getApproveHistory').get(auth('getApproveHistory'), notarizationCo
  *                         type: string
  *                         example: https://storage.googleapis.com/file-url.pdf
  *       "400":
- *         description: Bad Request - No files provided
+ *         description: Bad Request - No files or invalid IDs provided
  *         content:
  *           application/json:
  *             schema:
@@ -191,17 +191,17 @@ router.route('/getApproveHistory').get(auth('getApproveHistory'), notarizationCo
  *               properties:
  *                 message:
  *                   type: string
- *                   example: No files provided
+ *                   example: Invalid serviceId or fieldId provided / No files provided
  *       "401":
  *          description: Unauthorized
  *          content:
  *            application/json:
  *              schema:
- *              type: object
- *              properties:
- *                message:
- *                  type: string
- *                  example: Please authenticate
+ *                type: object
+ *                properties:
+ *                  message:
+ *                    type: string
+ *                    example: Please authenticate
  *       "500":
  *         description: Internal Server Error - Failed to upload files
  *         content:
@@ -488,7 +488,7 @@ router.route('/getApproveHistory').get(auth('getApproveHistory'), notarizationCo
 /**
  * @swagger
  * /notarization/getAllNotarization:
-*   get:
+ *   get:
  *     summary: Get allnotarizations
  *     description: Only admins can retrieve all notarizations.
  *     tags: [Notarizations]
