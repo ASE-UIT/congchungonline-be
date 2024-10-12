@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
+const parseJson = require('../../middlewares/parseJson');
 const notarizationValidation = require('../../validations/notarization.validation');
 const notarizationController = require('../../controllers/notarization.controller');
 
@@ -53,6 +54,7 @@ router
   .post(
     auth('uploadDocuments'),
     upload.array('files'),
+    parseJson,
     validate(notarizationValidation.createDocument),
     notarizationController.createDocument
   );
@@ -100,44 +102,61 @@ router.route('/getApproveHistory').get(auth('getApproveHistory'), notarizationCo
  *                 items:
  *                   type: string
  *                   format: binary
- *                 description: The files to upload
- *               notarizationServiceId:
- *                 type: string
- *                 description: ID of the notary service
- *                 example: 612e26f07e5b2b1c4f83e8c7
- *               notarizationFieldId:
- *                 type: string
- *                 description: ID of the notary field
- *                 example: 612e26f07e5b2b1c4f83e8d8
+ *                 description: The files to upload (e.g., PDF, DOCX)
+ *                 example: [file1.pdf, file2.docx]
+ *               notarizationField:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     description: ObjectId of the related notarization field
+ *                     example: "60d5ec49f2c1f814d3e8e3c7"
+ *                   name:
+ *                     type: string
+ *                     description: The name of the notarization field
+ *                     example: "Real Estate"
+ *                   description:
+ *                     type: string
+ *                     description: The description of the notarization field
+ *                     example: "Field related to real estate transactions."
+ *               notarizationService:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     description: ObjectId of the related notarization service
+ *                     example: "60d5ec49f2c1f814d3e8e3c5"
+ *                   name:
+ *                     type: string
+ *                     description: The name of the notarization service
+ *                     example: "Property Deed Notarization"
+ *                   fieldId:
+ *                     type: string
+ *                     description: ObjectId of the related notarization field
+ *                     example: "60d5ec49f2c1f814d3e8e3c6"
+ *                   description:
+ *                     type: string
+ *                     description: The description of the notarization service
+ *                     example: "Notarization for property deed transfer."
+ *                   price:
+ *                     type: number
+ *                     description: The price of the notarization service
+ *                     example: 150.00
  *               requesterInfo:
  *                 type: object
  *                 properties:
  *                   citizenId:
  *                     type: string
- *                     example: 123456789012
+ *                     description: Citizen ID of the requester
+ *                     example: "123456789"
  *                   phoneNumber:
  *                     type: string
- *                     example: 0941788455
+ *                     description: Phone number of the requester
+ *                     example: "+1234567890"
  *                   email:
  *                     type: string
- *                     example: 123@gmail.com
- *                 required:
- *                   - citizenId
- *                   - phoneNumber
- *                   - email
- *             required:
- *               - files
- *               - notarizationServiceId
- *               - notarizationFieldId
- *               - requesterInfo
- *           example:
- *             files: [file1.pdf, file2.docx]
- *             notarizationServiceId: 612e26f07e5b2b1c4f83e8c7
- *             notarizationFieldId: 612e26f07e5b2b1c4f83e8d8
- *             requesterInfo:
- *               citizenId: 123456789012
- *               phoneNumber: 0941788455
- *               email: 123@gmail.com
+ *                     description: Email of the requester
+ *                     example: "requester@example.com"
  *     responses:
  *       "201":
  *         description: Documents uploaded successfully
@@ -146,116 +165,85 @@ router.route('/getApproveHistory').get(auth('getApproveHistory'), notarizationCo
  *             schema:
  *               type: object
  *               properties:
- *                 id:
+ *                 _id:
  *                   type: string
- *                   description: ID of the created document
- *                   example: 66f1818416c9ba1bfc053c3c
- *                 notarizationServiceId:
- *                   type: string
- *                   example: 612e26f07e5b2b1c4f83e8c7
- *                 notarizationFieldId:
- *                   type: string
- *                   example: 612e26f07e5b2b1c4f83e8d8
- *                 requesterInfo:
- *                   type: object
- *                   properties:
- *                     citizenId:
- *                       type: string
- *                       example: 123456789012
- *                     phoneNumber:
- *                       type: string
- *                       example: 0941788455
- *                     email:
- *                       type: string
- *                       example: 123@gmail.com
+ *                   description: Document ID
+ *                   example: "60d5ec49f2c1f814d3e8e3c9"
  *                 files:
  *                   type: array
  *                   items:
  *                     type: object
  *                     properties:
- *                       _id:
- *                         type: string
- *                         example: 66f1818416c9ba1bfc053c3c
  *                       filename:
  *                         type: string
- *                         example: file1.pdf
+ *                         description: Name of the uploaded file
+ *                         example: "file1.pdf"
  *                       firebaseUrl:
  *                         type: string
- *                         example: https://storage.googleapis.com/file-url.pdf
- *       "400":
- *         description: Bad Request - No files or invalid IDs provided
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Invalid serviceId or fieldId provided / No files provided
- *       "401":
- *          description: Unauthorized
- *          content:
- *            application/json:
- *              schema:
- *                type: object
- *                properties:
- *                  message:
- *                    type: string
- *                    example: Please authenticate
- *       "500":
- *         description: Internal Server Error - Failed to upload files
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Failed to upload files
- */
-
-/**
- * @swagger
- * /notarization/history:
- *   get:
- *     summary: Retrieve notarization history by UUID
- *     tags: [Notarizations]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       "200":
- *         description: Notarization history details
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: string
- *                   description: ID of the created document
- *                   example: 66f1818416c9ba1bfc053c3c
- *                 notaryService:
- *                   type: string
- *                   example: Vay-Mượn Tài Sản
- *                 notaryField:
- *                   type: string
- *                   example: Vay mượn
+ *                         description: URL of the file in Firebase
+ *                         example: "https://firebase.com/path/to/file1.pdf"
+ *                 notarizationService:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       example: "60d5ec49f2c1f814d3e8e3c5"
+ *                     name:
+ *                       type: string
+ *                       example: "Property Deed Notarization"
+ *                     fieldId:
+ *                       type: string
+ *                       example: "60d5ec49f2c1f814d3e8e3c6"
+ *                     description:
+ *                       type: string
+ *                       example: "Notarization for property deed transfer."
+ *                     price:
+ *                       type: number
+ *                       example: 150.00
+ *                 notarizationField:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       example: "60d5ec49f2c1f814d3e8e3c7"
+ *                     name:
+ *                       type: string
+ *                       example: "Real Estate"
+ *                     description:
+ *                       type: string
+ *                       example: "Field related to real estate transactions."
  *                 requesterInfo:
  *                   type: object
  *                   properties:
  *                     citizenId:
  *                       type: string
- *                       example: 123456789012
+ *                       example: "123456789"
  *                     phoneNumber:
  *                       type: string
- *                       example: 0941788455
+ *                       example: "+1234567890"
  *                     email:
  *                       type: string
- *                       example: 123@gmail.com
+ *                       example: "requester@example.com"
  *       "400":
- *         $ref: '#/components/responses/BadRequest'
- *       "401":
- *         $ref: '#/components/responses/Unauthorized'
+ *         description: Bad Request - Invalid data provided
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid notarization service ID or field ID / No files provided"
+ *       "500":
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Failed to upload documents"
  */
 
 /**

@@ -128,13 +128,16 @@ router.patch(
  *             properties:
  *               name:
  *                 type: string
+ *                 description: The name of the notarization field.
  *               description:
  *                 type: string
+ *                 description: A brief description of the notarization field.
  *             example:
  *               name: Notarization Field Example
+ *               description: This is an example description for the notarization field.
  *     responses:
  *       "201":
- *         description: Created
+ *         description: Notarization field created successfully.
  *         content:
  *           application/json:
  *             schema:
@@ -145,6 +148,9 @@ router.patch(
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
  *         $ref: '#/components/responses/Forbidden'
+ *       "500":
+ *         description: Internal server error.
+ *
  *
  * /notarization-fields/get-all-notarization-fields:
  *   get:

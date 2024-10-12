@@ -1,6 +1,7 @@
 const httpStatus = require('http-status');
 const mongoose = require('mongoose');
 const catchAsync = require('../utils/catchAsync');
+const ApiError = require('../utils/ApiError');
 const pick = require('lodash/pick');
 const { notarizationService, emailService } = require('../services');
 
@@ -22,18 +23,14 @@ const sendDocumentCreationEmail = async (email, documentId) => {
 
 // Controller function to create a document
 const createDocument = catchAsync(async (req, res) => {
-  const { requesterInfo } = req.body;
   const userId = req.user.id;
 
-  if (typeof requesterInfo === 'string') {
-    req.body.requesterInfo = JSON.parse(requesterInfo);
-  }
-
   if (!isValidEmail(req.body.requesterInfo.email)) {
-    return res.status(httpStatus.BAD_REQUEST).send({ message: 'Invalid email address' });
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid email address');
   }
 
-  const document = await notarizationService.createDocument({ ...req.body, userId }, req.files);
+  const document = await notarizationService.createDocument({ ...req.body }, req.files, userId);
+
   await notarizationService.createStatusTracking(document._id, 'pending');
 
   try {
