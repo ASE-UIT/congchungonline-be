@@ -24,6 +24,8 @@ const allRoles = {
     'getUserMonthly',
     'getTodayDocumentsByNotaryField',
     'getMonthDocumentsByNotaryField',
+    'getEmployeeCount',
+    'getEmployeeList',
     'getNotarizationFields',
     'getNotarizationServices',
     'getSessions',
