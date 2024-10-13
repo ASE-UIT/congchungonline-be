@@ -4,7 +4,7 @@ const ApiError = require('../../../src/utils/ApiError');
 const firebaseAuth = require('../../../src/middlewares/firebase');
 const { app } = require('../../../src/config/firebase');
 
-jest.mock('../config/firebase', () => ({
+jest.mock('../../../src/config/firebase', () => ({
   app: {
     auth: jest.fn(),
   },

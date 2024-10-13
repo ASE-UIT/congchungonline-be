@@ -73,13 +73,13 @@ describe('Auth middleware', () => {
 
     const user = { id: 'userId123', role: 'user' };
 
-    passport.authenticate.mockImplementation((strategy, options, callback) => () => {
-      callback(null, user, null);
+    passport.authenticate.mockImplementation((strategy, options, callback) => {
+      return () => {
+        callback(null, user, null);
+      };
     });
 
-    jest.spyOn(rolesConfig, 'getPermissionsByRoleName').mockImplementation(() => {
-      throw new Error('Database error');
-    });
+    jest.spyOn(rolesConfig, 'getPermissionsByRoleName').mockRejectedValue(new Error('Database error'));
 
     const requiredRights = ['uploadDocuments'];
 
