@@ -53,8 +53,8 @@ const deleteUser = catchAsync(async (req, res) => {
   res.status(httpStatus.NO_CONTENT).send();
 });
 
-const getUserByEmail = catchAsync(async (req, res) => {
-  const user = await userService.getUserByEmail(req.params.email);
+const searchUserByEmail = catchAsync(async (req, res) => {
+  const user = await userService.searchUsersByEmail(req.params.email);
   res.status(httpStatus.OK).send(user);
 });
 
@@ -64,5 +64,5 @@ module.exports = {
   getUser,
   updateUser,
   deleteUser,
-  getUserByEmail,
+  searchUserByEmail,
 };
