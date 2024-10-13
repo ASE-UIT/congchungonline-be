@@ -49,15 +49,21 @@ const upload = multer({ storage: multer.memoryStorage() });
  *   description: Notarization document management API
  */
 
-router
-  .route('/upload-files')
-  .post(
-    auth('uploadDocuments'),
-    upload.array('files'),
-    parseJson,
-    validate(notarizationValidation.createDocument),
-    notarizationController.createDocument
-  );
+router.route('/upload-files').post(
+  auth('uploadDocuments'),
+  upload.array('files'),
+  (req, res, next) => {
+    req.body.notarizationService = JSON.parse(req.body.notarizationService);
+    req.body.notarizationField = JSON.parse(req.body.notarizationField);
+    req.body.requesterInfo = JSON.parse(req.body.requesterInfo);
+
+    req.body.files = req.files.map((file) => file.originalname);
+
+    next();
+  },
+  validate(notarizationValidation.createDocument),
+  notarizationController.createDocument
+);
 
 router
   .route('/history')
@@ -110,38 +116,38 @@ router.route('/getApproveHistory').get(auth('getApproveHistory'), notarizationCo
  *                   id:
  *                     type: string
  *                     description: ObjectId of the related notarization field
- *                     example: "60d5ec49f2c1f814d3e8e3c7"
+ *                     example: "670aad2016bb592ef84ee39d"
  *                   name:
  *                     type: string
  *                     description: The name of the notarization field
- *                     example: "Real Estate"
+ *                     example: "Hôn nhân gia đình"
  *                   description:
  *                     type: string
  *                     description: The description of the notarization field
- *                     example: "Field related to real estate transactions."
+ *                     example: "This is an example description for the notarization field."
  *               notarizationService:
  *                 type: object
  *                 properties:
  *                   id:
  *                     type: string
  *                     description: ObjectId of the related notarization service
- *                     example: "60d5ec49f2c1f814d3e8e3c5"
+ *                     example: "670a2ed9b2993b7b2051b3c7"
  *                   name:
  *                     type: string
  *                     description: The name of the notarization service
- *                     example: "Property Deed Notarization"
+ *                     example: "Ly hôn - Ly thân"
  *                   fieldId:
  *                     type: string
  *                     description: ObjectId of the related notarization field
- *                     example: "60d5ec49f2c1f814d3e8e3c6"
+ *                     example: "670aad2016bb592ef84ee39d"
  *                   description:
  *                     type: string
  *                     description: The description of the notarization service
- *                     example: "Notarization for property deed transfer."
+ *                     example: "This is an example of a notarization service."
  *                   price:
  *                     type: number
  *                     description: The price of the notarization service
- *                     example: 150.00
+ *                     example: 10000
  *               requesterInfo:
  *                 type: object
  *                 properties:
