@@ -8,7 +8,7 @@ const allRoles = {
     'joinSession',
     'getNotarizationFields',
     'getNotarizationServices',
-    'getUserByEmail',
+    'searchUserByEmail',
   ],
   admin: [
     'getUsers',
@@ -31,7 +31,7 @@ const allRoles = {
     'getSessions',
     'getDailySessionCount',
     'getMonthlySessionCount',
-    'getUserByEmail',
+    'searchUserByEmail',
     'createSession',
     'addUserToSession',
     'deleteUserOutOfSession',
