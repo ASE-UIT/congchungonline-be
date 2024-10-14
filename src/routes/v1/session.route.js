@@ -325,14 +325,12 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *           schema:
  *             type: object
  *             properties:
- *               emails:
- *                 type: array
- *                 items:
- *                   type: string
- *                 description: List of email addresses to delete from the session
- *                 example: ["abc@gmail.com", "def@gmail.com"]
+ *               email:
+ *                 type: string
+ *                 description: Email address to delete from the session
+ *                 example: "abc@gmail.com"
  *             required:
- *               - emails
+ *               - email
  *     responses:
  *       "200":
  *         description: User was deleted successfully
@@ -344,10 +342,8 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *                 sessionId:
  *                   type: string
  *                   example: "66fe4c6b76f99374f4c87165"
- *                 emails:
- *                   type: array
- *                   items:
- *                      type: string
+ *                 email:
+ *                   type: string
  *                   example: "abc@gmail.com"
  *       "400":
  *         description: Bad Request

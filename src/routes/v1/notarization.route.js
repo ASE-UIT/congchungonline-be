@@ -67,6 +67,14 @@ router
     notarizationController.getHistoryByUserId
   );
 
+router
+  .route('/get-history-with-status')
+  .get(
+    auth('viewNotarizationHistory'),
+    validate(notarizationValidation.getHistoryByUserId),
+    notarizationController.getHistoryWithStatus
+  );
+
 router.route('/getStatusById/:documentId').get(notarizationController.getDocumentStatus);
 
 router.route('/getDocumentByRole').get(auth('getDocumentsByRole'), notarizationController.getDocumentByRole);
@@ -531,5 +539,90 @@ router.route('/getApproveHistory').get(auth('getApproveHistory'), notarizationCo
  *       "403":
  *         $ref: '#/components/responses/Forbidden'
  */
+
+/**
+ * @swagger
+ * /notarization/history:
+ *   get:
+ *     summary: Get history of notarizations
+ *     description: Retrieve the history of notarizations for the authenticated user.
+ *     tags: [Notarizations]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       "200":
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Notarizations'
+ *       "401":
+ *         $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         $ref: '#/components/responses/Forbidden'
+ *       "404":
+ *         description: Not Found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *
+ */
+
+// /**
+//  * @swagger
+//  * /notarization/get-history-with-status:
+//  *   get:
+//  *     summary: Get history with status of notarizations
+//  *     description: Retrieve the history with status of notarizations for the authenticated user.
+//  *     tags: [Notarizations]
+//  *     security:
+//  *       - bearerAuth: []
+//  *     responses:
+//  *       "200":
+//  *         description: OK
+//  *         content:
+//  *           application/json:
+//  *             schema:
+//  *               type: array
+//  *               items:
+//  *                 type: ObjectId
+//  *                 properties:
+//  *                   _id:
+//  *                     type: string
+//  *                     example: "66f462fa57b33d48e47ab55f"
+//  *                   status:
+//  *                     type: string
+//  *                     example: "approved"
+//  *                   approvedBy:
+//  *                     type: string
+//  *                     example: "userId123"
+//  *                   approvedAt:
+//  *                     type: string
+//  *                     format: date-time
+//  *                     example: "2024-09-26T08:09:42.039Z"
+//  *                   comments:
+//  *                     type: string
+//  *                     example: "Document approved successfully."
+//  *       "401":
+//  *         $ref: '#/components/responses/Unauthorized'
+//  *       "403":
+//  *         $ref: '#/components/responses/Forbidden'
+//  *       "404":
+//  *         description: Not Found
+//  *         content:
+//  *           application/json:
+//  *             schema:
+//  *               type: object
+//  *               properties:
+//  *                 message:
+//  *                   type: string
+//  *                   example: "User not found"
+//  */
 
 module.exports = router;

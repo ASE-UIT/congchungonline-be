@@ -51,6 +51,12 @@ const getHistoryByUserId = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send(history);
 });
 
+const getHistoryWithStatus = catchAsync(async (req, res) => {
+  const { userId } = req.query;
+  const history = await notarizationService.getHistoryWithStatus(userId);
+  res.status(httpStatus.OK).send(history);
+});
+
 // Controller function to get document status by document ID
 const getDocumentStatus = catchAsync(async (req, res) => {
   const { documentId } = req.params;
@@ -102,4 +108,5 @@ module.exports = {
   forwardDocumentStatus,
   getApproveHistory,
   getAllNotarizations,
+  getHistoryWithStatus,
 };

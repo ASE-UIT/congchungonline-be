@@ -74,21 +74,17 @@ const addUserToSession = async (sessionId, emails) => {
   return session;
 };
 
-const deleteUserOutOfSession = async (sessionId, emails, userId) => {
+const deleteUserOutOfSession = async (sessionId, email, userId) => {
   const session = await findBySessionId(sessionId);
   if (session.createdBy.toString() !== userId.toString()) {
     throw new ApiError(httpStatus.FORBIDDEN, 'You are not authorized to delete users from this session');
   }
 
-  if (Array.isArray(emails)) {
-    emails.forEach((email) => {
-      const userIndex = session.users.findIndex((user) => user.email === email);
-      if (userIndex !== -1) {
-        session.users.splice(userIndex, 1);
-      }
-    });
+  const userIndex = session.users.findIndex((user) => user.email === email);
+  if (userIndex !== -1) {
+    session.users.splice(userIndex, 1);
   } else {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Emails must be an array');
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found in session');
   }
 
   await session.save();
