@@ -38,7 +38,7 @@ const deleteUserOutOfSession = {
     sessionId: Joi.string().required(),
   }),
   body: Joi.object().keys({
-    emails: Joi.array().items(Joi.string().email()).required(),
+    email: Joi.string().email().required(), // Changed to require a single email
   }),
 };
 

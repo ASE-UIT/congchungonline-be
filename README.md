@@ -37,8 +37,8 @@ This repository contains the backend code for **CongChungOnline**, a platform fo
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/FiveD-SE/congchungonline-backend.git
-   cd congchungonline-backend
+   git clone https://github.com/ASE-UIT/congchungonline-be.git
+   cd congchungonline-be
    ```
 
 2. Install dependencies:
@@ -64,8 +64,9 @@ This repository contains the backend code for **CongChungOnline**, a platform fo
 ## Environment Variables
 
 ```bash
-# Server Port
+# Port number
 PORT=3000
+HOST=http://localhost
 
 # MongoDB URL
 MONGODB_URL=mongodb://127.0.0.1:27017/node-boilerplate

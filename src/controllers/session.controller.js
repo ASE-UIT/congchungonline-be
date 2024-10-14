@@ -41,9 +41,9 @@ const addUserToSession = catchAsync(async (req, res) => {
 
 const deleteUserOutOfSession = catchAsync(async (req, res) => {
   const { sessionId } = req.params;
-  const { emails } = req.body;
+  const { email } = req.body; // Changed to receive a single email
   const userId = req.user.id;
-  const updatedSession = await sessionService.deleteUserOutOfSession(sessionId, emails, userId);
+  const updatedSession = await sessionService.deleteUserOutOfSession(sessionId, email, userId); // Pass single email
   res.status(httpStatus.OK).send(updatedSession);
 });
 

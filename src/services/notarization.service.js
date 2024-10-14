@@ -120,6 +120,18 @@ const getHistoryByUserId = async (userId) => {
   return Document.find({ userId });
 };
 
+const getHistoryWithStatus = async (userId) => {
+  const history = await Document.find({ userId });
+  const statusTrackings = await StatusTracking.find({ documentId: { $in: history.map((doc) => doc._id) } });
+  return history.map((doc) => {
+    const statusTracking = statusTrackings.find((tracking) => tracking.documentId.toString() === doc._id.toString());
+    return {
+      ...doc.toObject(),
+      status: statusTracking.status,
+    };
+  });
+};
+
 const getDocumentStatus = async (documentId) => {
   try {
     const statusTracking = await StatusTracking.findOne({ documentId });
@@ -269,4 +281,5 @@ module.exports = {
   forwardDocumentStatus,
   getApproveHistory,
   getAllNotarizations,
+  getHistoryWithStatus,
 };
