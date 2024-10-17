@@ -8,6 +8,10 @@ const notarizationFieldSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    description: {
+      type: String,
+      required: true,
+    },
   },
   { collection: 'notarizationFields' }
 );

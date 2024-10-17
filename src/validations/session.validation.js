@@ -3,12 +3,23 @@ const Joi = require('joi');
 const createSession = {
   body: Joi.object().keys({
     sessionName: Joi.string().required(),
-    notaryField: Joi.string().required(),
-    notaryService: Joi.string().required(),
+    notaryField: Joi.object().required(),
+    notaryService: Joi.object().required(),
     startDate: Joi.date().required(),
-    startTime: Joi.string().pattern(/^\d{2}:\d{2}$/, { name: 'time' }).required(),
-    duration: Joi.number().integer().min(1).required(),
-    email: Joi.array().items(Joi.string().email()).required(),
+    startTime: Joi.string()
+      .pattern(/^\d{2}:\d{2}$/, { name: 'time' })
+      .required(),
+    endTime: Joi.string()
+      .pattern(/^\d{2}:\d{2}$/, { name: 'time' })
+      .required(),
+    endDate: Joi.date().required(),
+    users: Joi.array()
+      .items(
+        Joi.object().keys({
+          email: Joi.string().email().required(),
+        })
+      )
+      .required(),
     createdBy: Joi.string(),
   }),
 };
@@ -18,7 +29,7 @@ const addUserToSession = {
     sessionId: Joi.string().required(),
   }),
   body: Joi.object().keys({
-    email: Joi.array().items(Joi.string()).required(),
+    emails: Joi.array().items(Joi.string()).required(),
   }),
 };
 
@@ -27,7 +38,7 @@ const deleteUserOutOfSession = {
     sessionId: Joi.string().required(),
   }),
   body: Joi.object().keys({
-    email: Joi.array().items(Joi.string()).required(),
+    email: Joi.string().email().required(), // Changed to require a single email
   }),
 };
 
@@ -36,22 +47,21 @@ const joinSession = {
     sessionId: Joi.string().required(),
   }),
   body: Joi.object().keys({
-    require: Joi.string().valid('accept', 'reject').required(),
+    action: Joi.string().valid('accept', 'reject').required(),
   }),
 };
 
 const getSessionsByDate = {
   query: Joi.object().keys({
     date: Joi.string().required(),
-  })
-}
+  }),
+};
 
 const getSessionsByMonth = {
   query: Joi.object().keys({
     date: Joi.string().required(),
-  })
-}
-
+  }),
+};
 
 module.exports = {
   createSession,

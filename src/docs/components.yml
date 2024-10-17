@@ -78,6 +78,53 @@ components:
           type: string
           format: date-time
 
+    Session:
+      type: object
+      properties:
+        sessionId:
+          type: string
+        notaryField:
+          type: object
+        notaryService:
+          type: object
+        sessionName:
+          type: string
+        startTime:
+          type: string
+        startDate:
+          type: string
+          format: date
+        endTime:
+          type: string
+        endDate:
+          type: string
+          format: date
+        users:
+          type: array
+          items:
+            type: object
+            properties:
+              email:
+                type: string
+              status:
+                type: string
+                enum: [pending, accepted, rejected]
+        createdBy:
+          type: string
+          format: objectId
+
+      example:
+        sessionId: 5ebac534954b54139806c112
+        notaryField: { name: 'Notary Field 1' }
+        notaryService: { name: 'Notary Service 1' }
+        sessionName: 'Session 1'
+        startTime: '10:00'
+        startDate: '2024-05-12'
+        endTime: '11:00'
+        endDate: '2024-05-12'
+        users: [{ email: 'user1@example.com', status: 'pending' }, { email: 'user2@example.com', status: 'accepted' }]
+        createdBy: '5ebac534954b54139806c112'
+
     Role:
       type: object
       properties:
@@ -90,39 +137,6 @@ components:
       example:
         name: 'user'
         permissions: ['viewNotarizationHistory', 'uploadDocuments']
-
-    Session:
-      type: object
-      properties:
-        id:
-          type: string
-        userId:
-          type: string
-        expires:
-          type: string
-          format: date-time
-        createdAt:
-          type: string
-          format: date-time
-        email:
-          type: array
-          items:
-            type: string
-        sessionName:
-          type: string
-        notaryField:
-          type: string
-        notaryService:
-          type: string
-        startTime:
-          type: string
-        startDate:
-          type: string
-          format: date-time
-        duration:
-          type: number
-        createdBy:
-          type: string
 
   responses:
     DuplicateEmail:

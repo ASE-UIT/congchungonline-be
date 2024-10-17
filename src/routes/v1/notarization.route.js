@@ -3,6 +3,7 @@ const httpStatus = require('http-status');
 const multer = require('multer');
 const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
+const parseJson = require('../../middlewares/parseJson');
 const notarizationValidation = require('../../validations/notarization.validation');
 const notarizationController = require('../../controllers/notarization.controller');
 const ApiError = require('../../utils/ApiError');
@@ -63,14 +64,21 @@ const upload = multer({
  *   description: Notarization document management API
  */
 
-router
-  .route('/upload-files')
-  .post(
-    auth('uploadDocuments'),
-    upload.array('files'),
-    validate(notarizationValidation.createDocument),
-    notarizationController.createDocument
-  );
+router.route('/upload-files').post(
+  auth('uploadDocuments'),
+  upload.array('files'),
+  (req, res, next) => {
+    req.body.notarizationService = JSON.parse(req.body.notarizationService);
+    req.body.notarizationField = JSON.parse(req.body.notarizationField);
+    req.body.requesterInfo = JSON.parse(req.body.requesterInfo);
+
+    req.body.files = req.files.map((file) => file.originalname);
+
+    next();
+  },
+  validate(notarizationValidation.createDocument),
+  notarizationController.createDocument
+);
 
 router
   .route('/history')
@@ -78,6 +86,14 @@ router
     auth('viewNotarizationHistory'),
     validate(notarizationValidation.getHistoryByUserId),
     notarizationController.getHistoryByUserId
+  );
+
+router
+  .route('/get-history-with-status')
+  .get(
+    auth('viewNotarizationHistory'),
+    validate(notarizationValidation.getHistoryByUserId),
+    notarizationController.getHistoryWithStatus
   );
 
 router.route('/getStatusById/:documentId').get(notarizationController.getDocumentStatus);
@@ -133,44 +149,61 @@ router
  *                 items:
  *                   type: string
  *                   format: binary
- *                 description: The files to upload
- *               notaryService:
- *                 type: string
- *                 description: Name of the notary service
- *                 example: Example Notary Service
- *               notaryField:
- *                 type: string
- *                 description: Field of the notary service
- *                 example: Example Notary Field
+ *                 description: The files to upload (e.g., PDF, DOCX)
+ *                 example: [file1.pdf, file2.docx]
+ *               notarizationField:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     description: ObjectId of the related notarization field
+ *                     example: "670aad2016bb592ef84ee39d"
+ *                   name:
+ *                     type: string
+ *                     description: The name of the notarization field
+ *                     example: "Hôn nhân gia đình"
+ *                   description:
+ *                     type: string
+ *                     description: The description of the notarization field
+ *                     example: "This is an example description for the notarization field."
+ *               notarizationService:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     description: ObjectId of the related notarization service
+ *                     example: "670a2ed9b2993b7b2051b3c7"
+ *                   name:
+ *                     type: string
+ *                     description: The name of the notarization service
+ *                     example: "Ly hôn - Ly thân"
+ *                   fieldId:
+ *                     type: string
+ *                     description: ObjectId of the related notarization field
+ *                     example: "670aad2016bb592ef84ee39d"
+ *                   description:
+ *                     type: string
+ *                     description: The description of the notarization service
+ *                     example: "This is an example of a notarization service."
+ *                   price:
+ *                     type: number
+ *                     description: The price of the notarization service
+ *                     example: 10000
  *               requesterInfo:
  *                 type: object
  *                 properties:
  *                   citizenId:
  *                     type: string
- *                     example: 123456789012
+ *                     description: Citizen ID of the requester
+ *                     example: "123456789"
  *                   phoneNumber:
  *                     type: string
- *                     example: 0941788455
+ *                     description: Phone number of the requester
+ *                     example: "+1234567890"
  *                   email:
  *                     type: string
- *                     example: 123@gmail.com
- *                 required:
- *                   - citizenId
- *                   - phoneNumber
- *                   - email
- *             required:
- *               - files
- *               - notaryService
- *               - notaryField
- *               - requesterInfo
- *           example:
- *             files: [file1.pdf, file2.docx]
- *             notaryService: Example Notary Service
- *             notaryField: Example Notary Field
- *             requesterInfo:
- *               citizenId: 123456789012
- *               phoneNumber: 0941788455
- *               email: 123@gmail.com
+ *                     description: Email of the requester
+ *                     example: "requester@example.com"
  *     responses:
  *       "201":
  *         description: Documents uploaded successfully
@@ -179,116 +212,85 @@ router
  *             schema:
  *               type: object
  *               properties:
- *                 id:
+ *                 _id:
  *                   type: string
- *                   description: ID of the created document
- *                   example: 66f1818416c9ba1bfc053c3c
- *                 notaryService:
- *                   type: string
- *                   example: Vay-Mượn Tài Sản
- *                 notaryField:
- *                   type: string
- *                   example: Vay mượn
- *                 requesterInfo:
- *                   type: object
- *                   properties:
- *                     citizenId:
- *                       type: string
- *                       example: 123456789012
- *                     phoneNumber:
- *                       type: string
- *                       example: 0941788455
- *                     email:
- *                       type: string
- *                       example: 123@gmail.com
+ *                   description: Document ID
+ *                   example: "60d5ec49f2c1f814d3e8e3c9"
  *                 files:
  *                   type: array
  *                   items:
  *                     type: object
  *                     properties:
- *                       _id:
- *                         type: string
- *                         example: 66f1818416c9ba1bfc053c3c
  *                       filename:
  *                         type: string
- *                         example: file1.pdf
+ *                         description: Name of the uploaded file
+ *                         example: "file1.pdf"
  *                       firebaseUrl:
  *                         type: string
- *                         example: https://storage.googleapis.com/file-url.pdf
- *       "400":
- *         description: Bad Request - No files provided
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: No files provided
- *       "401":
- *          description: Unauthorized
- *          content:
- *            application/json:
- *              schema:
- *              type: object
- *              properties:
- *                message:
- *                  type: string
- *                  example: Please authenticate
- *       "500":
- *         description: Internal Server Error - Failed to upload files
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Failed to upload files
- */
-
-/**
- * @swagger
- * /notarization/history:
- *   get:
- *     summary: Retrieve notarization history by UUID
- *     tags: [Notarizations]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       "200":
- *         description: Notarization history details
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: string
- *                   description: ID of the created document
- *                   example: 66f1818416c9ba1bfc053c3c
- *                 notaryService:
- *                   type: string
- *                   example: Vay-Mượn Tài Sản
- *                 notaryField:
- *                   type: string
- *                   example: Vay mượn
+ *                         description: URL of the file in Firebase
+ *                         example: "https://firebase.com/path/to/file1.pdf"
+ *                 notarizationService:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       example: "60d5ec49f2c1f814d3e8e3c5"
+ *                     name:
+ *                       type: string
+ *                       example: "Property Deed Notarization"
+ *                     fieldId:
+ *                       type: string
+ *                       example: "60d5ec49f2c1f814d3e8e3c6"
+ *                     description:
+ *                       type: string
+ *                       example: "Notarization for property deed transfer."
+ *                     price:
+ *                       type: number
+ *                       example: 150.00
+ *                 notarizationField:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       example: "60d5ec49f2c1f814d3e8e3c7"
+ *                     name:
+ *                       type: string
+ *                       example: "Real Estate"
+ *                     description:
+ *                       type: string
+ *                       example: "Field related to real estate transactions."
  *                 requesterInfo:
  *                   type: object
  *                   properties:
  *                     citizenId:
  *                       type: string
- *                       example: 123456789012
+ *                       example: "123456789"
  *                     phoneNumber:
  *                       type: string
- *                       example: 0941788455
+ *                       example: "+1234567890"
  *                     email:
  *                       type: string
- *                       example: 123@gmail.com
+ *                       example: "requester@example.com"
  *       "400":
- *         $ref: '#/components/responses/BadRequest'
- *       "401":
- *         $ref: '#/components/responses/Unauthorized'
+ *         description: Bad Request - Invalid data provided
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid notarization service ID or field ID / No files provided"
+ *       "500":
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Failed to upload documents"
  */
 
 /**
@@ -575,211 +577,6 @@ router
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
  *         $ref: '#/components/responses/Forbidden'
- */
-
-/**
- * @swagger
- * /notarization/approve-signature-by-user:
- *   post:
- *     summary: Approve a document signature by the user
- *     tags: [Notarizations]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             properties:
- *               documentId:
- *                 type: string
- *                 description: The ID of the document
- *                 example: "66f462fa57b33d48e47ab55f"
- *               amount:
- *                 type: number
- *                 description: The amount related to the document
- *                 example: 4
- *               signatureImage:
- *                 type: string
- *                 format: binary
- *                 description: The user's signature image file
- *             required:
- *               - documentId
- *               - amount
- *               - signatureImage
- *     responses:
- *       "201":
- *         description: Signature approved successfully by the user
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 approvalStatus:
- *                   type: object
- *                   properties:
- *                     secretary:
- *                       type: object
- *                       properties:
- *                         approved:
- *                           type: boolean
- *                           description: Whether the secretary approved
- *                           example: false
- *                         approvedAt:
- *                           type: string
- *                           format: date-time
- *                           example: null
- *                     user:
- *                       type: object
- *                       properties:
- *                         approved:
- *                           type: boolean
- *                           description: Whether the user approved
- *                           example: true
- *                         approvedAt:
- *                           type: string
- *                           format: date-time
- *                           description: Time of user's approval
- *                           example: "2024-10-12T04:16:37.754Z"
- *                 documentId:
- *                   type: string
- *                   description: The ID of the document
- *                   example: "66f462fa57b33d48e47ab55f"
- *                 amount:
- *                   type: number
- *                   description: The amount related to the document
- *                   example: 4
- *                 signatureImage:
- *                   type: string
- *                   description: The name of the uploaded signature image
- *                   example: "Avt.jpg"
- *                 id:
- *                   type: string
- *                   description: The ID of the approval request
- *                   example: "6709f825a9e8be589c9c775b"
- *       "400":
- *         description: Bad request - Missing required data or file
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: No signature image provided
- *       "401":
- *         description: Unauthorized - User is not authenticated
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Please authenticate
- *       "403":
- *         $ref: '#/components/responses/Forbidden'
- *       "409":
- *         description: Conflict - Document is not ready for digital signature
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Document is not ready for digital signature
- *       "500":
- *         description: Internal server error - Failed to approve signature by user
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Failed to approve signature by user
- */
-
-/**
- * @swagger
- * /notarization/approve-signature-by-secretary:
- *   post:
- *     summary: Approve a document signature by the secretary
- *     tags: [Notarizations]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             properties:
- *               documentId:
- *                 type: string
- *                 description: The ID of the document
- *                 example: "66f462fa57b33d48e47ab55f"
- *             required:
- *               - documentId
- *     responses:
- *       "200":
- *         description: Signature approved successfully by the secretary
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Secretary approved and signed the document successfully
- *                 documentId:
- *                   type: string
- *                   description: The ID of the document
- *                   example: "66f462fa57b33d48e47ab55f"
- *       "401":
- *         description: Unauthorized - User is not authenticated
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Please authenticate
- *       "403":
- *         $ref: '#/components/responses/Forbidden'
- *       "404":
- *         description: Not found - Signature request not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Signature request not found
- *       "409":
- *         description: Conflict - Cannot approve, user has not approved the document yet
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: User has not approved the document yet
- *       "500":
- *         description: Internal server error - Failed to approve signature by secretary
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Failed to approve signature by secretary
  */
 
 module.exports = router;

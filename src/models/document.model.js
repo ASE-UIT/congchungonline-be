@@ -16,13 +16,45 @@ const documentSchema = new mongoose.Schema({
       },
     },
   ],
-  notaryService: {
-    type: String,
-    required: true,
+  notarizationService: {
+    id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'NotarizationService',
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    fieldId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'NotarizationField',
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    price: {
+      type: Number,
+      required: true,
+    },
   },
-  notaryField: {
-    type: String,
-    required: true,
+  notarizationField: {
+    id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'NotarizationField',
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
   },
   requesterInfo: {
     citizenId: {
