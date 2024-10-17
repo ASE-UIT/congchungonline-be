@@ -49,6 +49,7 @@
   ],
   "dependencies": {
     "@google/generative-ai": "^0.19.0",
+    "@payos/node": "^1.0.10",
     "alchemy-sdk": "^3.4.1",
     "bcryptjs": "^2.4.3",
     "compression": "^1.7.4",
@@ -69,6 +70,7 @@
     "mongoose": "^5.13.20",
     "morgan": "^1.9.1",
     "multer": "^1.4.5-lts.1",
+    "nanoid": "^5.0.7",
     "node-cron": "^3.0.3",
     "nodemailer": "^6.9.15",
     "passport": "^0.7.0",

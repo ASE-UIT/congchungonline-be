@@ -2,6 +2,16 @@ const httpStatus = require('http-status');
 const { Document, StatusTracking, ApproveHistory, NotarizationService, NotarizationField } = require('../models');
 const ApiError = require('../utils/ApiError');
 const { bucket } = require('../config/firebase');
+const RequestSignature = require('../models/requestSignature.model');
+const { payOS } = require('../config/payos');
+const Payment = require('../models/payment.model');
+
+const generateOrderCode = () => {
+  const MAX_SAFE_INTEGER = 9007199254740991;
+  const MAX_ORDER_CODE = Math.floor(MAX_SAFE_INTEGER / 10);
+
+  return Math.floor(Math.random() * MAX_ORDER_CODE) + 1;
+};
 
 const uploadFileToFirebase = async (file, folderName) => {
   const fileName = `${Date.now()}-${file.originalname}`;
@@ -276,6 +286,7 @@ const approveSignatureByUser = async (documentId, amount, signatureImage) => {
   try {
     console.log(signatureImage);
     const statusTracking = await StatusTracking.findOne({ documentId });
+    // Check if the document is in the correct status
     if (statusTracking.status !== 'digitalSignature') {
       throw new ApiError(httpStatus.CONFLICT, 'Document is not ready for digital signature');
     }
@@ -323,6 +334,12 @@ const approveSignatureByUser = async (documentId, amount, signatureImage) => {
 
 const approveSignatureBySecretary = async (documentId, userId) => {
   try {
+    const statusTracking = await StatusTracking.findOne({ documentId });
+    // Check if the document is in the correct status
+    if (statusTracking.status !== 'digitalSignature') {
+      throw new ApiError(httpStatus.CONFLICT, 'Document is not ready for digital signature');
+    }
+
     const requestSignature = await RequestSignature.findOne({ documentId });
     if (!requestSignature) {
       throw new ApiError(httpStatus.NOT_FOUND, 'Signature request not found. User has not approved the document yet');
@@ -338,6 +355,48 @@ const approveSignatureBySecretary = async (documentId, userId) => {
     };
 
     await requestSignature.save();
+
+    const document = await Document.findById(documentId);
+    if (!document) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'Document not found');
+    }
+
+    // Check if the document has already been paid
+    if (document.payment) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Document has already been paid');
+    }
+
+    // Create a new payment object
+    const payment = new Payment({
+      orderCode: generateOrderCode(),
+      amount: document.notarizationService.price,
+      description: `${document._id}`,
+      returnUrl: `${process.env.SERVER_URL}/success.html`,
+      cancelUrl: `${process.env.SERVER_URL}/cancel.html`,
+      userId,
+    });
+
+    await payment.save();
+
+    // Create a payment link using PayOS
+    const paymentLinkResponse = await payOS.createPaymentLink({
+      orderCode: payment.orderCode,
+      amount: payment.amount,
+      description: payment.description,
+      returnUrl: payment.returnUrl,
+      cancelUrl: payment.cancelUrl,
+    });
+
+    payment.checkoutUrl = paymentLinkResponse.checkoutUrl;
+    await payment.save();
+
+    console.log(paymentLinkResponse);
+
+    document.payment = payment._id;
+    document.checkoutUrl = paymentLinkResponse.checkoutUrl;
+    document.orderCode = payment.orderCode;
+    await document.save();
+    console.log(document);
 
     await StatusTracking.updateOne(
       { documentId },

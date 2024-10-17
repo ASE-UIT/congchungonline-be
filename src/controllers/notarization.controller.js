@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const mongoose = require('mongoose');
 const catchAsync = require('../utils/catchAsync');
 const ApiError = require('../utils/ApiError');
-const pick = require('lodash/pick');
+const pick = require('../utils/pick');
 const { notarizationService, emailService } = require('../services');
 
 // Utility function to validate email format

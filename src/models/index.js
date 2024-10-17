@@ -8,3 +8,4 @@ module.exports.NotarizationService = require('./notarizationService.model');
 module.exports.ApproveHistory = require('./approveHistory.model');
 module.exports.Session = require('./session.model');
 module.exports.RequestSignature = require('./requestSignature.model');
+module.exports.Payment = require('./payment.model');
