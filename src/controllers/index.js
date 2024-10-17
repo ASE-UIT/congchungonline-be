@@ -7,3 +7,4 @@ module.exports.notarizationFieldController = require('./notarizationField.contro
 module.exports.notarizationServiceController = require('./notarizationService.controller');
 module.exports.adminController = require('./admin.controller');
 module.exports.sessionController = require('./session.controller');
+module.exports.locationController = require('./location.controller');
