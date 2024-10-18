@@ -1,22 +1,20 @@
 pipeline {
     agent any
 
-    tools {
-        nodejs 'NodeJS'
-    }
+    tools {nodejs "nodejs"}
 
     environment {
         NODE_ENV = 'development'
-        PORT = "${env.PORT}"
+        PORT = 3100
         HOST = "${env.HOST}"
         MONGODB_URL = "${env.MONGODB_URL}"
         JWT_SECRET = "${env.JWT_SECRET}"
-        JWT_ACCESS_EXPIRATION_MINUTES = "${env.JWT_ACCESS_EXPIRATION_MINUTES}"
-        JWT_REFRESH_EXPIRATION_DAYS = "${env.JWT_REFRESH_EXPIRATION_DAYS}"
-        JWT_RESET_PASSWORD_EXPIRATION_MINUTES = "${env.JWT_RESET_PASSWORD_EXPIRATION_MINUTES}"
-        JWT_VERIFY_EMAIL_EXPIRATION_MINUTES = "${env.JWT_VERIFY_EMAIL_EXPIRATION_MINUTES}"
+        JWT_ACCESS_EXPIRATION_MINUTES = 30
+        JWT_REFRESH_EXPIRATION_DAYS = 30
+        JWT_RESET_PASSWORD_EXPIRATION_MINUTES = 10
+        JWT_VERIFY_EMAIL_EXPIRATION_MINUTES = 10
         SMTP_HOST = "${env.SMTP_HOST}"
-        SMTP_PORT = "${env.SMTP_PORT}"
+        SMTP_PORT = 587
         SMTP_USERNAME = "${env.SMTP_USERNAME}"
         SMTP_PASSWORD = "${env.SMTP_PASSWORD}"
         EMAIL_FROM = "${env.EMAIL_FROM}"
@@ -28,7 +26,7 @@ pipeline {
         FIREBASE_PROJECT_ID = "${env.FIREBASE_PROJECT_ID}"
         FIREBASE_STORAGE_BUCKET = "${env.FIREBASE_STORAGE_BUCKET}"
         FIREBASE_PRIVATE_KEY_ID = "${env.FIREBASE_PRIVATE_KEY_ID}"
-        FIREBASE_PRIVATE_KEY = "${env.FIREBASE_PRIVATE_KEY}"
+        FIREBASE_PRIVATE_KEY = "${env.FIREBASE_PRIVATE_KEY_JENKINS}"
         FIREBASE_CLIENT_EMAIL = "${env.FIREBASE_CLIENT_EMAIL}"
         FIREBASE_CLIENT_ID = "${env.FIREBASE_CLIENT_ID}"
         FIREBASE_AUTH_URI = "${env.FIREBASE_AUTH_URI}"
@@ -45,8 +43,7 @@ pipeline {
                 script {
                     checkout([$class: 'GitSCM', branches: [[name: '*/main']],
                         userRemoteConfigs: [[
-                            url: 'https://github.com/ASE-UIT/congchungonline-be.git',
-                            credentialsId: 'jenkins-github-sloweyyy'
+                            url: 'https://github.com/ASE-UIT/congchungonline-be.git'
                         ]]
                     ])
                 }
@@ -66,18 +63,6 @@ pipeline {
                 }
             }
         }
-
-        // stage('Run Tests') {
-        //     steps {
-        //         script {
-        //             if (isUnix()) {
-        //                 sh "export MONGODB_URL=${MONGODB_URL} && export JWT_SECRET=${JWT_SECRET} && npm test"
-        //             } else {
-        //                 bat "set MONGODB_URL=${MONGODB_URL} && set JWT_SECRET=${JWT_SECRET} && npm test"
-        //             }
-        //         }
-        //     }
-        // }
 
         stage('Run Application') {
             steps {
