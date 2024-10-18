@@ -45,11 +45,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                    checkout([$class: 'GitSCM', branches: [[name: '*/main']],
-                        userRemoteConfigs: [[
-                            url: 'https://github.com/ASE-UIT/congchungonline-be.git'
-                        ]]
-                    ])
+                    checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'jenkins-demo', url: 'https://github.com/ASE-UIT/congchungonline-be.git']])
                 }
             }
         }
