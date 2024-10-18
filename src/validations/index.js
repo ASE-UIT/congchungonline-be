@@ -6,3 +6,4 @@ module.exports.roleValidation = require('./role.validation');
 module.exports.notarizationFieldValidation = require('./notarizationField.validation');
 module.exports.notarizationServiceValidation = require('./notarizationService.validation');
 module.exports.sessionValidation = require('./session.validation');
+module.exports.locationValidation = require('./location.validation');

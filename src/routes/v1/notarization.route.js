@@ -2,7 +2,6 @@ const express = require('express');
 const multer = require('multer');
 const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
-const parseJson = require('../../middlewares/parseJson');
 const notarizationValidation = require('../../validations/notarization.validation');
 const notarizationController = require('../../controllers/notarization.controller');
 
