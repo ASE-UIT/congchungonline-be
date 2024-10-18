@@ -37,6 +37,8 @@ pipeline {
         FIREBASE_DATABASE_URL = "${env.GITHUB_ENV.FIREBASE_DATABASE_URL}"
         RAILWAY_SERVICE_NAME = "${env.GITHUB_ENV.RAILWAY_SERVICE_NAME}"
         RAILWAY_TOKEN = "${env.GITHUB_ENV.RAILWAY_TOKEN}"
+        DOCKER_USERNAME = "${env.GITHUB_ENV.DOCKER_USERNAME}"
+        DOCKER_PASSWORD = "${env.GITHUB_ENV.DOCKER_PASSWORD}"
     }
 
     stages {
@@ -70,7 +72,7 @@ pipeline {
         //     steps {
         //         script {
         //             if (isUnix()) {
-        //                 sh "export PORT=${PORT} && export JWT_SECRET=${JWT_SECRET} && npm start"
+                        // sh "export PORT=${PORT} && export JWT_SECRET=${JWT_SECRET} && npm start"
         //             } else {
         //                 bat "set PORT=${PORT} && set JWT_SECRET=${JWT_SECRET} && npm start"
         //             }
@@ -90,31 +92,31 @@ pipeline {
         //     }
         // }
 
-        // stage('Build Docker Image') {
-        //     steps {
-        //         script {
-        //             if (isUnix()) {
-        //                 sh 'docker build -t congchungonline-be .'
-        //             } else {
-        //                 bat 'docker build -t congchungonline-be .'
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        sh 'docker build -t congchungonline-be .'
+                    } else {
+                        bat 'docker build -t congchungonline-be .'
+                    }
+                }
+            }
+        }
 
-        // stage('Push Docker Image') {
-        //     steps {
-        //         script {
-        //             if (isUnix()) {
-        //                 sh 'docker tag congchungonline-be ${env.GITHUB_ENV.DOCKER_USERNAME}/congchungonline-be'
-        //                 sh 'docker push ${env.GITHUB_ENV.DOCKER_USERNAME}/congchungonline-be'
-        //             } else {
-        //                 bat 'docker tag congchungonline-be %DOCKER_USERNAME%/congchungonline-be'
-        //                 bat 'docker push %DOCKER_USERNAME%/congchungonline-be'
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        sh 'docker tag congchungonline-be ${env.GITHUB_ENV.DOCKER_USERNAME}/congchungonline-be'
+                        sh 'docker push ${env.GITHUB_ENV.DOCKER_USERNAME}/congchungonline-be'
+                    } else {
+                        bat 'docker tag congchungonline-be %DOCKER_USERNAME%/congchungonline-be'
+                        bat 'docker push %DOCKER_USERNAME%/congchungonline-be'
+                    }
+                }
+            }
+        }
 
         stage('Install Railway') {
             steps {
@@ -143,7 +145,9 @@ pipeline {
 
     post {
         always {
-            cleanWs()
+            script {
+                cleanWs()
+            }
         }
     }
 }
