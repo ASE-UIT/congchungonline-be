@@ -1,12 +1,27 @@
 const express = require('express');
+const httpStatus = require('http-status');
 const multer = require('multer');
 const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
 const notarizationValidation = require('../../validations/notarization.validation');
 const notarizationController = require('../../controllers/notarization.controller');
+const ApiError = require('../../utils/ApiError');
 
 const router = express.Router();
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
+  fileFilter: (req, file, cb) => {
+    const allowedFileTypes = /jpeg|jpg|png|pdf/;
+    const mimeType = allowedFileTypes.test(file.mimetype);
+    const extname = allowedFileTypes.test(file.originalname.split('.').pop());
+
+    if (mimeType && extname) {
+      return cb(null, true);
+    }
+    cb(new ApiError(httpStatus.BAD_REQUEST, 'Only images and PDFs are allowed'));
+  },
+});
 
 /**
  * @swagger
@@ -95,6 +110,24 @@ router
 router.route('/getAllNotarization').get(auth('getAllNotarizations'), notarizationController.getAllNotarizations);
 
 router.route('/getApproveHistory').get(auth('getApproveHistory'), notarizationController.getApproveHistory);
+
+router
+  .route('/approve-signature-by-user')
+  .post(
+    auth('approveSignatureByUser'),
+    upload.single('signatureImage'),
+    validate(notarizationValidation.approveSignatureByUser),
+    notarizationController.approveSignatureByUser
+  );
+
+router
+  .route('/approve-signature-by-secretary')
+  .post(
+    auth('approveSignatureBySecretary'),
+    upload.none(),
+    validate(notarizationValidation.approveSignatureBySecretary),
+    notarizationController.approveSignatureBySecretary
+  );
 /**
  * @swagger
  * /notarization/upload-files:
@@ -547,28 +580,32 @@ router.route('/getApproveHistory').get(auth('getApproveHistory'), notarizationCo
 
 /**
  * @swagger
- * /notarization/history:
- *   get:
- *     summary: Get history of notarizations
- *     description: Retrieve the history of notarizations for the authenticated user.
+ * /notarization/approve-signature-by-user:
+ *   post:
+ *     summary: Approve signature by user
  *     tags: [Notarizations]
  *     security:
  *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               documentId:
+ *                 type: string
+ *                 description: ID of the document to approve
+ *               amount:
+ *                 type: number
+ *                 description: Amount of the document to approve
+ *               signatureImage:
+ *                 type: string
+ *                 format: binary
+ *                 description: Signature image of the document
  *     responses:
  *       "200":
- *         description: OK
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Notarizations'
- *       "401":
- *         $ref: '#/components/responses/Unauthorized'
- *       "403":
- *         $ref: '#/components/responses/Forbidden'
- *       "404":
- *         description: Not Found
+ *         description: Signature approved successfully
  *         content:
  *           application/json:
  *             schema:
@@ -576,58 +613,58 @@ router.route('/getApproveHistory').get(auth('getApproveHistory'), notarizationCo
  *               properties:
  *                 message:
  *                   type: string
- *
+ *                   example: "Signature approved successfully"
+ *       "400":
+ *         $ref: '#/components/responses/BadRequest'
+ *       "401":
+ *         $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         $ref: '#/components/responses/Forbidden'
+ *       "404":
+ *         $ref: '#/components/responses/NotFound'
+ *       "500":
+ *         $ref: '#/components/responses/InternalServerError'
  */
 
-// /**
-//  * @swagger
-//  * /notarization/get-history-with-status:
-//  *   get:
-//  *     summary: Get history with status of notarizations
-//  *     description: Retrieve the history with status of notarizations for the authenticated user.
-//  *     tags: [Notarizations]
-//  *     security:
-//  *       - bearerAuth: []
-//  *     responses:
-//  *       "200":
-//  *         description: OK
-//  *         content:
-//  *           application/json:
-//  *             schema:
-//  *               type: array
-//  *               items:
-//  *                 type: ObjectId
-//  *                 properties:
-//  *                   _id:
-//  *                     type: string
-//  *                     example: "66f462fa57b33d48e47ab55f"
-//  *                   status:
-//  *                     type: string
-//  *                     example: "approved"
-//  *                   approvedBy:
-//  *                     type: string
-//  *                     example: "userId123"
-//  *                   approvedAt:
-//  *                     type: string
-//  *                     format: date-time
-//  *                     example: "2024-09-26T08:09:42.039Z"
-//  *                   comments:
-//  *                     type: string
-//  *                     example: "Document approved successfully."
-//  *       "401":
-//  *         $ref: '#/components/responses/Unauthorized'
-//  *       "403":
-//  *         $ref: '#/components/responses/Forbidden'
-//  *       "404":
-//  *         description: Not Found
-//  *         content:
-//  *           application/json:
-//  *             schema:
-//  *               type: object
-//  *               properties:
-//  *                 message:
-//  *                   type: string
-//  *                   example: "User not found"
-//  */
+/**
+ * @swagger
+ * /notarization/approve-signature-by-secretary:
+ *   post:
+ *     summary: Approve signature by secretary
+ *     tags: [Notarizations]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               documentId:
+ *                 type: string
+ *                 description: ID of the document to approve
+ *     responses:
+ *       "200":
+ *         description: Signature approved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Signature approved successfully"
+ *       "400":
+ *         $ref: '#/components/responses/BadRequest'
+ *       "401":
+ *         $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         $ref: '#/components/responses/Forbidden'
+ *       "404":
+ *         $ref: '#/components/responses/NotFound'
+ *       "500":
+ *         $ref: '#/components/responses/InternalServerError'
+ */
 
 module.exports = router;

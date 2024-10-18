@@ -1468,6 +1468,14 @@
   resolved "https://registry.npmjs.org/@opentelemetry/api/-/api-1.9.0.tgz"
   integrity sha512-3giAOQvZiH5F9bMlMiv8+GSPMeqg0dbaeo58/0SlA9sxSqZhnUtxzX9/2FzyhS9sWQf5S0GJE0AKBrFqjpeYcg==
 
+"@payos/node@^1.0.10":
+  version "1.0.10"
+  resolved "https://registry.npmjs.org/@payos/node/-/node-1.0.10.tgz"
+  integrity sha512-dY+WHd6pLa558a1G8yv6oKfVe5QLTNyYnQBaSQtwvMAm/p0faKAnfXt04LNIwO9/4buas4ES+sDxc1bfX/mVbQ==
+  dependencies:
+    axios "^1.5.0"
+    crypto "^1.0.1"
+
 "@pm2/agent@~2.0.0":
   version "2.0.4"
   resolved "https://registry.npmjs.org/@pm2/agent/-/agent-2.0.4.tgz"
@@ -2219,7 +2227,7 @@ aws4@^1.8.0:
   resolved "https://registry.npmjs.org/aws4/-/aws4-1.13.2.tgz"
   integrity sha512-lHe62zvbTB5eEABUVi/AwVh0ZKY9rMMDhmm+eeyuuUQbQ3+J+fONVQOZyj+DdrvD4BY33uYniyRJ4UJIaSKAfw==
 
-axios@^1.7.4, axios@^1.7.7:
+axios@^1.5.0, axios@^1.7.4:
   version "1.7.7"
   resolved "https://registry.npmjs.org/axios/-/axios-1.7.7.tgz"
   integrity sha512-S4kL7XrjgBmvdGut0sN3yJxqYzrDOnivkBiN0OFs6hLiUam3UPvswUo0kqGyhqUZGEOytHyumEdXsAkgCOUf3Q==
@@ -2859,6 +2867,11 @@ cross-spawn@^7.0.1, cross-spawn@^7.0.2, cross-spawn@^7.0.3:
     path-key "^3.1.0"
     shebang-command "^2.0.0"
     which "^2.0.1"
+
+crypto@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.npmjs.org/crypto/-/crypto-1.0.1.tgz"
+  integrity sha512-VxBKmeNcqQdiUQUW2Tzq0t377b54N2bMtXO/qiLa+6eRRmmC4qT3D4OnTGoT/U6O9aklQ/jTwbOtRMTTY8G0Ig==
 
 culvert@^0.1.2:
   version "0.1.2"
@@ -5688,6 +5701,11 @@ mute-stream@~0.0.4:
   version "0.0.8"
   resolved "https://registry.npmjs.org/mute-stream/-/mute-stream-0.0.8.tgz"
   integrity sha512-nnbWWOkoWyUsTjKrhgD0dcz22mdkSnpYqbEjIm2nhwhuxlSkpywJmBo8h0ZqJdkp73mb90SssHkN4rsRaBAfAA==
+
+nanoid@^5.0.7:
+  version "5.0.7"
+  resolved "https://registry.npmjs.org/nanoid/-/nanoid-5.0.7.tgz"
+  integrity sha512-oLxFY2gd2IqnjcYyOXD8XGCftpGtZP2AbHbOkthDkvRywH5ayNtPVy9YlOPcHckXzbLTCHpkb7FB+yuxKV13pQ==
 
 natural-compare@^1.4.0:
   version "1.4.0"

@@ -46,4 +46,23 @@ const forwardDocumentStatus = {
   }),
 };
 
-module.exports = { createDocument, getHistoryByUserId, forwardDocumentStatus };
+const approveSignatureByUser = {
+  body: Joi.object().keys({
+    documentId: Joi.string().required(),
+    amount: Joi.number().required(),
+  }),
+};
+
+const approveSignatureBySecretary = {
+  body: Joi.object().keys({
+    documentId: Joi.string().required(),
+  }),
+};
+
+module.exports = {
+  createDocument,
+  getHistoryByUserId,
+  forwardDocumentStatus,
+  approveSignatureByUser,
+  approveSignatureBySecretary,
+};
