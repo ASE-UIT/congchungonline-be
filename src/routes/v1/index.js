@@ -8,6 +8,7 @@ const roleRoute = require('./role.route');
 const sessionRoute = require('./session.route');
 const notarizationFieldRoute = require('./notarizationField.route');
 const notarizationServiceRoute = require('./notarizationService.route');
+const locationRoute = require('./location.route');
 const config = require('../../config/config');
 const adminRoute = require('./admin.route');
 const paymentRoute = require('./payment.route');
@@ -56,6 +57,10 @@ const defaultRoutes = [
   {
     path: '/payments',
     route: paymentRoute,
+  },
+  {
+    path: '/location',
+    route: locationRoute,
   },
 ];
 
