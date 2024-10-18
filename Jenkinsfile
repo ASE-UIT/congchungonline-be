@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    tools {
+        nodejs 'NodeJS'
+    }
+
     environment {
         NODE_ENV = 'development'
         PORT = "${env.PORT}"
@@ -41,7 +45,7 @@ pipeline {
                 script {
                     checkout([$class: 'GitSCM', branches: [[name: '*/main']],
                         userRemoteConfigs: [[
-                            url: 'https://github.com/FiveD-SE/congchungonline-be.git',
+                            url: 'https://github.com/ASE-UIT/congchungonline-be.git',
                             credentialsId: 'jenkins-github-sloweyyy'
                         ]]
                     ])
