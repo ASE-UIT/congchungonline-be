@@ -37,8 +37,16 @@ app.use(mongoSanitize());
 // gzip compression
 app.use(compression());
 
+const corsOptions = {
+  origin: (origin, callback) => {
+    return callback(null, true);
+  },
+  optionsSuccessStatus: 200,
+  credentials: true,
+};
+
 // enable cors
-app.use(cors());
+app.use(cors(corsOptions));
 app.options('*', cors());
 
 // jwt authentication

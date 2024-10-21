@@ -43,18 +43,7 @@ const getUserById = async (id) => {
  * @returns {Promise<User>}
  */
 const getUserByEmail = async (email) => {
-  try {
-    const user = await User.findOne({ email });
-    if (!user) {
-      throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
-    }
-    return user;
-  } catch (error) {
-    if (error instanceof ApiError) {
-      throw error;
-    }
-    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Error get user by email');
-  }
+  return User.findOne({ email });
 };
 
 /**
@@ -90,6 +79,46 @@ const deleteUserById = async (userId) => {
   return user;
 };
 
+/**
+ * Escape special characters in a string for use in a regular expression
+ * @param {string} string - The string to escape
+ * @returns {string} The escaped string
+ */
+
+const escapeRegExp = (string) => {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+};
+
+/**
+ * Search for users by email
+ * @param {string} input - The email or part of the email to search for
+ * @returns {Promise<User[]>} An array of users that match the search criteria
+ */
+const searchUsersByEmail = async (input) => {
+  try {
+    if (typeof input !== 'string') {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Input must be a string');
+    }
+
+    const escapedInput = escapeRegExp(input);
+
+    const regex = new RegExp(`^${escapedInput}`, 'i');
+
+    const users = await User.find({ email: regex }, 'id name role email');
+
+    if (users.length === 0) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'No users found with the provided input');
+    }
+
+    return users;
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Error retrieving users by input');
+  }
+};
+
 module.exports = {
   createUser,
   queryUsers,
@@ -97,4 +126,5 @@ module.exports = {
   getUserByEmail,
   updateUserById,
   deleteUserById,
+  searchUsersByEmail,
 };

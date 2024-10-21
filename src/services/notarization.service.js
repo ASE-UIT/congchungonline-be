@@ -16,31 +16,72 @@ const uploadFileToFirebase = async (file, folderName) => {
   }
 };
 
-const createDocument = async (documentBody, files) => {
-  if (!files || files.length === 0) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'No files provided');
-  }
-
+const createDocument = async (documentBody, files, userId) => {
   try {
-    const notarizationFieldId = await NotarizationField.findById(documentBody.notarizationFieldId);
-    if (!notarizationFieldId) {
-      throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid fieldId provided');
+    if (!files || files.length === 0) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'No files provided');
     }
 
-    const notarizationServiceId = await NotarizationService.findById(documentBody.notarizationServiceId);
-    if (!notarizationServiceId) {
-      throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid serviceId provided');
+    const { notarizationField, notarizationService, requesterInfo } = documentBody;
+
+    const notarizationFieldDoc = await NotarizationField.findById(notarizationField.id);
+    if (!notarizationFieldDoc) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid notarization field ID provided');
+    }
+
+    const notarizationServiceDoc = await NotarizationService.findById(notarizationService.id);
+    if (!notarizationServiceDoc) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid notarization service ID provided');
+    }
+
+    if (String(notarizationServiceDoc.fieldId) !== String(notarizationFieldDoc._id)) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Notarization service does not match the provided field');
+    }
+
+    // Check if additional properties match
+    if (notarizationFieldDoc.name !== notarizationField.name) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Notarization field name does not match');
+    }
+
+    if (notarizationFieldDoc.description !== notarizationField.description) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Notarization field description does not match');
+    }
+    if (notarizationServiceDoc.name !== notarizationService.name) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Notarization service name does not match');
+    }
+
+    if (notarizationServiceDoc.description !== notarizationService.description) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Notarization service description does not match');
+    }
+
+    if (notarizationServiceDoc.price !== notarizationService.price) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Notarization service price does not match');
     }
 
     const newDocument = new Document({
-      ...documentBody,
       files: [],
+      notarizationService: {
+        id: notarizationService.id,
+        name: notarizationService.name,
+        fieldId: notarizationService.fieldId,
+        description: notarizationService.description,
+        price: notarizationService.price,
+      },
+      notarizationField: {
+        id: notarizationField.id,
+        name: notarizationField.name,
+        description: notarizationField.description,
+      },
+      requesterInfo: {
+        citizenId: requesterInfo.citizenId,
+        phoneNumber: requesterInfo.phoneNumber,
+        email: requesterInfo.email,
+      },
+      userId,
+      createdAt: Date.now(),
     });
 
-    await newDocument.save();
-
     const fileUrls = await Promise.all(files.map((file) => uploadFileToFirebase(file, newDocument._id)));
-
     const formattedFiles = files.map((file, index) => ({
       filename: `${Date.now()}-${file.originalname}`,
       firebaseUrl: fileUrls[index],
@@ -54,8 +95,8 @@ const createDocument = async (documentBody, files) => {
     if (error instanceof ApiError) {
       throw error;
     }
-    console.error('Error uploading file:', error.message);
-    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to upload file');
+    console.error('Error creating document:', error.message);
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to upload document');
   }
 };
 
@@ -77,6 +118,18 @@ const createStatusTracking = async (documentId, status) => {
 
 const getHistoryByUserId = async (userId) => {
   return Document.find({ userId });
+};
+
+const getHistoryWithStatus = async (userId) => {
+  const history = await Document.find({ userId });
+  const statusTrackings = await StatusTracking.find({ documentId: { $in: history.map((doc) => doc._id) } });
+  return history.map((doc) => {
+    const statusTracking = statusTrackings.find((tracking) => tracking.documentId.toString() === doc._id.toString());
+    return {
+      ...doc.toObject(),
+      status: statusTracking.status,
+    };
+  });
 };
 
 const getDocumentStatus = async (documentId) => {
@@ -228,4 +281,5 @@ module.exports = {
   forwardDocumentStatus,
   getApproveHistory,
   getAllNotarizations,
+  getHistoryWithStatus,
 };

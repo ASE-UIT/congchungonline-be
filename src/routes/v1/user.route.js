@@ -18,8 +18,8 @@ router
   .delete(auth('manageUsers'), validate(userValidation.deleteUser), userController.deleteUser);
 
 router
-  .route('/get-user-by-email/:email')
-  .get(auth('getUserByEmail'), validate(userValidation.getUserByEmail), userController.getUserByEmail);
+  .route('/search-user-by-email/:email')
+  .get(auth('searchUserByEmail'), validate(userValidation.searchUserByEmail), userController.searchUserByEmail);
 
 module.exports = router;
 
@@ -257,10 +257,10 @@ module.exports = router;
 
 /**
  * @swagger
- * /users/get-user-by-email/{email}:
+ * /users/search-user-by-email/{email}:
  *   get:
- *     summary: Get a user by email
- *     description: Retrieve user information by email.
+ *     summary: Search for users by email
+ *     description: Search for users by email.
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
@@ -271,7 +271,7 @@ module.exports = router;
  *         schema:
  *           type: string
  *           format: email
- *         description: The email of the user to retrieve
+ *         description: The email or part of the email to search for
  *     responses:
  *       "200":
  *         description: OK

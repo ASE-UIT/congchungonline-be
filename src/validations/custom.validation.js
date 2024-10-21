@@ -15,7 +15,15 @@ const password = (value, helpers) => {
   return value;
 };
 
+const emails = (value, helpers) => {
+  if (!value.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)) {
+    return helpers.message('Invalid email format');
+  }
+  return value;
+};
+
 module.exports = {
   objectId,
   password,
+  emails,
 };
