@@ -1,5 +1,5 @@
 const moment = require('moment');
-const { Document, User, Session } = require('../models');
+const { Document, User, Session, Payment } = require('../models');
 
 const getToDayDocumentCount = async () => {
   const startOfToday = new Date();
@@ -114,6 +114,28 @@ const getMonthlySessionCount = async () => {
   return monthlySessionCount;
 };
 
+const getDailyPaymentTotal = async () => {
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+  const endOfToday = new Date();
+  endOfToday.setHours(23, 59, 59, 999);
+  const dailyPaymentTotal = await Payment.aggregate([
+    { $match: { createdAt: { $gte: startOfToday, $lte: endOfToday } } },
+    { $group: { _id: null, total: { $sum: '$amount' } } },
+  ]);
+  return dailyPaymentTotal.length > 0 ? dailyPaymentTotal[0].total : 0;
+};
+
+const getMonthlyPaymentTotal = async () => {
+  const startOfMonth = moment().startOf('month').toDate();
+  const endOfMonth = moment().endOf('month').toDate();
+  const monthlyPaymentTotal = await Payment.aggregate([
+    { $match: { createdAt: { $gte: startOfMonth, $lte: endOfMonth } } },
+    { $group: { _id: null, total: { $sum: '$amount' } } },
+  ]);
+  return monthlyPaymentTotal.length > 0 ? monthlyPaymentTotal[0].total : 0;
+};
+
 module.exports = {
   getToDayDocumentCount,
   getToDayUserCount,
@@ -124,4 +146,6 @@ module.exports = {
   getEmployeeList,
   getDailySessionCount,
   getMonthlySessionCount,
+  getDailyPaymentTotal,
+  getMonthlyPaymentTotal,
 };

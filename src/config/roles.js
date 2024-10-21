@@ -37,6 +37,8 @@ const allRoles = {
     'addUserToSession',
     'deleteUserOutOfSession',
     'joinSession',
+    'getDailyPaymentTotal',
+    'getMonthlyPaymentTotal',
   ],
   notary: ['getDocumentsByRole', 'forwardDocumentStatus', 'getApproveHistory', 'joinSession'],
   secretary: [

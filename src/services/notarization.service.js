@@ -159,7 +159,7 @@ const getDocumentByRole = async (role) => {
     if (role === 'notary') {
       statusFilter = ['processing'];
     } else if (role === 'secretary') {
-      statusFilter = ['verification', 'digitalSignature'];
+      statusFilter = ['pending', 'verification', 'digitalSignature'];
     } else {
       throw new ApiError(httpStatus.FORBIDDEN, 'You do not have permission to access these documents');
     }
@@ -194,7 +194,7 @@ const forwardDocumentStatus = async (documentId, action, role, userId) => {
     const validStatuses = ['pending', 'verification', 'processing', 'digitalSignature', 'completed'];
     const roleStatusMap = {
       notary: ['processing'],
-      secretary: ['verification'],
+      secretary: ['pending', 'verification', 'digitalSignature'], // temporary
     };
 
     let newStatus;
