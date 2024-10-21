@@ -48,7 +48,6 @@ const createDocument = async (documentBody, files, userId) => {
       throw new ApiError(httpStatus.BAD_REQUEST, 'Notarization service does not match the provided field');
     }
 
-    // Check if additional properties match
     if (notarizationFieldDoc.name !== notarizationField.name) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'Notarization field name does not match');
     }
