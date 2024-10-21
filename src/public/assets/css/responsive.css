@@ -1,0 +1,468 @@
+/* Medium Layout: 1367px. */
+
+@media only screen and (min-width: 1200px) and (max-width: 1367px) {}
+
+
+
+/* Medium Layout: 1280px. */
+
+@media only screen and (min-width: 992px) and (max-width: 1200px) {
+    /*-----------------------
+    Home One
+    -----------------------*/
+    .main-menu nav ul li a {
+        padding: 29px 13px;
+    }
+    .screen-area img.screen-img {
+        bottom: 171px;
+        width: 434px;
+        height: 453px;
+    }
+
+    /*-----------------------
+        Blog Page
+    -----------------------*/
+    .blog-post-area {
+        padding-top: 90px;
+    }
+    .bp-with-sidebar {
+        padding-bottom: 80px;
+    }
+    .pagination-area {
+        padding-bottom: 70px;
+    }
+
+    /*-----------------------
+        Blog Details
+    -----------------------*/
+    .blog-details{
+        padding: 100px 0px;
+    }
+
+}
+
+
+/* Tablet Layout: 768px. */
+
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+    /*-----------------------
+    Home One
+    -----------------------*/
+    .menu-area{
+        display: block;
+    }
+    .logo {
+        padding: 21px 0px 17px;
+    }
+    .slider-area{
+        height: 646px;
+        padding-top: 0;
+    }
+    .service-single h2 {
+        font-size: 22px;
+    }
+    .service-single p{
+        font-size: 14px;
+    }
+    .about-area {
+        padding: 90px 0px 70px;
+    }
+    .feature-area {
+        padding: 90px 0px 40px;
+    }
+    .ft-content{
+        margin-top: 0;
+    }
+    .ft-single h2 {
+        font-size: 22px;
+    }
+    .screen-area,
+    .testimonial-area,
+    .pricing-area,
+    .clinet-area,
+    .contact-area {
+        padding: 90px 0px;
+    }
+    .screen-area img.screen-img {
+        bottom: 137px;
+        width: 529px;
+        height: 584px;
+    }
+    .prc-head h5 {
+        font-size: 35px;
+    }
+    .prc-head span {
+        font-size: 21px;
+        margin-bottom: 7px;
+    }
+    .team-area {
+        padding: 90px 0px 70px;
+    }
+    .single-team{
+        margin-bottom: 20px;
+    }
+    .download-btns a{
+        margin-bottom: 20px;
+    }
+    .blog-post{
+        padding: 90px 0px 20px;
+    }
+    .single-post{
+        margin-bottom: 50px;
+        border-bottom: 1px solid #efebeb;
+        padding-bottom: 30px;
+    }
+    
+    /*-----------------------
+        Blog Page
+    -----------------------*/
+    .blog-post-area {
+        padding-top: 80px;
+    }
+    .bp-with-sidebar {
+        padding-bottom: 70px;
+    }
+    .pagination-area {
+        padding-bottom: 70px;
+    }
+
+    /*-----------------------
+        Blog Details
+    -----------------------*/
+    .blog-details{
+        padding: 90px 0px;
+    }
+    .sidebar--area {
+        padding-left: 0;
+    }
+    .crumbs-inner h2 {
+        font-size: 31px;
+    }
+
+    
+}
+
+
+
+/* Max Size: 320px. */
+
+@media screen and (max-width: 991px) {}
+/* Mobile Layout: 320px. */
+
+@media only screen and (max-width: 767px) {
+    .screen-area img.screen-img{
+        display: none;
+    }
+}
+
+
+
+/* Wide Mobile Layout: 480px. */
+
+@media only screen and (min-width: 481px) and (max-width: 767px) {
+    /*-----------------------
+    Home One
+    -----------------------*/
+    /*preloader hide*/
+    #preloader {
+        display: none!important;
+    }
+    .menu-area{
+        display: block;
+    }
+    .logo {
+        padding: 21px 0px 17px;
+    }
+    .slider-area {
+        height: auto;
+        padding: 114px 0px 149px;
+    }
+    .slider-inner{
+        text-align: left;
+    }
+    .slider-inner h2 {
+        font-size: 33px;
+    }
+    .slider-inner h5 {
+        font-size: 23px;
+    line-height: 27px;
+    margin-bottom: 42px;
+    margin-top: 5px;
+    }
+    .service-single{
+        margin-bottom: 30px;
+    }
+    .service-single h2 {
+        font-size: 25px;
+    }
+    .about-area {
+        padding: 60px 0px 60px;
+    }
+    .section-title p {
+        font-size: 16px;
+    }
+    .feature-area {
+        padding: 80px 0px 40px;
+    }
+    .ft-content{
+        margin-top: 0;
+    }
+    .ft-screen-img{
+        margin-bottom: 40px;
+    }
+    .ach-single{
+        margin-bottom: 70px;
+    }
+    .achivement-area{
+        padding: 80px 0px 10px;
+    }
+    .screen-area,
+    .testimonial-area,
+    .video-area,
+    .call-to-action,
+    .clinet-area,
+    .contact-area {
+        padding: 80px 0px;
+    }
+    .screen-slider{
+        margin-top: 0;
+    }
+    .screen-slider .owl-dots{
+        margin-top: 40px;
+    }
+    .video-area h2 {
+        font-size: 25px;
+    }
+    .pricing-area,
+    .team-area{
+        padding: 80px 0px 60px;
+    }
+    .single-price,
+    .single-team{
+        margin-bottom: 30px;
+    }
+    .download-btns a{
+        margin: 5px 0px;
+    }
+    .blog-post{
+        padding: 80px 0px 40px;
+    }
+    .single-post{
+        margin-bottom: 50px;
+        border-bottom: 1px solid #efebeb;
+        padding-bottom: 30px;
+    }
+    .contact_info{
+        padding-left: 0;
+        margin-top: 40px;
+    }
+
+    /*-----------------------
+        Blog Page
+    -----------------------*/
+    .crumbs-area {
+        display: block;
+        height: 354px;
+    }
+    .crumbs-inner {
+        width: 80%;
+        margin-top: 148px;
+        padding: 40px 0px;
+    }
+    .blog-post-area {
+        padding-top: 70px;
+    }
+    .bp-with-sidebar {
+        padding-bottom: 60px;
+    }
+    .pagination-area {
+        padding-bottom: 80px;
+        padding-top: 20px;
+    }
+
+    /*-----------------------
+        Blog Details
+    -----------------------*/
+    .blog-details {
+        padding: 70px 0px;
+    }
+    .children {
+        padding-left: 12px;
+    }
+    .sidebar--area {
+        padding-left: 0;
+        max-width: 420px;
+        margin: auto;
+        margin-top: 55px;
+    }
+    .crumbs-inner h2 {
+        font-size: 26px;
+    }
+}
+
+
+/* Wide Mobile Layout: 600px - 767px. */
+
+@media only screen and (min-width: 600px) and (max-width: 767px) {
+    .col-6 {
+        float: left;
+        width: 50%;
+    }
+}
+
+
+/* Wide Mobile Layout: 480px. */
+
+@media only screen and (min-width: 240px) and (max-width: 480px) {
+
+    /*-----------------------
+    Home One
+    -----------------------*/
+    /*preloader hide*/
+    #preloader {
+        display: none!important;
+    }
+    .menu-area{
+        display: block;
+    }
+    .logo {
+        padding: 21px 0px 17px;
+    }
+    .slider-area {
+        height: auto;
+        padding: 114px 0px 149px;
+    }
+    .slider-inner{
+        text-align: left;
+    }
+    .slider-inner h2 {
+        font-size: 23px;
+    }
+    .slider-inner h5 {
+        font-size: 20px;
+        line-height: 27px;
+        margin-bottom: 42px;
+        margin-top: 0;
+    }
+    .service-single{
+        margin-bottom: 30px;
+    }
+    .service-single h2 {
+        font-size: 25px;
+    }
+    .about-area {
+        padding: 50px 0px 50px;
+    }
+    .section-title p {
+        font-size: 16px;
+    }
+    .feature-area {
+        padding: 70px 0px 30px;
+    }
+    .ft-content{
+        margin-top: 0;
+    }
+    .ft-screen-img{
+        margin-bottom: 40px;
+    }
+    .ach-single{
+        margin-bottom: 70px;
+    }
+    .achivement-area{
+        padding: 70px 0px 0px;
+    }
+    .screen-area,
+    .testimonial-area,
+    .video-area,
+    .call-to-action,
+    .clinet-area,
+    .contact-area {
+        padding: 70px 0px;
+    }
+    .screen-slider{
+        margin-top: 0;
+    }
+    .screen-slider .owl-dots{
+        margin-top: 40px;
+    }
+    .video-area h2 {
+        font-size: 25px;
+    }
+    .pricing-area,
+    .team-area{
+        padding: 70px 0px 40px;
+    }
+    .single-price,
+    .single-team{
+        margin-bottom: 30px;
+    }
+    .download-btns a{
+        margin: 5px 0px;
+    }
+    .blog-post{
+        padding: 70px 0px 20px;
+    }
+    .single-post{
+        margin-bottom: 50px;
+        border-bottom: 1px solid #efebeb;
+        padding-bottom: 30px;
+    }
+    .contact_info{
+        padding-left: 0;
+        margin-top: 40px;
+    }
+
+    /*-----------------------
+        Blog Page
+    -----------------------*/
+    .crumbs-area {
+        display: block;
+        height: 354px;
+    }
+    .crumbs-inner h2 {
+        font-size: 22px;
+    }
+    .crumbs-inner {
+        width: 100%;
+        margin-top: 148px;
+        padding: 40px 0px;
+    }
+    .blog-post-area {
+        padding-top: 60px;
+    }
+    .bp-with-sidebar {
+        padding-bottom: 60px;
+    }
+    .pagination-area {
+        padding-bottom: 70px;
+        padding-top: 20px;
+    }
+    .pagination ul {
+        padding: 4px 0px;
+    }
+    .pagination ul li a,
+    .pagination ul li span {
+        padding: 10px 5px;
+        font-size: 11px;
+    }
+
+    /*-----------------------
+        Blog Details
+    -----------------------*/
+    .blog-details {
+        padding: 60px 0px;
+    }
+    .children {
+        padding-left: 12px;
+    }
+    .sidebar--area {
+        padding-left: 0;
+        margin-top: 60px;
+    }
+     /*preloader hide*/
+     #preloader{
+        display: none!important;
+     }
+
+
+}
