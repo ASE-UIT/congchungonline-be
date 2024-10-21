@@ -8,6 +8,7 @@ const allRoles = {
     'joinSession',
     'getNotarizationFields',
     'getNotarizationServices',
+    'approveSignatureByUser',
     'searchUserByEmail',
   ],
   admin: [
@@ -36,9 +37,17 @@ const allRoles = {
     'addUserToSession',
     'deleteUserOutOfSession',
     'joinSession',
+    'getDailyPaymentTotal',
+    'getMonthlyPaymentTotal',
   ],
   notary: ['getDocumentsByRole', 'forwardDocumentStatus', 'getApproveHistory', 'joinSession'],
-  secretary: ['getDocumentsByRole', 'forwardDocumentStatus', 'getApproveHistory', 'joinSession'],
+  secretary: [
+    'getDocumentsByRole',
+    'forwardDocumentStatus',
+    'getApproveHistory',
+    'joinSession',
+    'approveSignatureBySecretary',
+  ],
 };
 
 const roles = Object.keys(allRoles);

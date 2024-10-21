@@ -138,6 +138,43 @@ components:
         name: 'user'
         permissions: ['viewNotarizationHistory', 'uploadDocuments']
 
+    Payment:
+      type: object
+      properties:
+        id:
+          type: string
+        orderCode:
+          type: string
+          required: true
+          unique: true
+        amount:
+          type: number
+          required: true
+        description:
+          type: string
+          required: true
+        returnUrl:
+          type: string
+          required: true
+        cancelUrl:
+          type: string
+          required: true
+        checkoutUrl:
+          type: string
+        status:
+          type: string
+          enum: [pending, success, failed, cancelled]
+          default: pending
+        userId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        default: now
+      updatedAt:
+        type: string
+        format: date-time
+
   responses:
     DuplicateEmail:
       description: Email already taken

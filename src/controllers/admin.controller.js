@@ -49,6 +49,16 @@ const getEmployeeList = catchAsync(async (req, res) => {
   res.send(EmployeeList);
 });
 
+const getDailyPaymentTotal = async (req, res) => {
+  const result = await adminService.getDailyPaymentTotal();
+  res.status(httpStatus.OK).send({ dailyPaymentTotal: result });
+};
+
+const getMonthlyPaymentTotal = async (req, res) => {
+  const result = await adminService.getMonthlyPaymentTotal();
+  res.status(httpStatus.OK).send({ monthlyPaymentTotal: result });
+};
+
 module.exports = {
   getToDayDocumentCount,
   getToDayUserCount,
@@ -59,4 +69,6 @@ module.exports = {
   getEmployeeList,
   getDailySessionCount,
   getMonthlySessionCount,
+  getDailyPaymentTotal,
+  getMonthlyPaymentTotal,
 };

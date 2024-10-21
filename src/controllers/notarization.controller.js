@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const mongoose = require('mongoose');
 const catchAsync = require('../utils/catchAsync');
 const ApiError = require('../utils/ApiError');
-const pick = require('lodash/pick');
+const pick = require('../utils/pick');
 const { notarizationService, emailService } = require('../services');
 
 // Utility function to validate email format
@@ -100,6 +100,18 @@ const getAllNotarizations = catchAsync(async (req, res) => {
   res.send(notarizations);
 });
 
+const approveSignatureByUser = catchAsync(async (req, res) => {
+  const { documentId, amount } = req.body;
+  const signatureImage = req.file.originalname;
+  const requestApproved = await notarizationService.approveSignatureByUser(documentId, amount, signatureImage);
+  res.status(httpStatus.CREATED).send(requestApproved);
+});
+
+const approveSignatureBySecretary = catchAsync(async (req, res) => {
+  const requestApproved = await notarizationService.approveSignatureBySecretary(req.body.documentId, req.user.id);
+  res.status(httpStatus.OK).send(requestApproved);
+});
+
 module.exports = {
   createDocument,
   getHistoryByUserId,
@@ -108,5 +120,7 @@ module.exports = {
   forwardDocumentStatus,
   getApproveHistory,
   getAllNotarizations,
+  approveSignatureByUser,
+  approveSignatureBySecretary,
   getHistoryWithStatus,
 };

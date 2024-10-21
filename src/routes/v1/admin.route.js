@@ -33,6 +33,11 @@ router.get('/sessions/daily', auth('getDailySessionCount'), adminController.getD
 
 router.get('/sessions/monthly', auth('getMonthlySessionCount'), adminController.getMonthlySessionCount);
 
+// Payment metrics
+router.get('/payments/daily', auth('getDailyPaymentTotal'), adminController.getDailyPaymentTotal);
+
+router.get('/payments/monthly', auth('getMonthlyPaymentTotal'), adminController.getMonthlyPaymentTotal);
+
 module.exports = router;
 
 /**
@@ -295,6 +300,74 @@ module.exports = router;
  *               type: integer
  *               description: The number of sessions created this month
  *               example: 1
+ *       "401":
+ *         description: Unauthorized access - invalid token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         description: Forbidden - the user doesn't have access
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/responses/Forbidden'
+ *       "404":
+ *         description: Not found - endpoint does not exist
+ */
+
+/**
+ * @swagger
+ * /admin/metrics/payments/daily:
+ *   get:
+ *     summary: Get today's total payment value
+ *     description: Retrieve the total value of payments created today. Only admins can access this information.
+ *     tags: [Admins]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       "200":
+ *         description: Successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: number
+ *               description: The total value of payments created today
+ *               example: 1000
+ *       "401":
+ *         description: Unauthorized access - invalid token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/responses/Unauthorized'
+ *       "403":
+ *         description: Forbidden - the user doesn't have access
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/responses/Forbidden'
+ *       "404":
+ *         description: Not found - endpoint does not exist
+ */
+
+/**
+ * @swagger
+ * /admin/metrics/payments/monthly:
+ *   get:
+ *     summary: Get month's total payment value
+ *     description: Retrieve the total value of payments created this month. Only admins can access this information.
+ *     tags: [Admins]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       "200":
+ *         description: Successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: number
+ *               description: The total value of payments created this month
+ *               example: 10000
  *       "401":
  *         description: Unauthorized access - invalid token
  *         content:
