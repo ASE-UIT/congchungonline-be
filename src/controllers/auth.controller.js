@@ -31,19 +31,19 @@ const login = catchAsync(async (req, res) => {
   const user = await authService.loginUserWithEmailAndPassword(email, password);
   const tokens = await tokenService.generateAuthTokens(user);
 
-  res.cookie('refreshToken', tokens.refresh.token, {
-    secure: process.env.NODE_ENV === 'production',
-    httpOnly: true,
-    sameSite: process.env.NODE_ENV === 'production' ? 'Strict' : 'Lax',
-    maxAge: ms('14 days'),
-  });
+  // res.cookie('refreshToken', tokens.refresh.token, {
+  //   secure: process.env.NODE_ENV === 'production',
+  //   httpOnly: true,
+  //   sameSite: 'Lax',
+  //   maxAge: ms('14 days'),
+  // });
 
-  res.cookie('accessToken', tokens.access.token, {
-    secure: process.env.NODE_ENV === 'production',
-    httpOnly: true,
-    sameSite: process.env.NODE_ENV === 'production' ? 'Strict' : 'Lax',
-    maxAge: ms('14 days'),
-  });
+  // res.cookie('accessToken', tokens.access.token, {
+  //   secure: process.env.NODE_ENV === 'production',
+  //   httpOnly: true,
+  //   sameSite: 'Lax',
+  //   maxAge: ms('14 days'),
+  // });
 
   res.status(httpStatus.OK).send({ user, tokens });
 });
