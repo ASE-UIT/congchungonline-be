@@ -1,7 +1,7 @@
+// session.model.test.js
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
-const faker = require('faker');
-const { Session } = require('../../../src/models');
+const Session = require('../../../src/models/session.model');
 
 let mongoServer;
 
@@ -19,72 +19,93 @@ afterAll(async () => {
   await mongoServer.stop();
 });
 
-describe('Session model', () => {
-  describe('Session validation', () => {
-    let newSession;
-    beforeEach(() => {
-      newSession = {
-        sessionId: faker.datatype.uuid(),
-        notaryField: faker.lorem.word(),
-        notaryService: faker.lorem.word(),
-        sessionName: faker.lorem.words(3),
-        startTime: faker.date.future(),
-        startDate: faker.date.future(),
-        duration: faker.datatype.number({ min: 1, max: 8 }),
-        email: [faker.internet.email(), faker.internet.email()],
-        createdBy: new mongoose.Types.ObjectId(),
-      };
-    });
-
-    test('should correctly validate a valid session', async () => {
-      await expect(new Session(newSession).validate()).resolves.toBeUndefined();
-    });
-
-    test('should throw a validation error if notaryField is missing', async () => {
-      newSession.notaryField = undefined;
-      await expect(new Session(newSession).validate()).rejects.toThrow();
-    });
-
-    test('should throw a validation error if notaryService is missing', async () => {
-      newSession.notaryService = undefined;
-      await expect(new Session(newSession).validate()).rejects.toThrow();
-    });
-
-    test('should throw a validation error if sessionName is missing', async () => {
-      newSession.sessionName = undefined;
-      await expect(new Session(newSession).validate()).rejects.toThrow();
-    });
-
-    test('should throw a validation error if startTime is missing', async () => {
-      newSession.startTime = undefined;
-      await expect(new Session(newSession).validate()).rejects.toThrow();
-    });
-
-    test('should throw a validation error if startDate is missing', async () => {
-      newSession.startDate = undefined;
-      await expect(new Session(newSession).validate()).rejects.toThrow();
-    });
-
-    test('should throw a validation error if duration is missing', async () => {
-      newSession.duration = undefined;
-      await expect(new Session(newSession).validate()).rejects.toThrow();
-    });
+describe('Session Model', () => {
+  beforeEach(async () => {
+    await Session.deleteMany({});
   });
 
-  describe('Session toJSON()', () => {
-    test('should not return __v when toJSON is called', () => {
-      const newSession = {
-        sessionId: faker.datatype.uuid(),
-        notaryField: faker.lorem.word(),
-        notaryService: faker.lorem.word(),
-        sessionName: faker.lorem.words(3),
-        startTime: faker.date.future(),
-        startDate: faker.date.future(),
-        duration: faker.datatype.number({ min: 1, max: 8 }),
-        email: [faker.internet.email(), faker.internet.email()],
-        createdBy: new mongoose.Types.ObjectId(),
-      };
-      expect(new Session(newSession).toJSON()).not.toHaveProperty('__v');
+  test('should correctly apply the toJSON plugin', async () => {
+    const session = await Session.create({
+      sessionName: 'Test Session',
+      notaryField: { name: 'Field' },
+      notaryService: { name: 'Service' },
+      startTime: '14:00',
+      startDate: new Date(),
+      endTime: '15:00',
+      endDate: new Date(),
+      users: [{ email: 'test@example.com' }],
+      createdBy: new mongoose.Types.ObjectId(),
     });
+
+    const jsonSession = session.toJSON();
+    expect(jsonSession).not.toHaveProperty('_id');
+    expect(jsonSession).not.toHaveProperty('__v');
+    expect(jsonSession).toHaveProperty('id', session._id.toString());
+  });
+
+  test('should correctly apply the paginate plugin', async () => {
+    await Session.create([
+      {
+        sessionName: 'Session 1',
+        notaryField: { name: 'Field 1' },
+        notaryService: { name: 'Service 1' },
+        startTime: '14:00',
+        startDate: new Date(),
+        endTime: '15:00',
+        endDate: new Date(),
+        users: [{ email: 'test1@example.com' }],
+        createdBy: new mongoose.Types.ObjectId(),
+      },
+      {
+        sessionName: 'Session 2',
+        notaryField: { name: 'Field 2' },
+        notaryService: { name: 'Service 2' },
+        startTime: '14:00',
+        startDate: new Date(),
+        endTime: '15:00',
+        endDate: new Date(),
+        users: [{ email: 'test2@example.com' }],
+        createdBy: new mongoose.Types.ObjectId(),
+      },
+      {
+        sessionName: 'Session 3',
+        notaryField: { name: 'Field 3' },
+        notaryService: { name: 'Service 3' },
+        startTime: '14:00',
+        startDate: new Date(),
+        endTime: '15:00',
+        endDate: new Date(),
+        users: [{ email: 'test3@example.com' }],
+        createdBy: new mongoose.Types.ObjectId(),
+      },
+    ]);
+
+    const result = await Session.paginate({}, { page: 1, limit: 2 });
+    expect(result.results).toHaveLength(2);
+    expect(result.totalResults).toBe(3);
+    expect(result.totalPages).toBe(2);
+    expect(result.page).toBe(1);
+  });
+
+  test('should throw validation error if required fields are missing', async () => {
+    const session = new Session({
+      notaryField: { name: 'Field' },
+      notaryService: { name: 'Service' },
+      startTime: '14:00',
+      startDate: new Date(),
+      endTime: '15:00',
+      endDate: new Date(),
+      users: [{ email: 'test@example.com' }],
+    });
+
+    let err;
+    try {
+      await session.validate();
+    } catch (error) {
+      err = error;
+    }
+
+    expect(err).toBeInstanceOf(mongoose.Error.ValidationError);
+    expect(err.errors.sessionName).toBeDefined();
   });
 });

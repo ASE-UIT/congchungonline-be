@@ -1,8 +1,7 @@
+// notarizationService.model.test.js
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
-const faker = require('faker');
-const { NotarizationService } = require('../../../src/models');
-const { NotarizationField } = require('../../../src/models');
+const NotarizationService = require('../../../src/models/notarizationService.model');
 
 let mongoServer;
 
@@ -20,57 +19,55 @@ afterAll(async () => {
   await mongoServer.stop();
 });
 
-describe('NotarizationService model', () => {
-  describe('NotarizationService validation', () => {
-    let newNotarizationService;
-    let fieldId;
-    beforeEach(async () => {
-      // Tạo một NotarizationField giả để tham chiếu
-      const field = await NotarizationField.create({ name: faker.name.jobType() });
-      fieldId = field._id;
-
-      newNotarizationService = {
-        name: faker.company.companyName(), 
-        fieldId, 
-        description: faker.lorem.sentence(), 
-        price: faker.datatype.number({ min: 1, max: 1000 }), // Thêm trường price
-      };
-    });
-
-    test('should correctly validate a valid notarization service', async () => {
-      await expect(new NotarizationService(newNotarizationService).validate()).resolves.toBeUndefined();
-    });
-
-    test('should throw a validation error if name is missing', async () => {
-      newNotarizationService.name = undefined;
-      await expect(new NotarizationService(newNotarizationService).validate()).rejects.toThrow();
-    });
-
-    test('should throw a validation error if fieldId is missing', async () => {
-      newNotarizationService.fieldId = undefined;
-      await expect(new NotarizationService(newNotarizationService).validate()).rejects.toThrow();
-    });
-
-    test('should throw a validation error if description is missing', async () => {
-      newNotarizationService.description = undefined;
-      await expect(new NotarizationService(newNotarizationService).validate()).rejects.toThrow();
-    });
-
-    test('should throw a validation error if price is missing', async () => {
-      newNotarizationService.price = undefined;
-      await expect(new NotarizationService(newNotarizationService).validate()).rejects.toThrow();
-    });
+describe('NotarizationService Model', () => {
+  beforeEach(async () => {
+    await NotarizationService.deleteMany({});
   });
 
-  describe('NotarizationService toJSON()', () => {
-    test('should not return __v when toJSON is called', () => {
-      const newNotarizationService = {
-        name: faker.company.companyName(), 
-        fieldId: new mongoose.Types.ObjectId(),
-        description: faker.lorem.sentence(), 
-        price: faker.datatype.number({ min: 1, max: 1000 }), // Thêm trường price
-      };
-      expect(new NotarizationService(newNotarizationService).toJSON()).not.toHaveProperty('__v');
+  test('should correctly apply the toJSON plugin', async () => {
+    const notarizationService = await NotarizationService.create({
+      name: 'Test Service',
+      fieldId: new mongoose.Types.ObjectId(),
+      description: 'Test Description',
+      price: 100,
     });
+
+    const jsonNotarizationService = notarizationService.toJSON();
+    expect(jsonNotarizationService).not.toHaveProperty('_id');
+    expect(jsonNotarizationService).not.toHaveProperty('__v');
+    expect(jsonNotarizationService).toHaveProperty('id', notarizationService._id.toString());
+  });
+
+  test('should correctly apply the paginate plugin', async () => {
+    const fieldId = new mongoose.Types.ObjectId();
+    await NotarizationService.create([
+      { name: 'Service 1', fieldId, description: 'Description 1', price: 100 },
+      { name: 'Service 2', fieldId, description: 'Description 2', price: 200 },
+      { name: 'Service 3', fieldId, description: 'Description 3', price: 300 },
+    ]);
+
+    const result = await NotarizationService.paginate({}, { page: 1, limit: 2 });
+    expect(result.results).toHaveLength(2);
+    expect(result.totalResults).toBe(3);
+    expect(result.totalPages).toBe(2);
+    expect(result.page).toBe(1);
+  });
+
+  test('should throw validation error if required fields are missing', async () => {
+    const notarizationService = new NotarizationService({
+      name: 'Test Service',
+      description: 'Test Description',
+      price: 100,
+    });
+
+    let err;
+    try {
+      await notarizationService.validate();
+    } catch (error) {
+      err = error;
+    }
+
+    expect(err).toBeInstanceOf(mongoose.Error.ValidationError);
+    expect(err.errors.fieldId).toBeDefined();
   });
 });

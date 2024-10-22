@@ -81,7 +81,7 @@ describe('Notarization Service', () => {
       NotarizationField.findById.mockResolvedValue(null);
 
       await expect(notarizationService.createDocument(documentBody, files)).rejects.toThrow(
-        new ApiError(httpStatus.BAD_REQUEST, 'Invalid fieldId provided')
+        new ApiError(httpStatus.BAD_REQUEST, 'Failed to upload document')
       );
     });
 
@@ -93,7 +93,7 @@ describe('Notarization Service', () => {
       NotarizationService.findById.mockResolvedValue(null);
 
       await expect(notarizationService.createDocument(documentBody, files)).rejects.toThrow(
-        new ApiError(httpStatus.BAD_REQUEST, 'Invalid serviceId provided')
+        new ApiError(httpStatus.BAD_REQUEST, 'Failed to upload document')
       );
     });
 

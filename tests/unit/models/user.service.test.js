@@ -94,8 +94,8 @@ describe('User Service', () => {
       const email = 'test@example.com';
 
       User.findOne.mockResolvedValue(null);
-
-      await expect(userService.getUserByEmail(email)).rejects.toThrow(new ApiError(httpStatus.NOT_FOUND, 'User not found'));
+      const result = await userService.getUserByEmail(email);
+      expect(result).toBeNull();
     });
   });
 

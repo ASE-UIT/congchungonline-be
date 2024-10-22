@@ -20,6 +20,8 @@ jest.mock('../../../src/controllers/admin.controller', () => ({
   getEmployeeList: jest.fn((req, res) => res.status(200).send([{ id: 1, name: 'John Doe', role: 'notary' }])),
   getDailySessionCount: jest.fn((req, res) => res.status(200).send({ dailySessionCount: 5 })),
   getMonthlySessionCount: jest.fn((req, res) => res.status(200).send({ monthlySessionCount: 50 })),
+  getDailyPaymentTotal: jest.fn((req, res) => res.status(200).send({ dailyPaymentTotal: 1000 })),
+  getMonthlyPaymentTotal: jest.fn((req, res) => res.status(200).send({ monthlyPaymentTotal: 10000 })),
 }));
 
 const app = express();
@@ -65,5 +67,13 @@ describe('Admin Routes', () => {
 
   test('GET /v1/admin/sessions/monthly nên trả về 200', async () => {
     await request(app).get('/v1/admin/sessions/monthly').expect(200);
+  });
+
+  test('GET /v1/admin/payments/daily nên trả về 200', async () => {
+    await request(app).get('/v1/admin/payments/daily').expect(200);
+  });
+
+  test('GET /v1/admin/payments/monthly nên trả về 200', async () => {
+    await request(app).get('/v1/admin/payments/monthly').expect(200);
   });
 });

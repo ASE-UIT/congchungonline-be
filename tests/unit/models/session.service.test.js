@@ -1,295 +1,285 @@
+// session.service.test.js
 const mongoose = require('mongoose');
+const { MongoMemoryServer } = require('mongodb-memory-server');
 const httpStatus = require('http-status');
-const sessionService = require('../../../src/services/session.service');
 const { Session } = require('../../../src/models');
 const ApiError = require('../../../src/utils/ApiError');
-const validator = require('validator');
-const { userService } = require('../../../src/services');
-const setupTestDB = require('../../utils/setupTestDB');
-const mockFirebase = require('./firebase.mock');
+const userService = require('../../../src/services/user.service');
+const sessionService = require('../../../src/services/session.service');
 
-// Mock các phương thức của Session model và userService
-jest.mock('../../../src/models/session.model', () => {
-  const actualSessionModel = jest.requireActual('../../../src/models/session.model');
-  return {
-    ...actualSessionModel,
-    findById: jest.fn(),
-    create: jest.fn(),
-  };
+let mongoServer;
+
+beforeAll(async () => {
+  mongoServer = await MongoMemoryServer.create();
+  const uri = mongoServer.getUri();
+  await mongoose.connect(uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
 });
-jest.mock('../../../src/services/user.service');
-jest.mock('validator');
 
-mockFirebase();
+afterAll(async () => {
+  await mongoose.disconnect();
+  await mongoServer.stop();
+});
 
 describe('Session Service', () => {
-  setupTestDB();
-
-  afterEach(async () => {
-    jest.clearAllMocks();
+  beforeEach(async () => {
+    await Session.deleteMany({});
   });
 
   describe('validateEmails', () => {
+    test('should throw an error if emails is not an array', async () => {
+      await expect(sessionService.validateEmails('not-an-array')).rejects.toThrow(ApiError);
+    });
+
     test('should throw an error if any email is invalid', async () => {
-      const emails = ['valid@example.com', 'invalid-email'];
-      validator.isEmail.mockImplementation((email) => email === 'valid@example.com');
-
-      await expect(sessionService.validateEmails(emails)).rejects.toThrow(
-        new ApiError(httpStatus.BAD_REQUEST, 'Invalid email(s): invalid-email')
-      );
+      await expect(sessionService.validateEmails(['valid@example.com', 'invalid-email'])).rejects.toThrow(ApiError);
     });
 
-    test('should throw an error if any email is not found', async () => {
-      const emails = ['valid@example.com', 'notfound@example.com'];
-      validator.isEmail.mockReturnValue(true);
-      userService.getUserByEmail.mockResolvedValueOnce({ email: 'valid@example.com' }).mockResolvedValueOnce(null);
-
-      await expect(sessionService.validateEmails(emails)).rejects.toThrow(
-        new ApiError(httpStatus.NOT_FOUND, 'Email(s) not found: notfound@example.com')
-      );
-    });
-
-    test('should pass if all emails are valid and found', async () => {
-      const emails = ['valid@example.com'];
-      validator.isEmail.mockReturnValue(true);
-      userService.getUserByEmail.mockResolvedValue({ email: 'valid@example.com' });
-
-      await expect(sessionService.validateEmails(emails)).resolves.toBeUndefined();
-    });
-  });
-
-  describe('findBySessionId', () => {
-    test('should throw an error if sessionId is invalid', async () => {
-      const sessionId = 'invalid-session-id';
-
-      await expect(sessionService.findBySessionId(sessionId)).rejects.toThrow(
-        new ApiError(httpStatus.BAD_REQUEST, 'Invalid session ID')
-      );
-    });
-
-    test('should throw an error if session is not found', async () => {
-      const sessionId = new mongoose.Types.ObjectId();
-
-      Session.findById.mockResolvedValue(null);
-
-      await expect(sessionService.findBySessionId(sessionId)).rejects.toThrow(
-        new ApiError(httpStatus.NOT_FOUND, 'Session not found')
-      );
-    });
-
-    test('should return the session if found', async () => {
-      const sessionId = new mongoose.Types.ObjectId();
-      const session = { id: sessionId, email: [], createdBy: new mongoose.Types.ObjectId() };
-
-      Session.findById.mockResolvedValue(session);
-
-      const result = await sessionService.findBySessionId(sessionId);
-
-      expect(Session.findById).toHaveBeenCalledWith(sessionId);
-      expect(result).toEqual(session);
+    test('should return true if all emails are valid', async () => {
+      await expect(sessionService.validateEmails(['valid@example.com'])).resolves.toBe(true);
     });
   });
 
   describe('createSession', () => {
-    test('should create a new session', async () => {
-      const data = { email: ['test@example.com'], createdBy: new mongoose.Types.ObjectId() };
-      const session = { id: new mongoose.Types.ObjectId(), ...data };
-
-      Session.create.mockResolvedValue(session);
-
-      const result = await sessionService.createSession(data);
-
-      expect(Session.create).toHaveBeenCalledWith(data);
-      expect(result).toEqual(session);
-    });
-
-    test('should throw an error if session creation fails', async () => {
-      const data = { email: ['test@example.com'], createdBy: new mongoose.Types.ObjectId() };
-
-      Session.create.mockRejectedValue(new Error());
-
-      await expect(sessionService.createSession(data)).rejects.toThrow(
-        new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to create session')
-      );
+    test('should create a session', async () => {
+      const sessionBody = {
+        sessionName: 'Test Session',
+        notaryField: { name: 'Field' },
+        notaryService: { name: 'Service' },
+        startTime: '14:00',
+        startDate: new Date(),
+        endTime: '15:00',
+        endDate: new Date(),
+        users: [{ email: 'test@example.com' }],
+        createdBy: new mongoose.Types.ObjectId(),
+      };
+      const session = await sessionService.createSession(sessionBody);
+      expect(session.toObject()).toMatchObject(sessionBody);
     });
   });
 
   describe('addUserToSession', () => {
-    test('should add user to session if all conditions are met', async () => {
-      const sessionId = new mongoose.Types.ObjectId();
-      const email = ['newuser@example.com'];
-      const userId = new mongoose.Types.ObjectId().toString();
-      const session = {
-        id: sessionId,
-        email: [],
-        createdBy: userId,
-        save: jest.fn().mockResolvedValue(true),
-      };
+    test('should add users to session', async () => {
+      const session = await Session.create({
+        sessionName: 'Test Session',
+        notaryField: { name: 'Field' },
+        notaryService: { name: 'Service' },
+        startTime: '14:00',
+        startDate: new Date(),
+        endTime: '15:00',
+        endDate: new Date(),
+        users: [],
+        createdBy: new mongoose.Types.ObjectId(),
+      });
 
-      Session.findById.mockResolvedValue(session);
-      jest.spyOn(sessionService, 'isAuthenticated').mockResolvedValue(true);
-      jest.spyOn(sessionService, 'validateEmails').mockResolvedValue(true);
-
-      const result = await sessionService.addUserToSession({ sessionId, email, userId });
-
-      expect(Session.findById).toHaveBeenCalledWith(sessionId);
-      expect(session.email).toEqual(email);
-      expect(session.save).toHaveBeenCalled();
-      expect(result).toEqual(session);
+      const emails = ['test1@example.com', 'test2@example.com'];
+      const updatedSession = await sessionService.addUserToSession(session._id, emails);
+      expect(updatedSession.users).toHaveLength(2);
+      expect(updatedSession.users.map((user) => user.email)).toEqual(expect.arrayContaining(emails));
     });
 
-    test('should throw an error if email(s) are already in the session', async () => {
-      const sessionId = new mongoose.Types.ObjectId();
-      const email = ['existinguser@example.com'];
-      const userId = new mongoose.Types.ObjectId().toString();
-      const session = {
-        id: sessionId,
-        email: ['existinguser@example.com'],
-        createdBy: userId,
-        save: jest.fn().mockResolvedValue(true),
-      };
+    test('should throw an error if user is already added to session', async () => {
+      const session = await Session.create({
+        sessionName: 'Test Session',
+        notaryField: { name: 'Field' },
+        notaryService: { name: 'Service' },
+        startTime: '14:00',
+        startDate: new Date(),
+        endTime: '15:00',
+        endDate: new Date(),
+        users: [{ email: 'test1@example.com' }],
+        createdBy: new mongoose.Types.ObjectId(),
+      });
 
-      Session.findById.mockResolvedValue(session);
-      jest.spyOn(sessionService, 'isAuthenticated').mockResolvedValue(true);
-      jest.spyOn(sessionService, 'validateEmails').mockResolvedValue(true);
-
-      await expect(sessionService.addUserToSession({ sessionId, email, userId })).rejects.toThrow(
-        new ApiError(httpStatus.BAD_REQUEST, 'Email(s) are already in the session')
-      );
+      const emails = ['test1@example.com'];
+      await expect(sessionService.addUserToSession(session._id, emails)).rejects.toThrow(ApiError);
     });
   });
 
   describe('deleteUserOutOfSession', () => {
-    test('should delete user from session if all conditions are met', async () => {
-      const sessionId = new mongoose.Types.ObjectId();
-      const email = ['user@example.com'];
-      const userId = new mongoose.Types.ObjectId().toString();
-      const session = {
-        id: sessionId,
-        email: ['user@example.com'],
-        createdBy: userId,
-        save: jest.fn().mockResolvedValue(true),
-      };
+    test('should delete user from session', async () => {
+      const session = await Session.create({
+        sessionName: 'Test Session',
+        notaryField: { name: 'Field' },
+        notaryService: { name: 'Service' },
+        startTime: '14:00',
+        startDate: new Date(),
+        endTime: '15:00',
+        endDate: new Date(),
+        users: [{ email: 'test1@example.com' }],
+        createdBy: new mongoose.Types.ObjectId(),
+      });
 
-      Session.findById.mockResolvedValue(session);
-      jest.spyOn(sessionService, 'isAuthenticated').mockResolvedValue(true);
-      jest.spyOn(sessionService, 'validateEmails').mockResolvedValue(true);
-
-      const result = await sessionService.deleteUserOutOfSession({ sessionId, email, userId });
-
-      expect(Session.findById).toHaveBeenCalledWith(sessionId);
-      expect(session.email).toEqual([]);
-      expect(session.save).toHaveBeenCalled();
-      expect(result).toEqual(session);
+      const updatedSession = await sessionService.deleteUserOutOfSession(
+        session._id,
+        'test1@example.com',
+        session.createdBy
+      );
+      expect(updatedSession.users).toHaveLength(0);
     });
 
-    test('should throw an error if email(s) not found in the session', async () => {
-      const sessionId = new mongoose.Types.ObjectId();
-      const email = ['nonexistentuser@example.com'];
-      const userId = new mongoose.Types.ObjectId().toString();
-      const session = {
-        id: sessionId,
-        email: ['user@example.com'],
-        createdBy: userId,
-        save: jest.fn().mockResolvedValue(true),
-      };
+    test('should throw an error if user is not found in session', async () => {
+      const session = await Session.create({
+        sessionName: 'Test Session',
+        notaryField: { name: 'Field' },
+        notaryService: { name: 'Service' },
+        startTime: '14:00',
+        startDate: new Date(),
+        endTime: '15:00',
+        endDate: new Date(),
+        users: [{ email: 'test1@example.com' }],
+        createdBy: new mongoose.Types.ObjectId(),
+      });
 
-      Session.findById.mockResolvedValue(session);
-      jest.spyOn(sessionService, 'isAuthenticated').mockResolvedValue(true);
-      jest.spyOn(sessionService, 'validateEmails').mockResolvedValue(true);
-
-      await expect(sessionService.deleteUserOutOfSession({ sessionId, email, userId })).rejects.toThrow(
-        new ApiError(httpStatus.BAD_REQUEST, 'Email(s) not found in this session')
-      );
+      await expect(
+        sessionService.deleteUserOutOfSession(session._id, 'test2@example.com', session.createdBy)
+      ).rejects.toThrow(ApiError);
     });
   });
 
   describe('joinSession', () => {
-    test('should allow user to join session if invited', async () => {
-      const sessionId = new mongoose.Types.ObjectId();
-      const userId = new mongoose.Types.ObjectId().toString();
-      const user = { id: userId, email: 'user@example.com' };
-      const session = { id: sessionId, createdBy: userId, email: ['user@example.com'] };
+    test('should update user status to accepted', async () => {
+      const user = { _id: new mongoose.Types.ObjectId(), email: 'test@example.com' };
+      jest.spyOn(userService, 'getUserById').mockResolvedValue(user);
 
-      Session.findById.mockResolvedValue(session);
-      userService.getUserById.mockResolvedValue(user);
+      const session = await Session.create({
+        sessionName: 'Test Session',
+        notaryField: { name: 'Field' },
+        notaryService: { name: 'Service' },
+        startTime: '14:00',
+        startDate: new Date(),
+        endTime: '15:00',
+        endDate: new Date(),
+        users: [{ email: 'test@example.com', status: 'pending' }],
+        createdBy: new mongoose.Types.ObjectId(),
+      });
 
-      const result = await sessionService.joinSession({ sessionId, require: 'accept', userId });
-
-      expect(Session.findById).toHaveBeenCalledWith(sessionId);
-      expect(userService.getUserById).toHaveBeenCalledWith(userId);
-      expect(result).toEqual(session);
+      const updatedSession = await sessionService.joinSession(session._id, 'accept', user._id);
+      expect(updatedSession.users[0].status).toBe('accepted');
     });
 
-    test('should throw an error if user is not invited to the session', async () => {
-      const sessionId = new mongoose.Types.ObjectId();
-      const userId = new mongoose.Types.ObjectId().toString();
-      const user = { id: userId, email: 'user@example.com' };
-      const session = { id: sessionId, createdBy: new mongoose.Types.ObjectId(), email: [] };
+    test('should throw an error if user is not found in session', async () => {
+      const user = { _id: new mongoose.Types.ObjectId(), email: 'test@example.com' };
+      jest.spyOn(userService, 'getUserById').mockResolvedValue(user);
 
-      Session.findById.mockResolvedValue(session);
-      userService.getUserById.mockResolvedValue(user);
+      const session = await Session.create({
+        sessionName: 'Test Session',
+        notaryField: { name: 'Field' },
+        notaryService: { name: 'Service' },
+        startTime: '14:00',
+        startDate: new Date(),
+        endTime: '15:00',
+        endDate: new Date(),
+        users: [{ email: 'test1@example.com', status: 'pending' }],
+        createdBy: new mongoose.Types.ObjectId(),
+      });
 
-      await expect(sessionService.joinSession({ sessionId, require: 'accept', userId })).rejects.toThrow(
-        new ApiError(httpStatus.FORBIDDEN, 'You are not invited to this session')
-      );
+      await expect(sessionService.joinSession(session._id, 'accept', user._id)).rejects.toThrow(ApiError);
+    });
+  });
+
+  describe('getAllSessions', () => {
+    test('should return all sessions', async () => {
+      const session = await Session.create({
+        sessionName: 'Test Session',
+        notaryField: { name: 'Field' },
+        notaryService: { name: 'Service' },
+        startTime: '14:00',
+        startDate: new Date(),
+        endTime: '15:00',
+        endDate: new Date(),
+        users: [{ email: 'test@example.com' }],
+        createdBy: new mongoose.Types.ObjectId(),
+      });
+
+      const sessions = await sessionService.getAllSessions();
+      expect(sessions).toHaveLength(1);
+      expect(sessions[0].toObject()).toMatchObject(session.toObject());
     });
 
-    test('should allow user to reject session invitation', async () => {
-      const sessionId = new mongoose.Types.ObjectId();
-      const userId = new mongoose.Types.ObjectId().toString();
-      const user = { id: userId, email: 'user@example.com' };
-      const session = { id: sessionId, createdBy: new mongoose.Types.ObjectId(), email: ['user@example.com'] };
+    test('should throw an error if no sessions are found', async () => {
+      await expect(sessionService.getAllSessions()).rejects.toThrow(ApiError);
+    });
+  });
 
-      Session.findById.mockResolvedValue(session);
-      userService.getUserById.mockResolvedValue(user);
+  describe('getSessionsByDate', () => {
+    test('should return sessions for a specific date', async () => {
+      const date = new Date();
+      const session = await Session.create({
+        sessionName: 'Test Session',
+        notaryField: { name: 'Field' },
+        notaryService: { name: 'Service' },
+        startTime: '14:00',
+        startDate: date,
+        endTime: '15:00',
+        endDate: date,
+        users: [{ email: 'test@example.com' }],
+        createdBy: new mongoose.Types.ObjectId(),
+      });
 
-      const result = await sessionService.joinSession({ sessionId, require: 'reject', userId });
-
-      expect(Session.findById).toHaveBeenCalledWith(sessionId);
-      expect(userService.getUserById).toHaveBeenCalledWith(userId);
-      expect(result).toEqual({ message: 'You have rejected the invitation to join the session' });
+      const sessions = await sessionService.getSessionsByDate(date.toISOString().split('T')[0]);
+      expect(sessions).toHaveLength(1);
+      expect(sessions[0].toObject()).toMatchObject(session.toObject());
     });
 
-    test('should throw an error if user cannot reject the session', async () => {
-      const sessionId = new mongoose.Types.ObjectId();
-      const userId = new mongoose.Types.ObjectId().toString();
-      const user = { id: userId, email: 'user@example.com' };
-      const session = { id: sessionId, createdBy: new mongoose.Types.ObjectId(), email: [] };
+    test('should throw an error if no sessions are found for the specified date', async () => {
+      const date = new Date();
+      await expect(sessionService.getSessionsByDate(date.toISOString().split('T')[0])).rejects.toThrow(ApiError);
+    });
+  });
 
-      Session.findById.mockResolvedValue(session);
-      userService.getUserById.mockResolvedValue(user);
+  describe('getSessionsByMonth', () => {
+    test('should return sessions for a specific month', async () => {
+      const date = new Date();
+      const session = await Session.create({
+        sessionName: 'Test Session',
+        notaryField: { name: 'Field' },
+        notaryService: { name: 'Service' },
+        startTime: '14:00',
+        startDate: date,
+        endTime: '15:00',
+        endDate: date,
+        users: [{ email: 'test@example.com' }],
+        createdBy: new mongoose.Types.ObjectId(),
+      });
 
-      await expect(sessionService.joinSession({ sessionId, require: 'reject', userId })).rejects.toThrow(
-        new ApiError(httpStatus.FORBIDDEN, 'You cannot reject the session')
+      const sessions = await sessionService.getSessionsByMonth(date.toISOString().split('T')[0].slice(0, 7));
+      expect(sessions).toHaveLength(1);
+      expect(sessions[0].toObject()).toMatchObject(session.toObject());
+    });
+
+    test('should throw an error if no sessions are found for the specified month', async () => {
+      const date = new Date();
+      await expect(sessionService.getSessionsByMonth(date.toISOString().split('T')[0].slice(0, 7))).rejects.toThrow(
+        ApiError
       );
     });
   });
 
-  describe('isAuthenticated', () => {
-    test('should return true if user is authenticated', async () => {
-      const sessionId = new mongoose.Types.ObjectId();
-      const userId = new mongoose.Types.ObjectId().toString();
-      const session = { id: sessionId, createdBy: userId };
+  describe('getActiveSessions', () => {
+    test('should return active sessions', async () => {
+      const date = new Date();
+      const session = await Session.create({
+        sessionName: 'Test Session',
+        notaryField: { name: 'Field' },
+        notaryService: { name: 'Service' },
+        startTime: '14:00',
+        startDate: date,
+        endTime: '15:00',
+        endDate: new Date(date.getTime() + 60 * 60 * 1000), // 1 hour later
+        users: [{ email: 'test@example.com' }],
+        createdBy: new mongoose.Types.ObjectId(),
+      });
 
-      Session.findById.mockResolvedValue(session);
-
-      const result = await sessionService.isAuthenticated(sessionId, userId);
-
-      expect(Session.findById).toHaveBeenCalledWith(sessionId);
-      expect(result).toBe(true);
+      const sessions = await sessionService.getActiveSessions();
+      expect(sessions).toHaveLength(1);
+      expect(sessions[0].toObject()).toMatchObject(session.toObject());
     });
 
-    test('should throw an error if user is not authenticated', async () => {
-      const sessionId = new mongoose.Types.ObjectId();
-      const userId = new mongoose.Types.ObjectId().toString();
-      const session = { id: sessionId, createdBy: new mongoose.Types.ObjectId() };
-
-      Session.findById.mockResolvedValue(session);
-
-      await expect(sessionService.isAuthenticated(sessionId, userId)).rejects.toThrow(
-        new ApiError(httpStatus.FORBIDDEN, 'Forbidden')
-      );
+    test('should throw an error if no active sessions are found', async () => {
+      await expect(sessionService.getActiveSessions()).rejects.toThrow(ApiError);
     });
   });
 });

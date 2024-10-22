@@ -1,6 +1,6 @@
+// document.model.test.js
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
-const faker = require('faker');
 const Document = require('../../../src/models/document.model');
 
 let mongoServer;
@@ -19,72 +19,143 @@ afterAll(async () => {
   await mongoServer.stop();
 });
 
-describe('Document model', () => {
-  describe('Document validation', () => {
-    let newDocument;
-    beforeEach(() => {
-      newDocument = {
-        files: [
-          {
-            filename: faker.system.fileName(),
-            firebaseUrl: faker.internet.url(),
-          },
-        ],
-        notarizationServiceId: new mongoose.Types.ObjectId(),
-        notarizationFieldId: new mongoose.Types.ObjectId(),
-        requesterInfo: {
-          citizenId: faker.datatype.uuid(),
-          phoneNumber: faker.phone.phoneNumber(),
-          email: faker.internet.email(),
-        },
-        userId: new mongoose.Types.ObjectId(),
-      };
-    });
-
-    test('should correctly validate a valid document', async () => {
-      await expect(new Document(newDocument).validate()).resolves.toBeUndefined();
-    });
-
-    test('should throw a validation error if notarizationServiceId is missing', async () => {
-      newDocument.notarizationServiceId = undefined;
-      await expect(new Document(newDocument).validate()).rejects.toThrow();
-    });
-
-    test('should throw a validation error if notarizationFieldId is missing', async () => {
-      newDocument.notarizationFieldId = undefined;
-      await expect(new Document(newDocument).validate()).rejects.toThrow();
-    });
-
-    test('should throw a validation error if requesterInfo is missing', async () => {
-      newDocument.requesterInfo = undefined;
-      await expect(new Document(newDocument).validate()).rejects.toThrow();
-    });
-
-    test('should throw a validation error if userId is missing', async () => {
-      newDocument.userId = undefined;
-      await expect(new Document(newDocument).validate()).rejects.toThrow();
-    });
+describe('Document Model', () => {
+  beforeEach(async () => {
+    await Document.deleteMany({});
   });
 
-  describe('Document toJSON()', () => {
-    test('should not return __v when toJSON is called', () => {
-      const newDocument = {
+  test('should correctly apply the toJSON plugin', async () => {
+    const document = await Document.create({
+      files: [
+        {
+          filename: 'file1.pdf',
+          firebaseUrl: 'https://firebase.com/path/to/file1.pdf',
+        },
+      ],
+      notarizationService: {
+        id: new mongoose.Types.ObjectId(),
+        name: 'Service',
+        fieldId: new mongoose.Types.ObjectId(),
+        description: 'Service Description',
+        price: 100,
+      },
+      notarizationField: {
+        id: new mongoose.Types.ObjectId(),
+        name: 'Field',
+        description: 'Field Description',
+      },
+      requesterInfo: {
+        citizenId: '123456789',
+        phoneNumber: '1234567890',
+        email: 'test@example.com',
+      },
+      userId: new mongoose.Types.ObjectId(),
+    });
+
+    const jsonDocument = document.toJSON();
+    expect(jsonDocument).not.toHaveProperty('_id');
+    expect(jsonDocument).not.toHaveProperty('__v');
+    expect(jsonDocument).toHaveProperty('id', document._id.toString());
+  });
+
+  test('should correctly apply the paginate plugin', async () => {
+    await Document.create([
+      {
         files: [
           {
-            filename: faker.system.fileName(),
-            firebaseUrl: faker.internet.url(),
+            filename: 'file1.pdf',
+            firebaseUrl: 'https://firebase.com/path/to/file1.pdf',
           },
         ],
-        notarizationServiceId: new mongoose.Types.ObjectId(),
-        notarizationFieldId: new mongoose.Types.ObjectId(),
+        notarizationService: {
+          id: new mongoose.Types.ObjectId(),
+          name: 'Service 1',
+          fieldId: new mongoose.Types.ObjectId(),
+          description: 'Service Description 1',
+          price: 100,
+        },
+        notarizationField: {
+          id: new mongoose.Types.ObjectId(),
+          name: 'Field 1',
+          description: 'Field Description 1',
+        },
         requesterInfo: {
-          citizenId: faker.datatype.uuid(),
-          phoneNumber: faker.phone.phoneNumber(),
-          email: faker.internet.email(),
+          citizenId: '123456789',
+          phoneNumber: '1234567890',
+          email: 'test1@example.com',
         },
         userId: new mongoose.Types.ObjectId(),
-      };
-      expect(new Document(newDocument).toJSON()).not.toHaveProperty('__v');
+      },
+      {
+        files: [
+          {
+            filename: 'file2.pdf',
+            firebaseUrl: 'https://firebase.com/path/to/file2.pdf',
+          },
+        ],
+        notarizationService: {
+          id: new mongoose.Types.ObjectId(),
+          name: 'Service 2',
+          fieldId: new mongoose.Types.ObjectId(),
+          description: 'Service Description 2',
+          price: 200,
+        },
+        notarizationField: {
+          id: new mongoose.Types.ObjectId(),
+          name: 'Field 2',
+          description: 'Field Description 2',
+        },
+        requesterInfo: {
+          citizenId: '987654321',
+          phoneNumber: '0987654321',
+          email: 'test2@example.com',
+        },
+        userId: new mongoose.Types.ObjectId(),
+      },
+    ]);
+
+    const result = await Document.paginate({}, { page: 1, limit: 1 });
+    expect(result.results).toHaveLength(1);
+    expect(result.totalResults).toBe(2);
+    expect(result.totalPages).toBe(2);
+    expect(result.page).toBe(1);
+  });
+
+  test('should throw validation error if required fields are missing', async () => {
+    const document = new Document({
+      files: [
+        {
+          filename: 'file1.pdf',
+          firebaseUrl: 'https://firebase.com/path/to/file1.pdf',
+        },
+      ],
+      notarizationService: {
+        id: new mongoose.Types.ObjectId(),
+        name: 'Service',
+        fieldId: new mongoose.Types.ObjectId(),
+        description: 'Service Description',
+        price: 100,
+      },
+      notarizationField: {
+        id: new mongoose.Types.ObjectId(),
+        name: 'Field',
+        description: 'Field Description',
+      },
+      requesterInfo: {
+        citizenId: '123456789',
+        phoneNumber: '1234567890',
+        email: 'test@example.com',
+      },
     });
+
+    let err;
+    try {
+      await document.validate();
+    } catch (error) {
+      err = error;
+    }
+
+    expect(err).toBeInstanceOf(mongoose.Error.ValidationError);
+    expect(err.errors.userId).toBeDefined();
   });
 });
