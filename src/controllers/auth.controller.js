@@ -50,18 +50,18 @@ const login = catchAsync(async (req, res) => {
 
 const logout = catchAsync(async (req, res) => {
   await authService.logout(req.body.refreshToken);
-  res.clearCookie('refreshToken');
-  res.clearCookie('accessToken');
+  // res.clearCookie('refreshToken');
+  // res.clearCookie('accessToken');
   res.status(httpStatus.NO_CONTENT).send();
 });
 
 const refreshTokens = catchAsync(async (req, res) => {
   const tokens = await authService.refreshAuth(req.body.refreshToken);
-  res.cookie('accessToken', tokens.access.token, {
-    secure: true,
-    sameSite: 'none',
-    maxAge: ms('14 days'),
-  });
+  // res.cookie('accessToken', tokens.access.token, {
+  //   secure: true,
+  //   sameSite: 'none',
+  //   maxAge: ms('14 days'),
+  // });
   res.send({ ...tokens });
 });
 
