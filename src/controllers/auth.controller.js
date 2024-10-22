@@ -1,8 +1,8 @@
 const httpStatus = require('http-status');
+const ms = require('ms');
 const catchAsync = require('../utils/catchAsync');
 const { authService, userService, tokenService, emailService } = require('../services');
 const { auth, db } = require('../config/firebase');
-const ms = require('ms');
 
 const register = catchAsync(async (req, res) => {
   // Create user in Firebase
@@ -32,17 +32,20 @@ const login = catchAsync(async (req, res) => {
   const tokens = await tokenService.generateAuthTokens(user);
 
   res.cookie('refreshToken', tokens.refresh.token, {
-    secure: true,
-    sameSite: 'none',
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    sameSite: process.env.NODE_ENV === 'production' ? 'Strict' : 'Lax',
     maxAge: ms('14 days'),
   });
 
   res.cookie('accessToken', tokens.access.token, {
-    secure: true,
-    sameSite: 'none',
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    sameSite: process.env.NODE_ENV === 'production' ? 'Strict' : 'Lax',
     maxAge: ms('14 days'),
   });
-  res.send({ user, tokens });
+
+  res.status(httpStatus.OK).send({ user, tokens });
 });
 
 const logout = catchAsync(async (req, res) => {

@@ -42,9 +42,7 @@ app.use(mongoSanitize());
 app.use(compression());
 
 const corsOptions = {
-  origin: (origin, callback) => {
-    return callback(null, true);
-  },
+  origin: ['http://localhost:3000', '*'],
   optionsSuccessStatus: 200,
   credentials: true,
 };
