@@ -1,4 +1,5 @@
 const httpStatus = require('http-status');
+const emailService = require('./email.service');
 const { Document, StatusTracking, ApproveHistory, NotarizationService, NotarizationField } = require('../models');
 const ApiError = require('../utils/ApiError');
 const { bucket } = require('../config/firebase');
@@ -182,26 +183,28 @@ const getDocumentByRole = async (role) => {
     if (error instanceof ApiError) {
       throw error;
     }
-
     console.error('Error retrieving documents by role:', error.message);
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to retrieve documents');
   }
 };
 
-const forwardDocumentStatus = async (documentId, action, role, userId) => {
+const forwardDocumentStatus = async (documentId, action, role, userId, feedback) => {
   try {
     const validStatuses = ['pending', 'verification', 'processing', 'digitalSignature', 'completed'];
     const roleStatusMap = {
       notary: ['processing'],
-      secretary: ['pending', 'verification', 'digitalSignature'], // temporary
+      secretary: ['pending', 'verification', 'digitalSignature'],
     };
 
     let newStatus;
+    const currentStatus = await StatusTracking.findOne({ documentId }, 'status');
 
     if (action === 'accept') {
-      const currentStatus = await StatusTracking.findOne({ documentId }, 'status');
       if (!currentStatus) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Document status not found');
+      }
+      if (currentStatus.status === 'rejected') {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Document already been rejected');
       }
       if (!roleStatusMap[role]) {
         throw new ApiError(httpStatus.FORBIDDEN, 'You do not have permission to access these documents');
@@ -233,13 +236,35 @@ const forwardDocumentStatus = async (documentId, action, role, userId) => {
 
     await approveHistory.save();
 
-    const result = await StatusTracking.updateOne(
-      { documentId },
-      {
-        status: newStatus,
-        updatedAt: new Date(),
+    const updateData = {
+      status: newStatus,
+      updatedAt: new Date(),
+    };
+
+    if (newStatus === 'rejected') {
+      if (!feedback) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'feedBack is required for rejected status');
       }
-    );
+      updateData.feedBack = feedback;
+    }
+
+    const email = await Document.findOne({ _id: documentId }, 'requesterInfo.email');
+    if (!email) {
+      console.log('This is email', email);
+      throw new ApiError(httpStatus.NOT_FOUND, 'Email not found');
+    }
+
+    if (newStatus === 'rejected') {
+      const subject = 'Tài liệu bị từ chối';
+      const message = `Tài liệu của bạn với ID: ${documentId} đã bị từ chối công chứng!\nLý do: ${feedback}`;
+      await emailService.sendEmail(email, subject, message);
+    } else {
+      const subject = 'Cập nhật trạng thái tài liệu';
+      const message = `Tài liệu của bạn với ID: ${documentId} đã được cập nhật từ trạng thái ${currentStatus.status} sang ${newStatus}.`;
+      await emailService.sendEmail(email, subject, message);
+    }
+
+    const result = await StatusTracking.updateOne({ documentId }, updateData);
 
     if (result.nModified === 0) {
       throw new ApiError(httpStatus.NOT_FOUND, 'No status found for this document');
