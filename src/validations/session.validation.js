@@ -63,6 +63,12 @@ const getSessionsByMonth = {
   }),
 };
 
+const getSessionBySessionId = {
+  params: Joi.object().keys({
+    sessionId: Joi.string().required(),
+  }),
+};
+
 module.exports = {
   createSession,
   addUserToSession,
@@ -70,4 +76,5 @@ module.exports = {
   joinSession,
   getSessionsByDate,
   getSessionsByMonth,
+  getSessionBySessionId,
 };

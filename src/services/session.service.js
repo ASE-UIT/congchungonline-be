@@ -1,7 +1,8 @@
 const httpStatus = require('http-status');
-const { Session } = require('../models');
+const { Session, User } = require('../models');
 const ApiError = require('../utils/ApiError');
 const { userService } = require('.');
+const mongoose = require('mongoose');
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -57,6 +58,9 @@ const createSession = async (sessionBody) => {
 };
 
 const addUserToSession = async (sessionId, emails) => {
+  if (!mongoose.Types.ObjectId.isValid(sessionId)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid session ID');
+  }
   const session = await findBySessionId(sessionId);
 
   if (!session) {
@@ -75,6 +79,9 @@ const addUserToSession = async (sessionId, emails) => {
 };
 
 const deleteUserOutOfSession = async (sessionId, email, userId) => {
+  if (!mongoose.Types.ObjectId.isValid(sessionId)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid session ID');
+  }
   const session = await findBySessionId(sessionId);
   if (session.createdBy.toString() !== userId.toString()) {
     throw new ApiError(httpStatus.FORBIDDEN, 'You are not authorized to delete users from this session');
@@ -91,6 +98,9 @@ const deleteUserOutOfSession = async (sessionId, email, userId) => {
   return session;
 };
 const joinSession = async (sessionId, action, userId) => {
+  if (!mongoose.Types.ObjectId.isValid(sessionId)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid session ID');
+  }
   const session = await Session.findById(sessionId);
   if (!session) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Session not found');
@@ -208,6 +218,31 @@ const getActiveSessions = async () => {
   }
 };
 
+const getSessionsByUserId = async (userId) => {
+  const sessions = await Session.find({ createdBy: userId });
+  if (sessions.length === 0) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Sessions not found');
+  }
+  return sessions;
+};
+
+const getSessionBySessionId = async (sessionId, userId) => {
+  if (!mongoose.Types.ObjectId.isValid(sessionId)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid session ID');
+  }
+  const session = await Session.findById(sessionId);
+  if (!session) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Session not found');
+  }
+  const user = await User.findById(userId);
+  const isSessionCreator = session.createdBy.toString() === userId.toString();
+  const isSessionUser = session.users.some((u) => u.email === user.email);
+  if (!isSessionCreator && !isSessionUser) {
+    throw new ApiError(httpStatus.FORBIDDEN, 'User does not have access to this session');
+  }
+  return session;
+};
+
 module.exports = {
   validateEmails,
   findBySessionId,
@@ -221,4 +256,6 @@ module.exports = {
   getActiveSessions,
   isValidFullDate,
   isValidMonth,
+  getSessionsByUserId,
+  getSessionBySessionId,
 };

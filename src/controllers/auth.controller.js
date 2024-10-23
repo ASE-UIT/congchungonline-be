@@ -20,6 +20,7 @@ const register = catchAsync(async (req, res) => {
   //   updatedAt: new Date().toISOString(),
   // });
   // Create user in MongoDB
+  console.log('register------------');
   const user = await userService.createUser(req.body);
   const tokens = await tokenService.generateAuthTokens(user);
   await emailService.sendEmail(user.email, 'Hi', '123');

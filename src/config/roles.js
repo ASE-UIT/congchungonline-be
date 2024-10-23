@@ -10,6 +10,8 @@ const allRoles = {
     'getNotarizationServices',
     'approveSignatureByUser',
     'searchUserByEmail',
+    'getSessionsByUserId',
+    'getSessionBySessionId',
   ],
   admin: [
     'getUsers',
@@ -40,13 +42,14 @@ const allRoles = {
     'getDailyPaymentTotal',
     'getMonthlyPaymentTotal',
   ],
-  notary: ['getDocumentsByRole', 'forwardDocumentStatus', 'getApproveHistory', 'joinSession'],
+  notary: ['getDocumentsByRole', 'forwardDocumentStatus', 'getApproveHistory', 'joinSession','getSessionBySessionId',],
   secretary: [
     'getDocumentsByRole',
     'forwardDocumentStatus',
     'getApproveHistory',
     'joinSession',
     'approveSignatureBySecretary',
+    'getSessionBySessionId',
   ],
 };
 
