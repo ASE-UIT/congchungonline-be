@@ -368,7 +368,7 @@ const approveSignatureBySecretary = async (documentId, userId) => {
     // Create a new payment object
     const payment = new Payment({
       orderCode: generateOrderCode(),
-      amount: document.notarizationService.price,
+      amount: document.notarizationService.price * requestSignature.amount,
       description: `${document._id}`,
       returnUrl: `${process.env.SERVER_URL}/success.html`,
       cancelUrl: `${process.env.SERVER_URL}/cancel.html`,

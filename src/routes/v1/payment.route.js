@@ -7,7 +7,7 @@ const router = express.Router();
  * @swagger
  * tags:
  *   name: Payment
- *   description: API endpoints for managing payments
+ *   description: Testing route for payment API
  */
 
 router.post('/create-payment', paymentController.createPayment);
