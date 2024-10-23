@@ -41,16 +41,14 @@ app.use(mongoSanitize());
 // gzip compression
 app.use(compression());
 
-const corsOptions = {
-  origin: (origin, callback) => {
-    return callback(null, true);
-  },
-  optionsSuccessStatus: 200,
-  credentials: true,
-};
+// const corsOptions = {
+//   origin: ['http://localhost:3000', '*'],
+//   optionsSuccessStatus: 200,
+//   credentials: true,
+// };
 
 // enable cors
-app.use(cors(corsOptions));
+app.use(cors());
 app.options('*', cors());
 
 // jwt authentication

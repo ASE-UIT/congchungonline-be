@@ -1,8 +1,8 @@
 const httpStatus = require('http-status');
+const ms = require('ms');
 const catchAsync = require('../utils/catchAsync');
 const { authService, userService, tokenService, emailService } = require('../services');
 const { auth, db } = require('../config/firebase');
-const ms = require('ms');
 
 const register = catchAsync(async (req, res) => {
   // Create user in Firebase
@@ -20,6 +20,7 @@ const register = catchAsync(async (req, res) => {
   //   updatedAt: new Date().toISOString(),
   // });
   // Create user in MongoDB
+  console.log('register------------');
   const user = await userService.createUser(req.body);
   const tokens = await tokenService.generateAuthTokens(user);
   await emailService.sendEmail(user.email, 'Hi', '123');
@@ -31,34 +32,37 @@ const login = catchAsync(async (req, res) => {
   const user = await authService.loginUserWithEmailAndPassword(email, password);
   const tokens = await tokenService.generateAuthTokens(user);
 
-  res.cookie('refreshToken', tokens.refresh.token, {
-    secure: true,
-    sameSite: 'none',
-    maxAge: ms('14 days'),
-  });
+  // res.cookie('refreshToken', tokens.refresh.token, {
+  //   secure: process.env.NODE_ENV === 'production',
+  //   httpOnly: true,
+  //   sameSite: 'Lax',
+  //   maxAge: ms('14 days'),
+  // });
 
-  res.cookie('accessToken', tokens.access.token, {
-    secure: true,
-    sameSite: 'none',
-    maxAge: ms('14 days'),
-  });
-  res.send({ user, tokens });
+  // res.cookie('accessToken', tokens.access.token, {
+  //   secure: process.env.NODE_ENV === 'production',
+  //   httpOnly: true,
+  //   sameSite: 'Lax',
+  //   maxAge: ms('14 days'),
+  // });
+
+  res.status(httpStatus.OK).send({ user, tokens });
 });
 
 const logout = catchAsync(async (req, res) => {
   await authService.logout(req.body.refreshToken);
-  res.clearCookie('refreshToken');
-  res.clearCookie('accessToken');
+  // res.clearCookie('refreshToken');
+  // res.clearCookie('accessToken');
   res.status(httpStatus.NO_CONTENT).send();
 });
 
 const refreshTokens = catchAsync(async (req, res) => {
   const tokens = await authService.refreshAuth(req.body.refreshToken);
-  res.cookie('accessToken', tokens.access.token, {
-    secure: true,
-    sameSite: 'none',
-    maxAge: ms('14 days'),
-  });
+  // res.cookie('accessToken', tokens.access.token, {
+  //   secure: true,
+  //   sameSite: 'none',
+  //   maxAge: ms('14 days'),
+  // });
   res.send({ ...tokens });
 });
 
