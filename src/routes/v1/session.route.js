@@ -86,6 +86,17 @@ router
   .get(auth('getSessions'), validate(sessionValidation.getSessionsByMonth), sessionController.getSessionsByMonth);
 
 router.route('/getActiveSessions').get(auth('getSessions'), sessionController.getActiveSessions);
+
+router.route('/getSessionsByUserId').get(auth('getSessionsByUserId'), sessionController.getSessionsByUserId);
+
+router
+  .route('/getSessionBySessionId/:sessionId')
+  .get(
+    auth('getSessionBySessionId'),
+    validate(sessionValidation.getSessionBySessionId),
+    sessionController.getSessionBySessionId
+  );
+
 /**
  * @swagger
  * /session/createSession:
@@ -773,4 +784,205 @@ router.route('/getActiveSessions').get(auth('getSessions'), sessionController.ge
  *                   type: string
  *                   example: "Failed to retrieve sessions"
  * */
+/**
+ * @swagger
+ * /session/getSessionsByUserId:
+ *   get:
+ *     summary: Get sessions by user id
+ *     tags: [Sessions]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       "200":
+ *         description: Sessions retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   sessionName:
+ *                     type: string
+ *                     example: "Notarization Session"
+ *                   notaryField:
+ *                     type: object
+ *                     properties:
+ *                       name:
+ *                         type: string
+ *                         example: "Notary Field"
+ *                   notaryService:
+ *                     type: object
+ *                     properties:
+ *                       name:
+ *                         type: string
+ *                         example: "Notary Service"
+ *                   startTime:
+ *                     type: string
+ *                     format: time
+ *                     example: "14:00"
+ *                   startDate:
+ *                     type: string
+ *                     format: date-time
+ *                     example: "2024-10-10T14:00:00Z"
+ *                   endTime:
+ *                     type: string
+ *                     format: time
+ *                     example: "15:00"
+ *                   endDate:
+ *                     type: string
+ *                     format: date-time
+ *                     example: "2024-10-10T15:00:00Z"
+ *                   users:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         email:
+ *                           type: string
+ *                           example: "abc@gmail.com"
+ *                         status:
+ *                           type: string
+ *                           example: "pending"
+ *                         _id:
+ *                           type: string
+ *                           example: "671826e21c0db33a40e7e786"
+ *                   createdBy:
+ *                     type: string
+ *                     example: "67180dde1a53252834c466bd"
+ *       "400":
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid request parameters"
+ *       "401":
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Unauthorized"
+ *       "500":
+ *         description: Internal Server Error - Failed to retrieve sessions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Failed to retrieve sessions"
+ */
+
+/**
+ * @swagger
+ * /session/getSessionBySessionId/{sessionId}:
+ *   get:
+ *     summary: Get sessions by session id
+ *     tags: [Sessions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: sessionId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the session
+ *     responses:
+ *       "201":
+ *         description: Session retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 sessionName:
+ *                   type: string
+ *                   example: "Notarization Session"
+ *                 notaryField:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                       example: "Notary Field"
+ *                 notaryService:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                       example: "Notary Service"
+ *                 startTime:
+ *                   type: string
+ *                   format: time
+ *                   example: "14:00"
+ *                 startDate:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2024-10-10T14:00:00Z"
+ *                 endTime:
+ *                   type: string
+ *                   format: time
+ *                   example: "15:00"
+ *                 endDate:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2024-10-10T15:00:00Z"
+ *                 users:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       email:
+ *                         type: string
+ *                         example: "abc@gmail.com"
+ *                       status:
+ *                         type: string
+ *                         example: "pending"
+ *                       _id:
+ *                         type: string
+ *                         example: "671826e21c0db33a40e7e786"
+ *                 createdBy:
+ *                   type: string
+ *                   example: "67180dde1a53252834c466bd"
+ *       "400":
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid request parameters"
+ *       "401":
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Unauthorized"
+ *       "500":
+ *         description: Internal Server Error - Failed to retrieve sessions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Failed to retrieve sessions"
+ */
+
 module.exports = router;

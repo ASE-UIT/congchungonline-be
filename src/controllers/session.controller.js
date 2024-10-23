@@ -78,6 +78,19 @@ const getActiveSessions = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send(sessions);
 });
 
+const getSessionsByUserId = catchAsync(async (req, res) => {
+  const userId = req.user.id;
+  const sessions = await sessionService.getSessionsByUserId(userId);
+  res.status(httpStatus.OK).send(sessions);
+});
+
+const getSessionBySessionId = catchAsync(async (req, res) => {
+  const { sessionId } = req.params;
+  const userId = req.user.id;
+  const sessions = await sessionService.getSessionBySessionId(sessionId, userId);
+  res.status(httpStatus.OK).send(sessions);
+});
+
 module.exports = {
   createSession,
   addUserToSession,
@@ -87,4 +100,6 @@ module.exports = {
   getSessionsByDate,
   getSessionsByMonth,
   getActiveSessions,
+  getSessionsByUserId,
+  getSessionBySessionId,
 };
