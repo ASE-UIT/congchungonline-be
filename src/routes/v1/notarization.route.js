@@ -421,8 +421,12 @@ router
  *             properties:
  *               action:
  *                 type: string
- *                 description: The action to do
- *                 example: accept
+ *                 description: The action to perform on the document (accept or reject)
+ *                 example: reject
+ *               feedback:
+ *                 type: string
+ *                 description: Feedback for rejecting the document (required if action is 'reject')
+ *                 example: "The document is missing necessary information."
  *     responses:
  *       "200":
  *         description: Successfully updated the document status
@@ -438,15 +442,47 @@ router
  *                   type: string
  *                   example: "66f462fa57b33d48e47ab55f"
  *       "400":
- *         $ref: '#/components/responses/BadRequest'
+ *         description: Bad request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 400
+ *                 message:
+ *                   type: string
+ *                   example: "feedBack is required for rejected status"
  *       "401":
+ *         description: Unauthorized
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
- *         code: 403
- *         message: You do not have permission to access these documents
+ *         description: Forbidden
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 403
+ *                 message:
+ *                   type: string
+ *                   example: "You do not have permission to access these documents"
  *       "404":
- *         code: 404
- *         message: Document not found
+ *         description: Document not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 404
+ *                 message:
+ *                   type: string
+ *                   example: "Document not found"
  *       "500":
  *         $ref: '#/components/responses/InternalServerError'
  */

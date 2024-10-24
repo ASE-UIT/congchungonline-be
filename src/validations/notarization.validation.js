@@ -43,6 +43,7 @@ const forwardDocumentStatus = {
   }),
   body: Joi.object().keys({
     action: Joi.string().required(),
+    feedBack: Joi.string(),
   }),
 };
 
