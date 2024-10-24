@@ -1,4 +1,11 @@
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'JWT authorization header. Use `Bearer <token>` format.'
+
   schemas:
     User:
       type: object
@@ -12,7 +19,11 @@ components:
           type: string
         role:
           type: string
-          enum: [user, admin]
+          enum:
+            - user
+            - admin
+            - secretary
+            - notary
       example:
         id: 5ebac534954b54139806c112
         email: fake@example.com
@@ -29,7 +40,7 @@ components:
           format: date-time
       example:
         token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ZWJhYzUzNDk1NGI1NDEzOTgwNmMxMTIiLCJpYXQiOjE1ODkyOTg0ODQsImV4cCI6MTU4OTMwMDI4NH0.m1U63blB0MLej_WfB7yC2FTMnCziif9X8yzwDEfJXAg
-        expires: 2020-05-12T16:18:04.793Z
+        expires: '2020-05-12T16:18:04.793Z'
 
     AuthTokens:
       type: object
@@ -77,6 +88,15 @@ components:
         createdAt:
           type: string
           format: date-time
+        status:
+          type: string
+          enum:
+            - pending
+            - processing
+            - digitalSignature
+            - approved
+            - rejected
+            - cancelled
 
     Session:
       type: object
@@ -85,8 +105,14 @@ components:
           type: string
         notaryField:
           type: object
+          properties:
+            name:
+              type: string
         notaryService:
           type: object
+          properties:
+            name:
+              type: string
         sessionName:
           type: string
         startTime:
@@ -108,22 +134,30 @@ components:
                 type: string
               status:
                 type: string
-                enum: [pending, accepted, rejected]
+                enum:
+                  - pending
+                  - accepted
+                  - rejected
         createdBy:
           type: string
           format: objectId
-
       example:
         sessionId: 5ebac534954b54139806c112
-        notaryField: { name: 'Notary Field 1' }
-        notaryService: { name: 'Notary Service 1' }
-        sessionName: 'Session 1'
+        notaryField:
+          name: Notary Field 1
+        notaryService:
+          name: Notary Service 1
+        sessionName: Session 1
         startTime: '10:00'
         startDate: '2024-05-12'
         endTime: '11:00'
         endDate: '2024-05-12'
-        users: [{ email: 'user1@example.com', status: 'pending' }, { email: 'user2@example.com', status: 'accepted' }]
-        createdBy: '5ebac534954b54139806c112'
+        users:
+          - email: user1@example.com
+            status: pending
+          - email: user2@example.com
+            status: accepted
+        createdBy: 5ebac534954b54139806c112
 
     Role:
       type: object
@@ -135,45 +169,113 @@ components:
           items:
             type: string
       example:
-        name: 'user'
-        permissions: ['viewNotarizationHistory', 'uploadDocuments']
+        name: user
+        permissions:
+          - viewNotarizationHistory
+          - uploadDocuments
 
-    Payment:
+    NotarizationField:
       type: object
       properties:
         id:
           type: string
-        orderCode:
+          description: The unique identifier for a notarization field.
+        name:
           type: string
-          required: true
-          unique: true
-        amount:
-          type: number
-          required: true
+          description: The name of the notarization field.
         description:
           type: string
-          required: true
+          description: A brief description of the notarization field.
+      required:
+        - id
+        - name
+      example:
+        id: '12345'
+        name: Notarization Field Example
+        description: This is an example description for the notarization field.
+
+    NotarizationService:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the notarization service
+        name:
+          type: string
+          description: Name of the notarization service
+        fieldId:
+          type: string
+          description: ID of the associated notarization field
+          example: 5f2b2b23c3a2b16f2e143b67
+        description:
+          type: string
+          description: Description of the notarization service
+        price:
+          type: number
+          format: float
+          description: Price of the notarization service
+      required:
+        - name
+        - fieldId
+        - description
+        - price
+      example:
+        id: '12345'
+        name: Notarization Service Example
+        fieldId: 5f2b2b23c3a2b16f2e143b67
+        description: This is an example of a notarization service.
+        price: 10000.0
+
+    Payment:
+      type: object
+      required:
+        - orderCode
+        - amount
+        - description
+        - returnUrl
+        - cancelUrl
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the payment
+        orderCode:
+          type: string
+          description: Unique code for the order
+        amount:
+          type: number
+          description: Payment amount
+        description:
+          type: string
+          description: Payment description
         returnUrl:
           type: string
-          required: true
+          description: URL to redirect after payment completion
         cancelUrl:
           type: string
-          required: true
+          description: URL to redirect if payment is cancelled
         checkoutUrl:
           type: string
+          description: URL for the payment checkout
         status:
           type: string
-          enum: [pending, success, failed, cancelled]
+          enum:
+            - pending
+            - success
+            - failed
+            - cancelled
           default: pending
+          description: Payment status
         userId:
           type: string
+          description: ID of the user who made the payment
         createdAt:
           type: string
           format: date-time
-        default: now
-      updatedAt:
-        type: string
-        format: date-time
+          description: Timestamp of payment creation
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp of the last update
 
   responses:
     DuplicateEmail:
@@ -185,6 +287,7 @@ components:
           example:
             code: 400
             message: Email already taken
+
     Unauthorized:
       description: Unauthorized
       content:
@@ -194,6 +297,7 @@ components:
           example:
             code: 401
             message: Please authenticate
+
     Forbidden:
       description: Forbidden
       content:
@@ -203,6 +307,7 @@ components:
           example:
             code: 403
             message: Forbidden
+
     NotFound:
       description: Not found
       content:
@@ -212,6 +317,7 @@ components:
           example:
             code: 404
             message: Not found
+
     BadRequest:
       description: Bad Request
       content:
@@ -221,6 +327,7 @@ components:
           example:
             code: 400
             message: Bad request
+
     InternalServerError:
       description: Internal Server Error
       content:
@@ -230,9 +337,3 @@ components:
           example:
             code: 500
             message: Internal server error
-
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT

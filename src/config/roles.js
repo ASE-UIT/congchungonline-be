@@ -42,7 +42,7 @@ const allRoles = {
     'getDailyPaymentTotal',
     'getMonthlyPaymentTotal',
   ],
-  notary: ['getDocumentsByRole', 'forwardDocumentStatus', 'getApproveHistory', 'joinSession','getSessionBySessionId',],
+  notary: ['getDocumentsByRole', 'forwardDocumentStatus', 'getApproveHistory', 'joinSession', 'getSessionBySessionId'],
   secretary: [
     'getDocumentsByRole',
     'forwardDocumentStatus',
