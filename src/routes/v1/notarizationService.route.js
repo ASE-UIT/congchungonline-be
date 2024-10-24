@@ -53,43 +53,6 @@ router.get(
 
 /**
  * @swagger
- * components:
- *   schemas:
- *     NotarizationService:
- *       type: object
- *       properties:
- *         id:
- *           type: string
- *           description: Unique identifier for the notarization service
- *         name:
- *           type: string
- *           description: Name of the notarization service
- *         fieldId:
- *           type: string
- *           description: ID of the associated notarization field
- *           example: "5f2b2b23c3a2b16f2e143b67"  # example of a NotarizationField ID
- *         description:
- *           type: string
- *           description: Description of the notarization service
- *         price:
- *           type: number
- *           format: float
- *           description: Price of the notarization service
- *       required:
- *         - name
- *         - fieldId
- *         - description
- *         - price
- *       example:
- *         id: "12345"
- *         name: "Notarization Service Example"
- *         fieldId: "5f2b2b23c3a2b16f2e143b67"
- *         description: "This is an example of a notarization service."
- *         price: 10000.00
- */
-
-/**
- * @swagger
  * /notarization-services/create-notarization-service:
  *   post:
  *     summary: Create a notarization service

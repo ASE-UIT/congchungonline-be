@@ -4,11 +4,11 @@ const config = require('../config/config');
 const swaggerDef = {
   openapi: '3.0.0',
   info: {
-    title: 'CongChungOnline API documentation',
+    title: 'Notarization Platform API',
     version,
     license: {
       name: 'MIT',
-      url: 'https://github.com/hagopj13/node-express-boilerplate/blob/master/LICENSE',
+      url: 'https://github.com/ASE-UIT/03.-Online-Notarization-Management-System-BE/blob/main/LICENSE',
     },
   },
   servers: [

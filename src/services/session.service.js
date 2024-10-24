@@ -1,8 +1,8 @@
 const httpStatus = require('http-status');
+const mongoose = require('mongoose');
 const { Session, User } = require('../models');
 const ApiError = require('../utils/ApiError');
 const { userService } = require('.');
-const mongoose = require('mongoose');
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
